@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Connexa.Api/Connexa.Api.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Connexa.Api.Tests/Connexa.Api.Tests.csproj" />
+  </Folder>
+</Solution>

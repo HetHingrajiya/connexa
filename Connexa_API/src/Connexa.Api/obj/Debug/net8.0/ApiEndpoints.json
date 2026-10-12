@@ -1,0 +1,159 @@
+[
+  {
+    "ContainingType": "Connexa.Api.Controllers.HealthController",
+    "Method": "GetApiHealth",
+    "RelativePath": "api/v1/health",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.MasterDataController",
+    "Method": "GetBusinessGroupsByQuery",
+    "RelativePath": "api/v1/master/business-groups",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "industryId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "industry_id",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.MasterDataController",
+    "Method": "GetSubGroupsByPath",
+    "RelativePath": "api/v1/master/business-groups/{businessGroupId}/sub-groups",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "businessGroupId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.MasterDataController",
+    "Method": "GetCategoriesByQuery",
+    "RelativePath": "api/v1/master/categories",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "subGroupId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "sub_group_id",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.MasterDataController",
+    "Method": "GetIndustries",
+    "RelativePath": "api/v1/master/industries",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.MasterDataController",
+    "Method": "GetBusinessGroupsByPath",
+    "RelativePath": "api/v1/master/industries/{industryId}/business-groups",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "industryId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.MasterDataController",
+    "Method": "MigrateFromSqlite",
+    "RelativePath": "api/v1/master/migrate-from-sqlite",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "sourcePath",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.MasterDataController",
+    "Method": "GetSubGroupsByQuery",
+    "RelativePath": "api/v1/master/sub-groups",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "businessGroupId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "business_group_id",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.MasterDataController",
+    "Method": "GetCategoriesByPath",
+    "RelativePath": "api/v1/master/sub-groups/{subGroupId}/categories",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "subGroupId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.HealthController",
+    "Method": "GetRootHealth",
+    "RelativePath": "health",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  }
+]
