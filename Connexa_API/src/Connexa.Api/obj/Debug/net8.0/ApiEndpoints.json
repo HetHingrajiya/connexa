@@ -19,12 +19,12 @@
     "Parameters": [
       {
         "Name": "industryId",
-        "Type": "System.String",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "IsRequired": false
       },
       {
         "Name": "industry_id",
-        "Type": "System.String",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "IsRequired": false
       }
     ],
@@ -40,7 +40,7 @@
     "Parameters": [
       {
         "Name": "businessGroupId",
-        "Type": "System.String",
+        "Type": "System.Int32",
         "IsRequired": true
       }
     ],
@@ -56,12 +56,12 @@
     "Parameters": [
       {
         "Name": "subGroupId",
-        "Type": "System.String",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "IsRequired": false
       },
       {
         "Name": "sub_group_id",
-        "Type": "System.String",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "IsRequired": false
       }
     ],
@@ -87,7 +87,7 @@
     "Parameters": [
       {
         "Name": "industryId",
-        "Type": "System.String",
+        "Type": "System.Int32",
         "IsRequired": true
       }
     ],
@@ -119,12 +119,12 @@
     "Parameters": [
       {
         "Name": "businessGroupId",
-        "Type": "System.String",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "IsRequired": false
       },
       {
         "Name": "business_group_id",
-        "Type": "System.String",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "IsRequired": false
       }
     ],
@@ -140,11 +140,452 @@
     "Parameters": [
       {
         "Name": "subGroupId",
-        "Type": "System.String",
+        "Type": "System.Int32",
         "IsRequired": true
       }
     ],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.RegistrationController",
+    "Method": "SubmitRegistration",
+    "RelativePath": "api/v1/registration/submit",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Connexa.Api.DTOs.SubmitRegistrationRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.RegistrationResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 201
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.RegistrationResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.RegistrationResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 409
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.RegistrationResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 500
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.VerificationPolicyController",
+    "Method": "ConsumeGrant",
+    "RelativePath": "api/v1/verification/consume-grant",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Connexa.Api.DTOs.ValidateVerificationGrantRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ValidateVerificationGrantResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ValidateVerificationGrantResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.EmailVerificationController",
+    "Method": "ResendOtp",
+    "RelativePath": "api/v1/verification/email/resend",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Connexa.Api.DTOs.ResendEmailOtpRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ResendEmailOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ResendEmailOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ResendEmailOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ResendEmailOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 429
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ResendEmailOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 502
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.EmailVerificationController",
+    "Method": "SendOtp",
+    "RelativePath": "api/v1/verification/email/send",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Connexa.Api.DTOs.SendEmailOtpRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.SendEmailOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.SendEmailOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.SendEmailOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 429
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.SendEmailOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 502
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.EmailVerificationController",
+    "Method": "VerifyOtp",
+    "RelativePath": "api/v1/verification/email/verify",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Connexa.Api.DTOs.VerifyEmailOtpRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.VerifyEmailOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.VerifyEmailOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.VerifyEmailOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.VerificationPolicyController",
+    "Method": "ValidateGrant",
+    "RelativePath": "api/v1/verification/validate-grant",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Connexa.Api.DTOs.ValidateVerificationGrantRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ValidateVerificationGrantResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ValidateVerificationGrantResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.VerificationController",
+    "Method": "ResendOtp",
+    "RelativePath": "api/v1/verification/whatsapp/resend",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Connexa.Api.DTOs.ResendOtpRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ResendOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ResendOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ResendOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ResendOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 429
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ResendOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 502
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.VerificationController",
+    "Method": "SendOtp",
+    "RelativePath": "api/v1/verification/whatsapp/send",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Connexa.Api.DTOs.SendOtpRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.SendOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.SendOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.SendOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 429
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.SendOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 502
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.VerificationController",
+    "Method": "VerifyOtp",
+    "RelativePath": "api/v1/verification/whatsapp/verify",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Connexa.Api.DTOs.VerifyOtpRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.VerifyOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.VerifyOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.VerifyOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      }
+    ]
   },
   {
     "ContainingType": "Connexa.Api.Controllers.HealthController",

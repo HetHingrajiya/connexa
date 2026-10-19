@@ -4,19 +4,71 @@ import 'package:go_router/go_router.dart';
 
 import 'package:connexa/core/theme/theme.dart';
 import 'package:connexa/core/widgets/widgets.dart';
+import 'package:connexa/features/auth/presentation/login_screen.dart';
+import 'package:connexa/features/auth/presentation/setup_password_screen.dart';
+import 'package:connexa/features/auth/providers/auth_provider.dart';
+import 'package:connexa/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:connexa/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:connexa/features/registration/presentation/email_verification_screen.dart';
 import 'package:connexa/features/registration/presentation/phone_verification_screen.dart';
 import 'package:connexa/features/registration/presentation/profile_details_screen.dart';
 import 'package:connexa/features/registration/presentation/registration_review_screen.dart';
 import 'package:connexa/features/registration/presentation/registration_screen.dart';
+import 'package:connexa/features/directory/presentation/directory_screen.dart';
+import 'package:connexa/features/profile/presentation/edit_profile_screen.dart';
+import 'package:connexa/features/profile/presentation/profile_screen.dart';
 import 'package:connexa/features/registration/presentation/registration_success_screen.dart';
 import 'package:connexa/features/splash/presentation/splash_screen.dart';
 
+/// Listenable notifier bridging Riverpod auth state updates to GoRouter redirection.
+class AuthRouterNotifier extends ChangeNotifier {
+  AuthRouterNotifier(this._ref) {
+    _ref.listen<AuthState>(authProvider, (AuthState? previous, AuthState next) {
+      if (previous?.isAuthenticated != next.isAuthenticated ||
+          previous?.isRestoringSession != next.isRestoringSession) {
+        notifyListeners();
+      }
+    });
+  }
+
+  final Ref _ref;
+}
+
 /// Riverpod provider exposing the application router configuration.
 final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((Ref ref) {
+  final AuthRouterNotifier authNotifier = AuthRouterNotifier(ref);
+  ref.onDispose(authNotifier.dispose);
+
   return GoRouter(
     initialLocation: '/',
+    refreshListenable: authNotifier,
+    redirect: (BuildContext context, GoRouterState state) {
+      final AuthState authState = ref.read(authProvider);
+      final bool isAuthenticated = authState.isAuthenticated;
+      final String loc = state.matchedLocation;
+
+      // When restoring active session at boot, defer redirect decisions until completed
+      if (authState.isRestoringSession) {
+        return null;
+      }
+
+      final bool isProtectedRoute =
+          loc == '/dashboard' ||
+          loc == '/profile' ||
+          loc == '/profile/edit' ||
+          loc == '/directory';
+      final bool isAuthRoute = loc == '/login';
+
+      if (!isAuthenticated && isProtectedRoute) {
+        return '/login';
+      }
+
+      if (isAuthenticated && isAuthRoute) {
+        return '/dashboard';
+      }
+
+      return null;
+    },
     routes: <RouteBase>[
       GoRoute(
         path: '/',
@@ -30,6 +82,61 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((Ref ref) {
         name: 'onboarding',
         builder: (BuildContext context, GoRouterState state) {
           return const OnboardingScreen();
+        },
+      ),
+      GoRoute(
+        path: '/login',
+        name: 'login',
+        builder: (BuildContext context, GoRouterState state) {
+          return const LoginScreen();
+        },
+      ),
+      GoRoute(
+        path: '/setup-password',
+        name: 'setup-password',
+        builder: (BuildContext context, GoRouterState state) {
+          String? token;
+          String? destination;
+          if (state.extra is Map<String, dynamic>) {
+            final Map<String, dynamic> extra =
+                state.extra! as Map<String, dynamic>;
+            token = extra['token'] as String?;
+            destination = extra['destination'] as String?;
+          } else if (state.extra is String) {
+            token = state.extra as String;
+          }
+          return SetupPasswordScreen(
+            initialCredentialSetupToken: token,
+            initialDestination: destination,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/dashboard',
+        name: 'dashboard',
+        builder: (BuildContext context, GoRouterState state) {
+          return const DashboardScreen();
+        },
+      ),
+      GoRoute(
+        path: '/profile',
+        name: 'profile',
+        builder: (BuildContext context, GoRouterState state) {
+          return const ProfileScreen();
+        },
+      ),
+      GoRoute(
+        path: '/profile/edit',
+        name: 'profile-edit',
+        builder: (BuildContext context, GoRouterState state) {
+          return const EditProfileScreen();
+        },
+      ),
+      GoRoute(
+        path: '/directory',
+        name: 'directory',
+        builder: (BuildContext context, GoRouterState state) {
+          return const BusinessDirectoryScreen();
         },
       ),
       GoRoute(

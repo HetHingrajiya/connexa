@@ -226,7 +226,8 @@ class RegistrationDraft {
     this.verificationGrantExpiresAt,
     this.verifiedMethod,
     this.verifiedDestination,
-  });
+    bool? consentAgreed,
+  }) : _consentAgreed = consentAgreed ?? false;
 
   // Step 4 Basic Details
   final String fullName;
@@ -248,6 +249,10 @@ class RegistrationDraft {
   final DateTime? verificationGrantExpiresAt;
   final String? verifiedMethod; // 'whatsapp' or 'email'
   final String? verifiedDestination; // e.g. masked phone or masked email
+  final bool? _consentAgreed;
+
+  /// Whether the user has consented to accurate details declaration.
+  bool get consentAgreed => _consentAgreed ?? false;
 
   /// Whether either phone or email has been verified server-side with an active verification grant.
   bool get isVerified =>
@@ -288,6 +293,7 @@ class RegistrationDraft {
     bool clearVerificationGrant = false,
     String? verifiedMethod,
     String? verifiedDestination,
+    bool? consentAgreed,
   }) {
     return RegistrationDraft(
       fullName: fullName ?? this.fullName,
@@ -323,6 +329,7 @@ class RegistrationDraft {
       verifiedDestination: clearVerificationGrant
           ? null
           : (verifiedDestination ?? this.verifiedDestination),
+      consentAgreed: consentAgreed ?? this.consentAgreed,
     );
   }
 

@@ -27,6 +27,13 @@ class _RegistrationReviewScreenState
   List<String> _validationErrors = const <String>[];
   VerificationMethod _selectedMethod = VerificationMethod.whatsapp;
 
+  @override
+  void initState() {
+    super.initState();
+    final RegistrationDraft draft = ref.read(registrationDraftProvider);
+    _consentAgreed = draft.consentAgreed || draft.isVerified;
+  }
+
   Future<void> _handleContinue() async {
     setState(() {
       _submitted = true;
@@ -34,7 +41,8 @@ class _RegistrationReviewScreenState
 
     final RegistrationDraft draft = ref.read(registrationDraftProvider);
     final List<String> draftErrors = draft.allValidationErrors;
-    final bool consentValid = _consentAgreed;
+    final bool consentValid =
+        _consentAgreed || draft.consentAgreed || draft.isVerified;
 
     setState(() {
       _consentError = consentValid
@@ -46,6 +54,12 @@ class _RegistrationReviewScreenState
     // If any validation fails or consent is missing, remain on review screen
     if (!consentValid || draftErrors.isNotEmpty) {
       return;
+    }
+
+    if (!draft.consentAgreed) {
+      ref.read(registrationDraftProvider.notifier).state = draft.copyWith(
+        consentAgreed: true,
+      );
     }
 
     if (draft.isVerified) {
@@ -1120,12 +1134,16 @@ class _RegistrationReviewScreenState
           // Interactive Consent Checkbox
           InkWell(
             onTap: () {
+              final bool nextVal = !_consentAgreed;
               setState(() {
-                _consentAgreed = !_consentAgreed;
+                _consentAgreed = nextVal;
                 if (_consentAgreed) {
                   _consentError = null;
                 }
               });
+              ref.read(registrationDraftProvider.notifier).state = ref
+                  .read(registrationDraftProvider)
+                  .copyWith(consentAgreed: nextVal);
             },
             borderRadius: AppSpacing.borderRadiusMd,
             child: Padding(
@@ -1137,12 +1155,16 @@ class _RegistrationReviewScreenState
                     key: const Key('consentCheckbox'),
                     value: _consentAgreed,
                     onChanged: (bool? val) {
+                      final bool nextVal = val ?? false;
                       setState(() {
-                        _consentAgreed = val ?? false;
+                        _consentAgreed = nextVal;
                         if (_consentAgreed) {
                           _consentError = null;
                         }
                       });
+                      ref.read(registrationDraftProvider.notifier).state = ref
+                          .read(registrationDraftProvider)
+                          .copyWith(consentAgreed: nextVal);
                     },
                   ),
                   const SizedBox(width: AppSpacing.xs),

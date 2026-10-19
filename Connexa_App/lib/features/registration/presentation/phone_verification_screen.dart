@@ -560,6 +560,12 @@ class _PhoneVerificationScreenState
           runSpacing: AppSpacing.md,
           alignment: WrapAlignment.center,
           children: <Widget>[
+            AppButton.primary(
+              key: const Key('proceedToReviewFromPhoneVerifiedButton'),
+              text: 'Proceed to Final Review',
+              leadingIcon: const Icon(Icons.arrow_forward_rounded, size: 18),
+              onPressed: () => context.go('/registration/review'),
+            ),
             AppButton.secondary(
               key: const Key('returnToReviewFromVerifiedButton'),
               text: 'Return to Review',

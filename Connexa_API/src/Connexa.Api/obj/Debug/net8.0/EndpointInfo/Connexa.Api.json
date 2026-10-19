@@ -5,6 +5,330 @@
     "version": "1.0"
   },
   "paths": {
+    "/api/v1/verification/email/send": {
+      "post": {
+        "tags": [
+          "EmailVerification"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendEmailOtpRequestDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendEmailOtpRequestDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendEmailOtpRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendEmailOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendEmailOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendEmailOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendEmailOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/verification/email/resend": {
+      "post": {
+        "tags": [
+          "EmailVerification"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendEmailOtpRequestDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendEmailOtpRequestDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendEmailOtpRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendEmailOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendEmailOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendEmailOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendEmailOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendEmailOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/verification/email/verify": {
+      "post": {
+        "tags": [
+          "EmailVerification"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyEmailOtpRequestDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyEmailOtpRequestDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyEmailOtpRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyEmailOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyEmailOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyEmailOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyEmailOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "tags": [
@@ -52,7 +376,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
@@ -73,14 +398,16 @@
             "name": "industryId",
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           },
           {
             "name": "industry_id",
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
@@ -102,7 +429,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
@@ -123,14 +451,16 @@
             "name": "businessGroupId",
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           },
           {
             "name": "business_group_id",
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
@@ -152,7 +482,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
@@ -173,14 +504,16 @@
             "name": "subGroupId",
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           },
           {
             "name": "sub_group_id",
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
@@ -211,7 +544,1350 @@
           }
         }
       }
+    },
+    "/api/v1/registration/submit": {
+      "post": {
+        "tags": [
+          "Registration"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitRegistrationRequestDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitRegistrationRequestDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitRegistrationRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationResponseDtoApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationResponseDtoApiResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationResponseDtoApiResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationResponseDtoApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/verification/whatsapp/send": {
+      "post": {
+        "tags": [
+          "Verification"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendOtpRequestDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendOtpRequestDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendOtpRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/verification/whatsapp/resend": {
+      "post": {
+        "tags": [
+          "Verification"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendOtpRequestDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendOtpRequestDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendOtpRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResendOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/verification/whatsapp/verify": {
+      "post": {
+        "tags": [
+          "Verification"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyOtpRequestDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyOtpRequestDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyOtpRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyOtpResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyOtpResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyOtpResponseDtoApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/verification/validate-grant": {
+      "post": {
+        "tags": [
+          "VerificationPolicy"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateVerificationGrantRequestDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateVerificationGrantRequestDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateVerificationGrantRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateVerificationGrantResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateVerificationGrantResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateVerificationGrantResponseDtoApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateVerificationGrantResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateVerificationGrantResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateVerificationGrantResponseDtoApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/verification/consume-grant": {
+      "post": {
+        "tags": [
+          "VerificationPolicy"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateVerificationGrantRequestDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateVerificationGrantRequestDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateVerificationGrantRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateVerificationGrantResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateVerificationGrantResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateVerificationGrantResponseDtoApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateVerificationGrantResponseDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateVerificationGrantResponseDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateVerificationGrantResponseDtoApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
-  "components": { }
+  "components": {
+    "schemas": {
+      "BusinessProfileDetailsDto": {
+        "type": "object",
+        "properties": {
+          "companyName": {
+            "type": "string",
+            "nullable": true
+          },
+          "businessCapabilities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "businessDescription": {
+            "type": "string",
+            "nullable": true
+          },
+          "industryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "businessGroupId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "subGroupId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "categoryId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ContractorProfileDetailsDto": {
+        "type": "object",
+        "properties": {
+          "workName": {
+            "type": "string",
+            "nullable": true
+          },
+          "workCapabilities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "processesSupported": {
+            "type": "string",
+            "nullable": true
+          },
+          "workCoverage": {
+            "type": "string",
+            "nullable": true
+          },
+          "industryId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "businessGroupId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "subGroupId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "categoryId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "EmployeeProfileDetailsDto": {
+        "type": "object",
+        "properties": {
+          "jobTitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "skills": {
+            "type": "string",
+            "nullable": true
+          },
+          "experience": {
+            "type": "string",
+            "nullable": true
+          },
+          "preferredJobType": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ParentRefDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "industryId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "businessGroupId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RegistrationResponseDto": {
+        "type": "object",
+        "properties": {
+          "memberId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fullName": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "primaryProfileType": {
+            "type": "string",
+            "nullable": true
+          },
+          "verifiedMethod": {
+            "type": "string",
+            "nullable": true
+          },
+          "verifiedDestination": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RegistrationResponseDtoApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "parent": {
+            "$ref": "#/components/schemas/ParentRefDto"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/RegistrationResponseDto"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResendEmailOtpRequestDto": {
+        "type": "object",
+        "properties": {
+          "challengeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "registrationFlowId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResendEmailOtpResponseDto": {
+        "type": "object",
+        "properties": {
+          "challengeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maskedEmail": {
+            "type": "string",
+            "nullable": true
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cooldownSeconds": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "accepted": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "isLiveDelivery": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResendEmailOtpResponseDtoApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "parent": {
+            "$ref": "#/components/schemas/ParentRefDto"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ResendEmailOtpResponseDto"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResendOtpRequestDto": {
+        "type": "object",
+        "properties": {
+          "challengeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "registrationFlowId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResendOtpResponseDto": {
+        "type": "object",
+        "properties": {
+          "challengeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maskedPhoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cooldownSeconds": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "accepted": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "isLiveDelivery": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResendOtpResponseDtoApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "parent": {
+            "$ref": "#/components/schemas/ParentRefDto"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ResendOtpResponseDto"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SendEmailOtpRequestDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "registrationFlowId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SendEmailOtpResponseDto": {
+        "type": "object",
+        "properties": {
+          "challengeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maskedEmail": {
+            "type": "string",
+            "nullable": true
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cooldownSeconds": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "accepted": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "isLiveDelivery": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SendEmailOtpResponseDtoApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "parent": {
+            "$ref": "#/components/schemas/ParentRefDto"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/SendEmailOtpResponseDto"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SendOtpRequestDto": {
+        "type": "object",
+        "properties": {
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "registrationFlowId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SendOtpResponseDto": {
+        "type": "object",
+        "properties": {
+          "challengeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maskedPhoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cooldownSeconds": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "accepted": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "isLiveDelivery": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SendOtpResponseDtoApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "parent": {
+            "$ref": "#/components/schemas/ParentRefDto"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/SendOtpResponseDto"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ServiceEngineerProfileDetailsDto": {
+        "type": "object",
+        "properties": {
+          "specialization": {
+            "type": "string",
+            "nullable": true
+          },
+          "supportedEquipment": {
+            "type": "string",
+            "nullable": true
+          },
+          "yearsOfExperience": {
+            "type": "string",
+            "nullable": true
+          },
+          "serviceCoverage": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SubmitRegistrationRequestDto": {
+        "type": "object",
+        "properties": {
+          "verificationGrant": {
+            "type": "string",
+            "nullable": true
+          },
+          "registrationFlowId": {
+            "type": "string",
+            "nullable": true
+          },
+          "fullName": {
+            "type": "string",
+            "nullable": true
+          },
+          "countryCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "mobileNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "profileType": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "businessDetails": {
+            "$ref": "#/components/schemas/BusinessProfileDetailsDto"
+          },
+          "employeeDetails": {
+            "$ref": "#/components/schemas/EmployeeProfileDetailsDto"
+          },
+          "serviceEngineerDetails": {
+            "$ref": "#/components/schemas/ServiceEngineerProfileDetailsDto"
+          },
+          "traderDetails": {
+            "$ref": "#/components/schemas/TraderProfileDetailsDto"
+          },
+          "contractorDetails": {
+            "$ref": "#/components/schemas/ContractorProfileDetailsDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TraderProfileDetailsDto": {
+        "type": "object",
+        "properties": {
+          "tradingName": {
+            "type": "string",
+            "nullable": true
+          },
+          "capabilities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "productsSupplied": {
+            "type": "string",
+            "nullable": true
+          },
+          "serviceCoverage": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ValidateVerificationGrantRequestDto": {
+        "type": "object",
+        "properties": {
+          "verificationGrant": {
+            "type": "string",
+            "nullable": true
+          },
+          "registrationFlowId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ValidateVerificationGrantResponseDto": {
+        "type": "object",
+        "properties": {
+          "isValid": {
+            "type": "boolean"
+          },
+          "verifiedMethod": {
+            "type": "string",
+            "nullable": true
+          },
+          "maskedDestination": {
+            "type": "string",
+            "nullable": true
+          },
+          "expiresAtUtc": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ValidateVerificationGrantResponseDtoApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "parent": {
+            "$ref": "#/components/schemas/ParentRefDto"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ValidateVerificationGrantResponseDto"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "VerifyEmailOtpRequestDto": {
+        "type": "object",
+        "properties": {
+          "challengeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "registrationFlowId": {
+            "type": "string",
+            "nullable": true
+          },
+          "otpCode": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "VerifyEmailOtpResponseDto": {
+        "type": "object",
+        "properties": {
+          "verified": {
+            "type": "boolean"
+          },
+          "maskedEmail": {
+            "type": "string",
+            "nullable": true
+          },
+          "verificationGrant": {
+            "type": "string",
+            "nullable": true
+          },
+          "verificationGrantExpiresAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "VerifyEmailOtpResponseDtoApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "parent": {
+            "$ref": "#/components/schemas/ParentRefDto"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/VerifyEmailOtpResponseDto"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "VerifyOtpRequestDto": {
+        "type": "object",
+        "properties": {
+          "challengeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "registrationFlowId": {
+            "type": "string",
+            "nullable": true
+          },
+          "otpCode": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "VerifyOtpResponseDto": {
+        "type": "object",
+        "properties": {
+          "verified": {
+            "type": "boolean"
+          },
+          "maskedPhoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "verificationGrant": {
+            "type": "string",
+            "nullable": true
+          },
+          "verificationGrantExpiresAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "VerifyOtpResponseDtoApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "parent": {
+            "$ref": "#/components/schemas/ParentRefDto"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/VerifyOtpResponseDto"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
 }

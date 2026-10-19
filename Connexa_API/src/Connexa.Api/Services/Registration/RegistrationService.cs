@@ -286,6 +286,9 @@ public class RegistrationService : IRegistrationService
             challenge.Status = OtpChallengeStatus.Superseded;
 
             // 7. Create Member Account (Strictly "Member" role; Admin assignment forbidden)
+            var credentialSetupToken = Convert.ToHexString(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
+            var credentialSetupExpiresAt = DateTime.UtcNow.AddMinutes(30);
+
             var member = new Member
             {
                 FullName = request.FullName.Trim(),
@@ -297,7 +300,9 @@ public class RegistrationService : IRegistrationService
                 VerifiedDestination = verifiedDestination,
                 Role = "Member",
                 IsActive = true,
-                CreatedAtUtc = DateTime.UtcNow
+                CreatedAtUtc = DateTime.UtcNow,
+                CredentialSetupToken = credentialSetupToken,
+                CredentialSetupTokenExpiresAtUtc = credentialSetupExpiresAt
             };
 
             _dbContext.Members.Add(member);
@@ -406,7 +411,9 @@ public class RegistrationService : IRegistrationService
                 VerifiedMethod: verifiedMethod,
                 VerifiedDestination: verifiedDestination,
                 CreatedAtUtc: member.CreatedAtUtc,
-                Message: "Registration completed successfully. Profile records persisted to database."
+                Message: "Registration completed successfully. Profile records persisted to database.",
+                CredentialSetupToken: credentialSetupToken,
+                CredentialSetupTokenExpiresAtUtc: credentialSetupExpiresAt
             );
 
             return new RegistrationResult(true, responseDto, null, 201);

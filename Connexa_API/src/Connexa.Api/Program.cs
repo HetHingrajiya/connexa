@@ -1,10 +1,16 @@
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Connexa.Api.Configuration;
 using Connexa.Api.Data;
 using Connexa.Api.Middleware;
 using Connexa.Api.Services;
+using Connexa.Api.Services.Auth;
+using Connexa.Api.Services.Directory;
 using Connexa.Api.Services.Email;
 using Connexa.Api.Services.Registration;
 using Connexa.Api.Services.Verification;
@@ -31,12 +37,14 @@ builder.Services.AddDbContext<ConnexaDbContext>(options =>
 builder.Services.Configure<WhatsAppOptions>(builder.Configuration.GetSection(WhatsAppOptions.SectionName));
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection(EmailOptions.SectionName));
 builder.Services.Configure<OtpSecurityOptions>(builder.Configuration.GetSection(OtpSecurityOptions.SectionName));
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.SectionName));
 
 // Register HttpClient for WhatsApp Cloud API
 builder.Services.AddHttpClient<MetaCloudApiWhatsAppProvider>();
 
 // Register Cryptography & Providers
 builder.Services.AddSingleton<IOtpCryptographyService, OtpCryptographyService>();
+builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
 builder.Services.AddScoped<MetaCloudApiWhatsAppProvider>();
 builder.Services.AddScoped<DevelopmentWhatsAppProvider>();
@@ -63,13 +71,62 @@ builder.Services.AddScoped<IEmailProvider>(sp =>
     return sp.GetRequiredService<DevelopmentEmailProvider>();
 });
 
-// Register Domain Services
+// Register Domain & Auth Services
 builder.Services.AddScoped<IPhoneVerificationService, PhoneVerificationService>();
 builder.Services.AddScoped<IEmailVerificationService, EmailVerificationService>();
 builder.Services.AddScoped<IRegistrationVerificationPolicyService, RegistrationVerificationPolicyService>();
 builder.Services.AddScoped<IMasterDataService, MasterDataService>();
 builder.Services.AddScoped<ISqliteMigrationService, SqliteMigrationService>();
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IDirectoryService, DirectoryService>();
+
+// Configure JWT Bearer Authentication
+var jwtSection = builder.Configuration.GetSection(JwtOptions.SectionName);
+var signingKey = jwtSection["SigningKey"] ?? "ConnexaEnterpriseSecureJwtSecretKey2026!MustBe32BytesOrLonger#";
+var issuer = jwtSection["Issuer"] ?? "Connexa.Api";
+var audience = jwtSection["Audience"] ?? "Connexa.App";
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = issuer,
+        ValidateAudience = true,
+        ValidAudience = audience,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey)),
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.FromSeconds(30)
+    };
+    options.Events = new JwtBearerEvents
+    {
+        OnChallenge = context =>
+        {
+            context.HandleResponse();
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            context.Response.ContentType = "application/json";
+            return context.Response.WriteAsync("{\"success\":false,\"message\":\"Unauthorized. Valid Bearer access token required.\"}");
+        },
+        OnForbidden = context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            context.Response.ContentType = "application/json";
+            return context.Response.WriteAsync("{\"success\":false,\"message\":\"Forbidden. You do not have permission to access this resource.\"}");
+        }
+    };
+});
+
+builder.Services.AddAuthorization();
 
 // Configure Controllers and JSON Formatting
 builder.Services.AddControllers()
@@ -109,7 +166,6 @@ builder.Services.AddCors(options =>
 
     options.AddPolicy("ProductionCorsPolicy", policy =>
     {
-        // Strict production origins configured from environment
         var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
         if (allowedOrigins.Length > 0)
         {
@@ -122,7 +178,32 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Connexa API", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 var app = builder.Build();
 
@@ -151,6 +232,7 @@ else
     app.UseCors("ProductionCorsPolicy");
 }
 
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

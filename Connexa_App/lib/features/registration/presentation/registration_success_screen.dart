@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:connexa/core/theme/theme.dart';
 import 'package:connexa/core/widgets/widgets.dart';
+import 'package:connexa/features/auth/providers/auth_provider.dart';
 import 'package:connexa/features/registration/models/registration_draft.dart';
 import 'package:connexa/features/registration/models/registration_submission_models.dart';
 import 'package:connexa/features/registration/providers/registration_provider.dart';
@@ -116,7 +117,7 @@ class RegistrationSuccessScreen extends ConsumerWidget {
                       ],
                       const SizedBox(height: AppSpacing.xl),
 
-                      // Notice about subsequent authentication milestone
+                      // Notice about credential setup
                       Container(
                         padding: const EdgeInsets.all(AppSpacing.md),
                         decoration: BoxDecoration(
@@ -128,14 +129,16 @@ class RegistrationSuccessScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             const Icon(
-                              Icons.info_outline_rounded,
+                              Icons.verified_user_outlined,
                               size: 18,
-                              color: AppColors.primaryLight,
+                              color: AppColors.secondary,
                             ),
                             const SizedBox(width: AppSpacing.sm),
                             Expanded(
                               child: Text(
-                                'Authentication & Credential Setup: Full password creation and JWT authentication flows will be activated in the upcoming release. Your registration data has been securely committed.',
+                                result?.credentialSetupToken != null
+                                    ? 'Secure Credential Setup: A server-validated setup token has been authorized for your account. Create your password to sign in to the Connexa dashboard.'
+                                    : 'Your registration data and identity verification have been securely committed to the database.',
                                 style: AppTextStyles.bodySmall.copyWith(
                                   color: AppColors.textSecondary,
                                 ),
@@ -147,7 +150,67 @@ class RegistrationSuccessScreen extends ConsumerWidget {
                       const SizedBox(height: AppSpacing.xxl),
 
                       // Actions
-                      AppButton.primary(
+                      if (result?.credentialSetupToken != null &&
+                          result!.credentialSetupToken!.isNotEmpty) ...<Widget>[
+                        AppButton.primary(
+                          key: const Key('setupPasswordButton'),
+                          text: 'Set Up Password & Continue to App',
+                          isFullWidth: true,
+                          trailingIcon: const Icon(
+                            Icons.arrow_forward_rounded,
+                            size: 18,
+                          ),
+                          onPressed: () {
+                            ref
+                                .read(pendingSetupTokenProvider.notifier)
+                                .state = SetupTokenData(
+                              token: result.credentialSetupToken!,
+                              destination: result.email,
+                            );
+                            context.go(
+                              '/setup-password',
+                              extra: <String, dynamic>{
+                                'token': result.credentialSetupToken,
+                                'destination': result.email,
+                              },
+                            );
+                          },
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        AppButton.secondary(
+                          key: const Key('goToLoginButton'),
+                          text: 'Sign In to Account',
+                          isFullWidth: true,
+                          leadingIcon: const Icon(
+                            Icons.login_rounded,
+                            size: 18,
+                          ),
+                          onPressed: () => context.go('/login'),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                      ] else ...<Widget>[
+                        AppButton.primary(
+                          key: const Key('recoverSetupPasswordButton'),
+                          text: 'Verify Account & Create Password',
+                          isFullWidth: true,
+                          trailingIcon: const Icon(
+                            Icons.arrow_forward_rounded,
+                            size: 18,
+                          ),
+                          onPressed: () {
+                            context.go(
+                              '/setup-password',
+                              extra: <String, dynamic>{
+                                'destination': result?.email.isNotEmpty == true
+                                    ? result!.email
+                                    : draft.email,
+                              },
+                            );
+                          },
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                      ],
+                      AppButton.secondary(
                         key: const Key('returnToOnboardingButton'),
                         text: 'Go to Onboarding Overview',
                         isFullWidth: true,

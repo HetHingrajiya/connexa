@@ -118,6 +118,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         automaticallyImplyLeading: false,
         title: const Text('Connexa'),
         actions: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(right: AppSpacing.sm),
+            child: AppButton.text(
+              key: const Key('onboardingSignInButton'),
+              text: 'Sign In',
+              onPressed: () => context.go('/login'),
+            ),
+          ),
           if (!_isLastPage)
             Padding(
               padding: const EdgeInsets.only(right: AppSpacing.md),
@@ -277,14 +285,43 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 400),
           child: _isLastPage
-              ? AppButton.primary(
-                  text: 'Get Started',
-                  isFullWidth: true,
-                  trailingIcon: const Icon(
-                    Icons.arrow_forward_rounded,
-                    size: 18,
-                  ),
-                  onPressed: _handleGetStarted,
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    AppButton.primary(
+                      text: 'Get Started',
+                      isFullWidth: true,
+                      trailingIcon: const Icon(
+                        Icons.arrow_forward_rounded,
+                        size: 18,
+                      ),
+                      onPressed: _handleGetStarted,
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          'Already registered?',
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.xs),
+                        GestureDetector(
+                          key: const Key('onboardingBottomSignInLink'),
+                          onTap: () => context.go('/login'),
+                          child: Text(
+                            'Sign In',
+                            style: AppTextStyles.labelMedium.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 )
               : Row(
                   children: <Widget>[

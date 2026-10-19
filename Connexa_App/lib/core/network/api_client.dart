@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:connexa/core/constants/api_constants.dart';
 
+import 'package:connexa/core/network/auth_interceptor.dart';
+import 'package:connexa/core/storage/auth_storage.dart';
+
 /// Riverpod provider for the global [Dio] HTTP client instance.
 ///
 /// Can be overridden in widget/unit tests using `dioProvider.overrideWithValue(mockDio)`.
@@ -18,6 +21,10 @@ final Provider<Dio> dioProvider = Provider<Dio>((Ref ref) {
   );
 
   final Dio dio = Dio(options);
+  final AuthStorage authStorage = ref.watch(authStorageProvider);
+
+  // Add Auth Interceptor for automatic Bearer token injection and refresh token rotation
+  dio.interceptors.add(AuthInterceptor(authStorage: authStorage, dio: dio));
 
   // Add standard logging / request interceptor in debug mode
   dio.interceptors.add(

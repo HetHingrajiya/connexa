@@ -185,3 +185,11 @@ E:\Connexa\Connexa_API\src\Connexa.Api\bin\Debug\net8.0\System.Configuration.Con
 E:\Connexa\Connexa_API\src\Connexa.Api\bin\Debug\net8.0\runtimes\win\lib\net6.0\Microsoft.Data.SqlClient.dll
 E:\Connexa\Connexa_API\src\Connexa.Api\bin\Debug\net8.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
 E:\connexa\Connexa_API\src\Connexa.Api\bin\Debug\net8.0\MailKit.dll
+E:\Connexa\Connexa_API\src\Connexa.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+E:\Connexa\Connexa_API\src\Connexa.Api\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+E:\Connexa\Connexa_API\src\Connexa.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+E:\Connexa\Connexa_API\src\Connexa.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+E:\Connexa\Connexa_API\src\Connexa.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+E:\Connexa\Connexa_API\src\Connexa.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+E:\Connexa\Connexa_API\src\Connexa.Api\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+E:\connexa\Connexa_API\src\Connexa.Api\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll

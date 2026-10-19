@@ -20,6 +20,7 @@ public class ConnexaDbContext : DbContext
     public DbSet<ServiceEngineerProfile> ServiceEngineerProfiles => Set<ServiceEngineerProfile>();
     public DbSet<TraderProfile> TraderProfiles => Set<TraderProfile>();
     public DbSet<ContractorProfile> ContractorProfiles => Set<ContractorProfile>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -147,9 +148,14 @@ public class ConnexaDbContext : DbContext
             entity.Property(e => e.Role).HasMaxLength(50).HasDefaultValue("Member").IsRequired();
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+            entity.Property(e => e.PasswordHash).HasMaxLength(256);
+            entity.Property(e => e.PasswordSalt).HasMaxLength(128);
+            entity.Property(e => e.CredentialSetupToken).HasMaxLength(128);
+            entity.Property(e => e.FailedLoginAttempts).HasDefaultValue(0);
 
             entity.HasIndex(e => e.PhoneNumber).IsUnique().HasDatabaseName("IX_Members_PhoneNumber");
             entity.HasIndex(e => e.Email).IsUnique().HasDatabaseName("IX_Members_Email");
+            entity.HasIndex(e => e.CredentialSetupToken).HasDatabaseName("IX_Members_CredentialSetupToken");
         });
 
         // 7. BusinessProfile
@@ -307,6 +313,31 @@ public class ConnexaDbContext : DbContext
                   .HasConstraintName("FK_ContractorProfiles_Categories");
 
             entity.HasIndex(e => e.MemberId).IsUnique().HasDatabaseName("IX_ContractorProfiles_MemberId");
+        });
+
+        // 12. RefreshToken
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.ToTable("RefreshTokens");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.MemberId).IsRequired();
+            entity.Property(e => e.TokenHash).HasMaxLength(128).IsRequired();
+            entity.Property(e => e.ExpiresAtUtc).IsRequired();
+            entity.Property(e => e.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+            entity.Property(e => e.CreatedByIp).HasMaxLength(64);
+            entity.Property(e => e.RevokedByIp).HasMaxLength(64);
+            entity.Property(e => e.ReplacedByTokenHash).HasMaxLength(128);
+            entity.Property(e => e.ReasonRevoked).HasMaxLength(256);
+
+            entity.HasOne(e => e.Member)
+                  .WithMany(m => m.RefreshTokens)
+                  .HasForeignKey(e => e.MemberId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("FK_RefreshTokens_Members");
+
+            entity.HasIndex(e => e.MemberId).HasDatabaseName("IX_RefreshTokens_MemberId");
+            entity.HasIndex(e => e.TokenHash).IsUnique().HasDatabaseName("IX_RefreshTokens_TokenHash");
         });
     }
 }

@@ -66,5 +66,7 @@ public record RegistrationResponseDto(
     string VerifiedMethod,
     string VerifiedDestination,
     DateTime CreatedAtUtc,
-    string Message
+    string Message,
+    string? CredentialSetupToken = null,
+    DateTime? CredentialSetupTokenExpiresAtUtc = null
 );

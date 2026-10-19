@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:connexa/core/constants/api_constants.dart';
-import 'package:connexa/core/errors/app_exceptions.dart';
 import 'package:connexa/features/registration/models/industry_master_data.dart';
 import 'package:connexa/features/registration/services/industry_master_data_service.dart';
 
@@ -166,18 +165,112 @@ void main() {
     );
 
     test(
-      'Non-existent parent ID throws ApiException with 404 status',
+      'Live Step 16: Authenticate Member 6, fetch Profile, query Directory, and verify Hierarchy',
       () async {
-        expect(
-          () => service.getBusinessGroups(99999),
-          throwsA(
-            isA<ApiException>().having(
-              (ApiException e) => e.statusCode,
-              'statusCode',
-              404,
-            ),
-          ),
+        // 1. Authenticate Member #6
+        final Response<dynamic> loginResp = await liveDio.post<dynamic>(
+          '/api/v1/auth/login',
+          data: <String, dynamic>{
+            'identifier': 'hetpatel8517@gmail.com',
+            'password': 'ConnexaPassword2026!',
+          },
         );
+
+        expect(loginResp.statusCode, 200);
+        final Map<String, dynamic> loginData =
+            (loginResp.data as Map<String, dynamic>)['data']
+                as Map<String, dynamic>;
+        final String accessToken = loginData['accessToken'] as String;
+        expect(accessToken, isNotEmpty);
+
+        final Options authOptions = Options(
+          headers: <String, dynamic>{'Authorization': 'Bearer $accessToken'},
+        );
+
+        // 2. Fetch authenticated Member 6 profile (/api/v1/members/me)
+        final Response<dynamic> meResp = await liveDio.get<dynamic>(
+          '/api/v1/members/me',
+          options: authOptions,
+        );
+        expect(meResp.statusCode, 200);
+        final Map<String, dynamic> meData =
+            (meResp.data as Map<String, dynamic>)['data']
+                as Map<String, dynamic>;
+        expect(meData['memberId'], 6);
+        expect(meData['primaryProfileType'], 'BusinessCompany');
+
+        final Map<String, dynamic> profileDetails =
+            meData['profileDetails'] as Map<String, dynamic>;
+        expect(profileDetails['companyName'], 'mayuri bag');
+        expect(profileDetails['industryId'], 3);
+        expect(profileDetails['businessGroupId'], 4);
+        expect(profileDetails['subGroupId'], 5);
+        expect(profileDetails['categoryId'], 17);
+
+        // 3. Query Business Directory (/api/v1/directory/businesses)
+        final Response<dynamic> dirResp = await liveDio.get<dynamic>(
+          '/api/v1/directory/businesses',
+          options: authOptions,
+        );
+        expect(dirResp.statusCode, 200);
+        final Map<String, dynamic> dirData =
+            (dirResp.data as Map<String, dynamic>)['data']
+                as Map<String, dynamic>;
+        expect(dirData['totalCount'], greaterThanOrEqualTo(1));
+        final List<dynamic> items = dirData['items'] as List<dynamic>;
+        expect(
+          items.any(
+            (dynamic item) =>
+                (item as Map<String, dynamic>)['memberId'] == 6 &&
+                item['companyName'] == 'mayuri bag',
+          ),
+          isTrue,
+        );
+
+        // 4. Search Business Directory for 'mayuri'
+        final Response<dynamic> searchResp = await liveDio.get<dynamic>(
+          '/api/v1/directory/businesses',
+          queryParameters: <String, dynamic>{'search': 'mayuri'},
+          options: authOptions,
+        );
+        expect(searchResp.statusCode, 200);
+        final Map<String, dynamic> searchData =
+            (searchResp.data as Map<String, dynamic>)['data']
+                as Map<String, dynamic>;
+        final List<dynamic> searchItems = searchData['items'] as List<dynamic>;
+        expect(searchItems, isNotEmpty);
+        expect(
+          (searchItems.first as Map<String, dynamic>)['companyName'],
+          'mayuri bag',
+        );
+
+        // 5. Hierarchy Mismatch Rejection on Profile Update
+        try {
+          await liveDio.put<dynamic>(
+            '/api/v1/members/me/profile',
+            data: <String, dynamic>{
+              'fullName': 'Het Patel',
+              'businessDetails': <String, dynamic>{
+                'companyName': 'mayuri bag',
+                'businessCapabilities': <String>['Manufacturer'],
+                'industryId': 1, // Mismatch: Industry 1 with Group 4
+                'businessGroupId': 4,
+                'subGroupId': 5,
+                'categoryId': 17,
+              },
+            },
+            options: authOptions,
+          );
+          fail('Expected DioException with 400 Bad Request');
+        } on DioException catch (e) {
+          expect(e.response?.statusCode, 400);
+          final Map<String, dynamic> errData =
+              e.response?.data as Map<String, dynamic>;
+          expect(
+            errData['message'],
+            contains('Selected Business Group does not belong'),
+          );
+        }
       },
     );
   });

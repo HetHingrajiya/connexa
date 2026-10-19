@@ -6,12 +6,13 @@ import 'package:go_router/go_router.dart';
 
 import 'package:connexa/core/theme/theme.dart';
 import 'package:connexa/core/widgets/widgets.dart';
+import 'package:connexa/features/auth/providers/auth_provider.dart';
 import 'package:connexa/features/onboarding/providers/onboarding_provider.dart';
 
 /// Production-quality splash screen for Connexa.
 ///
 /// Features clean text-based brand mark, tagline, subtle loading indicator,
-/// and deterministic routing to Onboarding or Registration based on in-memory state.
+/// and deterministic routing to Dashboard, Onboarding or Registration based on auth state.
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({
     super.key,
@@ -41,8 +42,20 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   }
 
   void _scheduleNavigation() {
-    _timer = Timer(widget.navigationDelay, () {
+    _timer = Timer(widget.navigationDelay, () async {
       if (!mounted) return;
+
+      while (mounted && ref.read(authProvider).isRestoringSession) {
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+      }
+      if (!mounted) return;
+
+      final bool isAuthenticated = ref.read(authProvider).isAuthenticated;
+      if (isAuthenticated) {
+        context.go('/dashboard');
+        return;
+      }
+
       final bool hasCompletedOnboarding = ref.read(onboardingCompletedProvider);
       if (hasCompletedOnboarding) {
         context.go('/registration');

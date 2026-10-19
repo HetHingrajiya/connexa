@@ -10,6 +10,7 @@ class RegistrationSubmissionResult {
     required this.verifiedDestination,
     required this.createdAtUtc,
     required this.message,
+    this.credentialSetupToken,
   });
 
   final int memberId;
@@ -21,6 +22,7 @@ class RegistrationSubmissionResult {
   final String verifiedDestination;
   final DateTime createdAtUtc;
   final String message;
+  final String? credentialSetupToken;
 
   factory RegistrationSubmissionResult.fromJson(Map<String, dynamic> json) {
     return RegistrationSubmissionResult(
@@ -36,6 +38,7 @@ class RegistrationSubmissionResult {
           DateTime.now(),
       message:
           json['message']?.toString() ?? 'Registration completed successfully.',
+      credentialSetupToken: json['credentialSetupToken']?.toString(),
     );
   }
 }

@@ -24,10 +24,21 @@ public class Member
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAtUtc { get; set; }
 
+    // Security & Credential Setup
+    public string? PasswordHash { get; set; }
+    public string? PasswordSalt { get; set; }
+    public string? CredentialSetupToken { get; set; }
+    public DateTime? CredentialSetupTokenExpiresAtUtc { get; set; }
+    public int FailedLoginAttempts { get; set; } = 0;
+    public DateTime? LockoutEndUtc { get; set; }
+
     // 1-to-1 Profile navigations
     public BusinessProfile? BusinessProfile { get; set; }
     public EmployeeProfile? EmployeeProfile { get; set; }
     public ServiceEngineerProfile? ServiceEngineerProfile { get; set; }
     public TraderProfile? TraderProfile { get; set; }
     public ContractorProfile? ContractorProfile { get; set; }
+
+    // Refresh Tokens navigation
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 }
