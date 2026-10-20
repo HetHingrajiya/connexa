@@ -174,98 +174,170 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
           child: SingleChildScrollView(
             child: Form(
               key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  // Step Indicator
-                  _buildStepIndicator(),
-                  const SizedBox(height: AppSpacing.xl),
+              child: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  final bool isDesktop = constraints.maxWidth >= 900;
 
-                  // Header Titles
-                  const Text(
-                    'Create Your Connexa Account',
-                    style: AppTextStyles.headlineLarge,
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    'Start building meaningful business connections.',
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.xxl),
-
-                  // Section: Basic Contact Details Card
-                  AppCard(
-                    title: 'Contact Details',
-                    subtitle:
-                        'Enter your verified personal or enterprise contact information.',
-                    child: Column(
+                  if (isDesktop) {
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        // Full Name
-                        AppTextField(
-                          key: const Key('fullNameField'),
-                          controller: _nameController,
-                          label: 'Full Name *',
-                          hintText: 'e.g., Rajesh Sharma',
-                          keyboardType: TextInputType.name,
-                          textInputAction: TextInputAction.next,
-                          prefixIcon: const Icon(
-                            Icons.person_outline_rounded,
-                            size: 20,
-                            color: AppColors.textSecondary,
+                        // Left Column: Stepper, Headers, Contact Details, Button
+                        Expanded(
+                          flex: 5,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: <Widget>[
+                              AppStaggeredEntrance(
+                                index: 0,
+                                child: _buildStepIndicator(),
+                              ),
+                              const SizedBox(height: AppSpacing.lg),
+                              AppStaggeredEntrance(
+                                index: 1,
+                                child: _buildHeaderTitles(),
+                              ),
+                              const SizedBox(height: AppSpacing.xl),
+                              AppStaggeredEntrance(
+                                index: 2,
+                                child: _buildContactDetailsCard(),
+                              ),
+                              const SizedBox(height: AppSpacing.xl),
+                              AppStaggeredEntrance(
+                                index: 3,
+                                child: _buildContinueButton(),
+                              ),
+                            ],
                           ),
-                          validator: _validateName,
                         ),
-                        const SizedBox(height: AppSpacing.lg),
-
-                        // Mobile Number with Country Code
-                        _buildMobileField(),
-                        const SizedBox(height: AppSpacing.lg),
-
-                        // Email Address
-                        AppTextField(
-                          key: const Key('emailField'),
-                          controller: _emailController,
-                          label: 'Email Address *',
-                          hintText: 'name@company.com',
-                          keyboardType: TextInputType.emailAddress,
-                          textInputAction: TextInputAction.done,
-                          prefixIcon: const Icon(
-                            Icons.mail_outline_rounded,
-                            size: 20,
-                            color: AppColors.textSecondary,
+                        const SizedBox(width: AppSpacing.xxl),
+                        // Right Column: Profile Types
+                        Expanded(
+                          flex: 7,
+                          child: AppStaggeredEntrance(
+                            index: 2,
+                            child: _buildProfileTypeSection(),
                           ),
-                          validator: _validateEmail,
                         ),
                       ],
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.xxl),
+                    );
+                  }
 
-                  // Section: Profile Type Selection
-                  _buildProfileTypeSection(),
-                  const SizedBox(height: AppSpacing.xxxl),
-
-                  // Submit Action Button
-                  AppButton.primary(
-                    key: const Key('continueButton'),
-                    text: 'Continue',
-                    isLoading: _isSubmitting,
-                    isFullWidth: true,
-                    trailingIcon: const Icon(
-                      Icons.arrow_forward_rounded,
-                      size: 18,
-                    ),
-                    onPressed: _isSubmitting ? null : _handleContinue,
-                  ),
-                  const SizedBox(height: AppSpacing.xxl),
-                ],
+                  // Mobile and Tablet Single Column
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      AppStaggeredEntrance(
+                        index: 0,
+                        child: _buildStepIndicator(),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      AppStaggeredEntrance(
+                        index: 1,
+                        child: _buildHeaderTitles(),
+                      ),
+                      const SizedBox(height: AppSpacing.xl),
+                      AppStaggeredEntrance(
+                        index: 2,
+                        child: _buildContactDetailsCard(),
+                      ),
+                      const SizedBox(height: AppSpacing.xl),
+                      AppStaggeredEntrance(
+                        index: 3,
+                        child: _buildProfileTypeSection(),
+                      ),
+                      const SizedBox(height: AppSpacing.xl),
+                      AppStaggeredEntrance(
+                        index: 4,
+                        child: _buildContinueButton(),
+                      ),
+                      const SizedBox(height: AppSpacing.xxl),
+                    ],
+                  );
+                },
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildHeaderTitles() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        const Text(
+          'Create Your Connexa Account',
+          style: AppTextStyles.headlineLarge,
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        Text(
+          'Start building meaningful business connections.',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textSecondary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildContactDetailsCard() {
+    return AppCard(
+      title: 'Contact Details',
+      subtitle:
+          'Enter your verified personal or enterprise contact information.',
+      child: Column(
+        children: <Widget>[
+          // Full Name
+          AppTextField(
+            key: const Key('fullNameField'),
+            controller: _nameController,
+            label: 'Full Name *',
+            hintText: 'e.g., Rajesh Sharma',
+            keyboardType: TextInputType.name,
+            textInputAction: TextInputAction.next,
+            prefixIcon: const Icon(
+              Icons.person_outline_rounded,
+              size: 20,
+              color: AppColors.textSecondary,
+            ),
+            validator: _validateName,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+
+          // Mobile Number with Country Code
+          _buildMobileField(),
+          const SizedBox(height: AppSpacing.lg),
+
+          // Email Address
+          AppTextField(
+            key: const Key('emailField'),
+            controller: _emailController,
+            label: 'Email Address *',
+            hintText: 'name@company.com',
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.done,
+            prefixIcon: const Icon(
+              Icons.mail_outline_rounded,
+              size: 20,
+              color: AppColors.textSecondary,
+            ),
+            validator: _validateEmail,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContinueButton() {
+    return AppButton.primary(
+      key: const Key('continueButton'),
+      text: 'Continue',
+      isLoading: _isSubmitting,
+      isFullWidth: true,
+      trailingIcon: const Icon(Icons.arrow_forward_rounded, size: 18),
+      onPressed: _isSubmitting ? null : _handleContinue,
     );
   }
 

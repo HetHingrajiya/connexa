@@ -176,12 +176,16 @@ class AppButton extends StatelessWidget {
         AppButtonVariant.text => foregroundColor ?? AppColors.primary,
       };
 
-      return SizedBox(
-        width: 20,
-        height: 20,
-        child: CircularProgressIndicator(
-          strokeWidth: 2.2,
-          valueColor: AlwaysStoppedAnimation<Color>(indicatorColor),
+      return AnimatedSwitcher(
+        duration: const Duration(milliseconds: 180),
+        child: SizedBox(
+          key: const ValueKey<String>('button_loading'),
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(
+            strokeWidth: 2.2,
+            valueColor: AlwaysStoppedAnimation<Color>(indicatorColor),
+          ),
         ),
       );
     }
@@ -212,10 +216,14 @@ class AppButton extends StatelessWidget {
       children.add(trailingIcon!);
     }
 
-    return Row(
-      mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: children,
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 180),
+      child: Row(
+        key: const ValueKey<String>('button_label'),
+        mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: children,
+      ),
     );
   }
 }

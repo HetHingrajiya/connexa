@@ -81,8 +81,13 @@ class AppTextField extends StatelessWidget {
           ),
           decoration: InputDecoration(
             hintText: hintText,
+            hintStyle: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textMuted,
+            ),
             errorText: errorText,
             helperText: helperText,
+            prefixIconColor: AppColors.textSecondary,
+            suffixIconColor: AppColors.textSecondary,
             prefixIcon: prefixIcon != null
                 ? Padding(
                     padding: const EdgeInsets.symmetric(

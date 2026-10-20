@@ -396,35 +396,40 @@ class _SetupPasswordScreenState extends ConsumerState<SetupPasswordScreen> {
                 ],
 
                 // Card: Form Choice
-                if (hasValidToken)
-                  _buildPasswordForm(authState)
-                else
-                  _buildAccountVerificationForm(),
+                AppStaggeredEntrance(
+                  index: 0,
+                  child: hasValidToken
+                      ? _buildPasswordForm(authState)
+                      : _buildAccountVerificationForm(),
+                ),
 
                 const SizedBox(height: AppSpacing.xxl),
 
                 // Back / Alternative Actions
-                Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      TextButton.icon(
-                        key: const Key('returnToReviewButton'),
-                        icon: const Icon(Icons.assignment_outlined, size: 16),
-                        label: const Text('Review Registration'),
-                        onPressed: () => context.go('/registration/review'),
-                      ),
-                      const Text(
-                        ' • ',
-                        style: TextStyle(color: AppColors.textMuted),
-                      ),
-                      TextButton.icon(
-                        key: const Key('backToSignInButton'),
-                        icon: const Icon(Icons.login_rounded, size: 16),
-                        label: const Text('Back to Sign In'),
-                        onPressed: () => context.go('/login'),
-                      ),
-                    ],
+                AppStaggeredEntrance(
+                  index: 1,
+                  child: Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        TextButton.icon(
+                          key: const Key('returnToReviewButton'),
+                          icon: const Icon(Icons.assignment_outlined, size: 16),
+                          label: const Text('Review Registration'),
+                          onPressed: () => context.go('/registration/review'),
+                        ),
+                        const Text(
+                          ' • ',
+                          style: TextStyle(color: AppColors.textMuted),
+                        ),
+                        TextButton.icon(
+                          key: const Key('backToSignInButton'),
+                          icon: const Icon(Icons.login_rounded, size: 16),
+                          label: const Text('Back to Sign In'),
+                          onPressed: () => context.go('/login'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xxl),

@@ -823,138 +823,369 @@ class _BusinessDirectoryScreenState
         ],
       ),
       body: SafeArea(
-        child: ResponsiveCenterBox(
-          padding: AppSpacing.screenPaddingMobile,
-          maxTabletWidth: AppSpacing.maxContentWidthTablet,
-          maxDesktopWidth: AppSpacing.maxContentWidthDesktop,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              const SizedBox(height: AppSpacing.xs),
+        child: ResponsiveBuilder(
+          builder:
+              (
+                BuildContext context,
+                DeviceType deviceType,
+                BoxConstraints constraints,
+              ) {
+                if (deviceType == DeviceType.desktop) {
+                  return ResponsiveCenterBox(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                      vertical: AppSpacing.sm,
+                    ),
+                    maxDesktopWidth: 1400.0,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        // Desktop Filter Sidebar
+                        SizedBox(
+                          width: 320,
+                          child: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: <Widget>[
+                                // Search Box
+                                Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: TextField(
+                                        key: const Key(
+                                          'directorySearchTextField',
+                                        ),
+                                        controller: _searchController,
+                                        decoration: InputDecoration(
+                                          hintText:
+                                              'Search company, capabilities...',
+                                          prefixIcon: const Icon(
+                                            Icons.search_rounded,
+                                            color: AppColors.textSecondary,
+                                            size: 20,
+                                          ),
+                                          suffixIcon:
+                                              _searchController.text.isNotEmpty
+                                              ? IconButton(
+                                                  icon: const Icon(
+                                                    Icons.clear_rounded,
+                                                    size: 18,
+                                                  ),
+                                                  onPressed: _clearSearch,
+                                                )
+                                              : null,
+                                        ),
+                                        onChanged: _onSearchChanged,
+                                        onSubmitted: _onSearchSubmitted,
+                                        textInputAction: TextInputAction.search,
+                                      ),
+                                    ),
+                                    const SizedBox(width: AppSpacing.sm),
+                                    IconButton.filled(
+                                      key: const Key(
+                                        'directorySearchSubmitButton',
+                                      ),
+                                      icon: const Icon(
+                                        Icons.arrow_forward_rounded,
+                                        size: 20,
+                                      ),
+                                      style: IconButton.styleFrom(
+                                        backgroundColor: AppColors.primary,
+                                        foregroundColor: AppColors.onPrimary,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              AppSpacing.borderRadiusMd,
+                                        ),
+                                        minimumSize: const Size(48, 48),
+                                      ),
+                                      tooltip: 'Search',
+                                      onPressed: () => _onSearchSubmitted(
+                                        _searchController.text,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: AppSpacing.md),
 
-              // Modern Search Input
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: TextField(
-                      key: const Key('directorySearchTextField'),
-                      controller: _searchController,
-                      decoration: InputDecoration(
-                        hintText: 'Search company, capabilities, keywords...',
-                        prefixIcon: const Icon(
-                          Icons.search_rounded,
-                          color: AppColors.textSecondary,
-                          size: 20,
+                                // Business Type Section
+                                Text(
+                                  'BUSINESS TYPE',
+                                  style: AppTextStyles.labelSmall.copyWith(
+                                    color: AppColors.textSecondary,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.xs),
+                                Wrap(
+                                  spacing: AppSpacing.xs,
+                                  runSpacing: AppSpacing.xs,
+                                  children: _businessTypeOptions.map((
+                                    String type,
+                                  ) {
+                                    final bool isSelected =
+                                        (state.filter.businessType == null &&
+                                            type == 'All') ||
+                                        state.filter.businessType == type;
+                                    return FilterChip(
+                                      label: Text(type),
+                                      selected: isSelected,
+                                      showCheckmark: false,
+                                      onSelected: (bool selected) {
+                                        notifier.setBusinessType(
+                                          type == 'All' ? null : type,
+                                        );
+                                      },
+                                    );
+                                  }).toList(),
+                                ),
+                                const SizedBox(height: AppSpacing.md),
+
+                                // Hierarchy Dropdown Filter Panel
+                                _buildHierarchyFilterPanel(state, notifier),
+                                const SizedBox(height: AppSpacing.md),
+
+                                if (state.hasActiveFilters)
+                                  AppButton.secondary(
+                                    text: 'Reset All Filters',
+                                    leadingIcon: const Icon(
+                                      Icons.clear_all_rounded,
+                                      size: 18,
+                                    ),
+                                    onPressed: () {
+                                      _searchController.clear();
+                                      notifier.resetFilters();
+                                    },
+                                  ),
+                                const SizedBox(height: AppSpacing.lg),
+                              ],
+                            ),
+                          ),
                         ),
-                        suffixIcon: _searchController.text.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear_rounded, size: 18),
-                                onPressed: _clearSearch,
+                        const SizedBox(width: AppSpacing.lg),
+                        const VerticalDivider(width: 1),
+                        const SizedBox(width: AppSpacing.lg),
+
+                        // Right Main Workspace
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: <Widget>[
+                              // Results Count Bar & Reset Action
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.xs,
+                                  vertical: AppSpacing.xs,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Text(
+                                      '${state.totalCount} businesses found',
+                                      key: const Key(
+                                        'directoryResultCountText',
+                                      ),
+                                      style: AppTextStyles.labelMedium.copyWith(
+                                        color: AppColors.textSecondary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    if (state.hasActiveFilters)
+                                      TextButton.icon(
+                                        icon: const Icon(
+                                          Icons.clear_all_rounded,
+                                          size: 16,
+                                        ),
+                                        label: const Text('Reset All'),
+                                        onPressed: () {
+                                          _searchController.clear();
+                                          notifier.resetFilters();
+                                        },
+                                      ),
+                                  ],
+                                ),
+                              ),
+                              const Divider(height: 1),
+                              const SizedBox(height: AppSpacing.sm),
+                              Expanded(
+                                child: _buildContentArea(
+                                  state,
+                                  notifier,
+                                  isDesktop: true,
+                                ),
+                              ),
+                              if (state.totalPages > 1) ...<Widget>[
+                                const Divider(height: 1),
+                                _buildPaginationBar(state, notifier),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                // Mobile and Tablet Viewport
+                return ResponsiveCenterBox(
+                  padding: AppSpacing.screenPaddingMobile,
+                  maxTabletWidth: AppSpacing.maxContentWidthTablet,
+                  maxDesktopWidth: AppSpacing.maxContentWidthDesktop,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      const SizedBox(height: AppSpacing.xs),
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: TextField(
+                              key: const Key('directorySearchTextField'),
+                              controller: _searchController,
+                              decoration: InputDecoration(
+                                hintText:
+                                    'Search company, capabilities, keywords...',
+                                prefixIcon: const Icon(
+                                  Icons.search_rounded,
+                                  color: AppColors.textSecondary,
+                                  size: 20,
+                                ),
+                                suffixIcon: _searchController.text.isNotEmpty
+                                    ? IconButton(
+                                        icon: const Icon(
+                                          Icons.clear_rounded,
+                                          size: 18,
+                                        ),
+                                        onPressed: _clearSearch,
+                                      )
+                                    : null,
+                              ),
+                              onChanged: _onSearchChanged,
+                              onSubmitted: _onSearchSubmitted,
+                              textInputAction: TextInputAction.search,
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          IconButton.filled(
+                            key: const Key('directorySearchSubmitButton'),
+                            icon: const Icon(
+                              Icons.arrow_forward_rounded,
+                              size: 20,
+                            ),
+                            style: IconButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              foregroundColor: AppColors.onPrimary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: AppSpacing.borderRadiusMd,
+                              ),
+                              minimumSize: const Size(48, 48),
+                            ),
+                            tooltip: 'Search',
+                            onPressed: () =>
+                                _onSearchSubmitted(_searchController.text),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: _businessTypeOptions.map((String type) {
+                            final bool isSelected =
+                                (state.filter.businessType == null &&
+                                    type == 'All') ||
+                                state.filter.businessType == type;
+                            return Padding(
+                              padding: const EdgeInsets.only(
+                                right: AppSpacing.xs,
+                              ),
+                              child: FilterChip(
+                                label: Text(type),
+                                selected: isSelected,
+                                showCheckmark: false,
+                                onSelected: (bool selected) {
+                                  notifier.setBusinessType(
+                                    type == 'All' ? null : type,
+                                  );
+                                },
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      AnimatedSize(
+                        duration: const Duration(milliseconds: 240),
+                        curve: Curves.easeOutCubic,
+                        child: _filtersExpanded
+                            ? Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: AppSpacing.xs,
+                                ),
+                                child: _buildHierarchyFilterPanel(
+                                  state,
+                                  notifier,
+                                ),
                               )
-                            : null,
+                            : const SizedBox.shrink(),
                       ),
-                      onChanged: _onSearchChanged,
-                      onSubmitted: _onSearchSubmitted,
-                      textInputAction: TextInputAction.search,
-                    ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.xs,
+                          vertical: AppSpacing.xs,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(
+                              '${state.totalCount} businesses found',
+                              key: const Key('directoryResultCountText'),
+                              style: AppTextStyles.labelMedium.copyWith(
+                                color: AppColors.textSecondary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            if (state.hasActiveFilters)
+                              TextButton.icon(
+                                icon: const Icon(
+                                  Icons.clear_all_rounded,
+                                  size: 16,
+                                ),
+                                label: const Text('Reset All'),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  notifier.resetFilters();
+                                },
+                              ),
+                          ],
+                        ),
+                      ),
+                      const Divider(height: 1),
+                      Expanded(
+                        child: _buildContentArea(
+                          state,
+                          notifier,
+                          isDesktop: false,
+                        ),
+                      ),
+                      if (state.totalPages > 1) ...<Widget>[
+                        const Divider(height: 1),
+                        _buildPaginationBar(state, notifier),
+                      ],
+                    ],
                   ),
-                  const SizedBox(width: AppSpacing.sm),
-                  IconButton.filled(
-                    key: const Key('directorySearchSubmitButton'),
-                    icon: const Icon(Icons.arrow_forward_rounded, size: 20),
-                    style: IconButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.onPrimary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: AppSpacing.borderRadiusMd,
-                      ),
-                      minimumSize: const Size(48, 48),
-                    ),
-                    tooltip: 'Search',
-                    onPressed: () => _onSearchSubmitted(_searchController.text),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.sm),
-
-              // Business Type Filter Chips Bar
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: _businessTypeOptions.map((String type) {
-                    final bool isSelected =
-                        (state.filter.businessType == null && type == 'All') ||
-                        state.filter.businessType == type;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: AppSpacing.xs),
-                      child: FilterChip(
-                        label: Text(type),
-                        selected: isSelected,
-                        showCheckmark: false,
-                        onSelected: (bool selected) {
-                          notifier.setBusinessType(type == 'All' ? null : type);
-                        },
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.xs),
-
-              // Expandable 4-Tier Master Data Hierarchy Filter Panel
-              if (_filtersExpanded) ...<Widget>[
-                const SizedBox(height: AppSpacing.xs),
-                _buildHierarchyFilterPanel(state, notifier),
-                const SizedBox(height: AppSpacing.xs),
-              ],
-
-              // Results Count Bar & Reset Action
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.xs,
-                  vertical: AppSpacing.xs,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(
-                      '${state.totalCount} businesses found',
-                      key: const Key('directoryResultCountText'),
-                      style: AppTextStyles.labelMedium.copyWith(
-                        color: AppColors.textSecondary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    if (state.hasActiveFilters)
-                      TextButton.icon(
-                        icon: const Icon(Icons.clear_all_rounded, size: 16),
-                        label: const Text('Reset All'),
-                        onPressed: () {
-                          _searchController.clear();
-                          notifier.resetFilters();
-                        },
-                      ),
-                  ],
-                ),
-              ),
-              const Divider(height: 1),
-
-              // Content Area: Loading, Error, Empty or Listing Cards
-              Expanded(child: _buildContentArea(state, notifier)),
-
-              // Pagination Footer Bar
-              if (state.totalPages > 1) ...<Widget>[
-                const Divider(height: 1),
-                _buildPaginationBar(state, notifier),
-              ],
-            ],
-          ),
+                );
+              },
         ),
       ),
     );
   }
 
-  Widget _buildContentArea(DirectoryState state, DirectoryNotifier notifier) {
+  Widget _buildContentArea(
+    DirectoryState state,
+    DirectoryNotifier notifier, {
+    bool isDesktop = false,
+  }) {
     if (state.isLoading) {
       return const Center(
         child: AppLoadingIndicator(
@@ -988,13 +1219,36 @@ class _BusinessDirectoryScreenState
       );
     }
 
+    if (isDesktop) {
+      return GridView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: AppSpacing.md,
+          mainAxisSpacing: AppSpacing.md,
+          childAspectRatio: 1.55,
+        ),
+        itemCount: state.items.length,
+        itemBuilder: (BuildContext context, int index) {
+          final BusinessDirectoryItem item = state.items[index];
+          return AppStaggeredEntrance(
+            index: index,
+            child: _buildBusinessCard(context, item),
+          );
+        },
+      );
+    }
+
     return ListView.builder(
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: state.items.length,
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       itemBuilder: (BuildContext context, int index) {
         final BusinessDirectoryItem item = state.items[index];
-        return _buildBusinessCard(context, item);
+        return AppStaggeredEntrance(
+          index: index,
+          child: _buildBusinessCard(context, item),
+        );
       },
     );
   }

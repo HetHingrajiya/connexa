@@ -192,6 +192,7 @@ public class DirectoryService : IDirectoryService
 
         var rawItems = await query
             .OrderBy(b => b.CompanyName)
+            .ThenBy(b => b.MemberId)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);

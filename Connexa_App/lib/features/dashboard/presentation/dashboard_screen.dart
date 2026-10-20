@@ -129,53 +129,145 @@ class DashboardScreen extends ConsumerWidget {
                   },
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        const SizedBox(height: AppSpacing.sm),
+                    child: ResponsiveBuilder(
+                      builder:
+                          (
+                            BuildContext context,
+                            DeviceType deviceType,
+                            BoxConstraints constraints,
+                          ) {
+                            if (deviceType == DeviceType.desktop) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: AppSpacing.sm,
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    // Left Main Workspace Column
+                                    Expanded(
+                                      flex: 6,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: <Widget>[
+                                          AppStaggeredEntrance(
+                                            index: 0,
+                                            child: _buildMemberHeroCard(
+                                              context,
+                                              profile,
+                                              user,
+                                            ),
+                                          ),
+                                          const SizedBox(height: AppSpacing.lg),
+                                          AppStaggeredEntrance(
+                                            index: 1,
+                                            child: _buildQuickActionsCard(
+                                              context,
+                                              ref,
+                                            ),
+                                          ),
+                                          const SizedBox(height: AppSpacing.lg),
+                                          AppStaggeredEntrance(
+                                            index: 2,
+                                            child: _buildProfileDetailsCard(
+                                              profile,
+                                              user,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: AppSpacing.lg),
+                                    // Right Auxiliary Cockpit Column
+                                    Expanded(
+                                      flex: 4,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: <Widget>[
+                                          AppStaggeredEntrance(
+                                            index: 1,
+                                            child: _buildProfileCompletionCard(
+                                              profile,
+                                            ),
+                                          ),
+                                          const SizedBox(height: AppSpacing.lg),
+                                          if (_hasIndustryHierarchy(
+                                            profile,
+                                          )) ...<Widget>[
+                                            AppStaggeredEntrance(
+                                              index: 2,
+                                              child: _buildHierarchySummaryCard(
+                                                profile!,
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: AppSpacing.lg,
+                                            ),
+                                          ],
+                                          AppStaggeredEntrance(
+                                            index: 3,
+                                            child: _buildSecurityCard(
+                                              profile,
+                                              user,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
 
-                        // Member Hero Header Card
-                        _buildMemberHeroCard(context, profile, user),
-                        const SizedBox(height: AppSpacing.lg),
-
-                        // Profile Completion Status
-                        _buildProfileCompletionCard(profile),
-                        const SizedBox(height: AppSpacing.lg),
-
-                        // Quick Actions Grid
-                        _buildQuickActionsCard(context, ref),
-                        const SizedBox(height: AppSpacing.lg),
-
-                        // Industry 4-Tier Hierarchy Card
-                        if (_hasIndustryHierarchy(profile)) ...<Widget>[
-                          _buildHierarchySummaryCard(profile!),
-                          const SizedBox(height: AppSpacing.lg),
-                        ],
-
-                        // Member Details Section
-                        _buildProfileDetailsCard(profile, user),
-                        const SizedBox(height: AppSpacing.lg),
-
-                        // Security & Session Info Card
-                        _buildSecurityCard(profile, user),
-                        const SizedBox(height: AppSpacing.xl),
-
-                        // Action Logout Button in page footer
-                        AppButton.secondary(
-                          key: const Key('dashboardFooterLogoutButton'),
-                          text: 'Sign Out of Active Session',
-                          leadingIcon: const Icon(
-                            Icons.logout_rounded,
-                            size: 18,
-                            color: AppColors.error,
-                          ),
-                          foregroundColor: AppColors.error,
-                          borderColor: AppColors.error.withValues(alpha: 0.3),
-                          isFullWidth: true,
-                          onPressed: () => _handleLogout(context, ref),
-                        ),
-                        const SizedBox(height: AppSpacing.xxl),
-                      ],
+                            // Mobile and Tablet single column
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: <Widget>[
+                                const SizedBox(height: AppSpacing.sm),
+                                AppStaggeredEntrance(
+                                  index: 0,
+                                  child: _buildMemberHeroCard(
+                                    context,
+                                    profile,
+                                    user,
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.lg),
+                                AppStaggeredEntrance(
+                                  index: 1,
+                                  child: _buildProfileCompletionCard(profile),
+                                ),
+                                const SizedBox(height: AppSpacing.lg),
+                                AppStaggeredEntrance(
+                                  index: 2,
+                                  child: _buildQuickActionsCard(context, ref),
+                                ),
+                                const SizedBox(height: AppSpacing.lg),
+                                if (_hasIndustryHierarchy(profile)) ...<Widget>[
+                                  AppStaggeredEntrance(
+                                    index: 3,
+                                    child: _buildHierarchySummaryCard(profile!),
+                                  ),
+                                  const SizedBox(height: AppSpacing.lg),
+                                ],
+                                AppStaggeredEntrance(
+                                  index: 4,
+                                  child: _buildProfileDetailsCard(
+                                    profile,
+                                    user,
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.lg),
+                                AppStaggeredEntrance(
+                                  index: 5,
+                                  child: _buildSecurityCard(profile, user),
+                                ),
+                                const SizedBox(height: AppSpacing.xxl),
+                              ],
+                            );
+                          },
                     ),
                   ),
                 ),
@@ -401,8 +493,8 @@ class DashboardScreen extends ConsumerWidget {
             ) {
               final int crossAxisCount = switch (deviceType) {
                 DeviceType.mobile => 2,
-                DeviceType.tablet => 4,
-                DeviceType.desktop => 5,
+                DeviceType.tablet => 3,
+                DeviceType.desktop => 2,
               };
 
               return GridView.count(
@@ -411,7 +503,7 @@ class DashboardScreen extends ConsumerWidget {
                 mainAxisSpacing: AppSpacing.md,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                childAspectRatio: deviceType == DeviceType.mobile ? 1.35 : 1.25,
+                childAspectRatio: 2.4,
                 children: <Widget>[
                   _buildActionTile(
                     icon: Icons.person_outline_rounded,
@@ -468,8 +560,8 @@ class DashboardScreen extends ConsumerWidget {
         borderRadius: AppSpacing.borderRadiusMd,
         child: Container(
           padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.sm,
-            vertical: AppSpacing.md,
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
           ),
           decoration: BoxDecoration(
             color: AppColors.surface,
@@ -483,30 +575,32 @@ class DashboardScreen extends ConsumerWidget {
               ),
             ],
           ),
-          child: Column(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Container(
-                width: 44,
-                height: 44,
+                width: 36,
+                height: 36,
+                alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: effectiveColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, size: 24, color: effectiveColor),
+                child: Icon(icon, size: 20, color: effectiveColor),
               ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                label,
-                style: AppTextStyles.labelMedium.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: effectiveColor == AppColors.error
-                      ? AppColors.error
-                      : AppColors.textPrimary,
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  label,
+                  style: AppTextStyles.labelMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: effectiveColor == AppColors.error
+                        ? AppColors.error
+                        : AppColors.textPrimary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

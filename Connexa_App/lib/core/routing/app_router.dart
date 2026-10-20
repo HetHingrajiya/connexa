@@ -75,28 +75,34 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((Ref ref) {
       GoRoute(
         path: '/',
         name: 'splash',
-        builder: (BuildContext context, GoRouterState state) {
-          return const SplashScreen();
-        },
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const SplashScreen(),
+            ),
       ),
       GoRoute(
         path: '/onboarding',
         name: 'onboarding',
-        builder: (BuildContext context, GoRouterState state) {
-          return const OnboardingScreen();
-        },
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const OnboardingScreen(),
+            ),
       ),
       GoRoute(
         path: '/login',
         name: 'login',
-        builder: (BuildContext context, GoRouterState state) {
-          return const LoginScreen();
-        },
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const LoginScreen(),
+            ),
       ),
       GoRoute(
         path: '/setup-password',
         name: 'setup-password',
-        builder: (BuildContext context, GoRouterState state) {
+        pageBuilder: (BuildContext context, GoRouterState state) {
           String? token;
           String? destination;
           if (state.extra is Map<String, dynamic>) {
@@ -107,115 +113,147 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((Ref ref) {
           } else if (state.extra is String) {
             token = state.extra as String;
           }
-          return SetupPasswordScreen(
-            initialCredentialSetupToken: token,
-            initialDestination: destination,
+          return AppAnimations.buildPageTransition(
+            key: state.pageKey,
+            child: SetupPasswordScreen(
+              initialCredentialSetupToken: token,
+              initialDestination: destination,
+            ),
           );
         },
       ),
       GoRoute(
         path: '/dashboard',
         name: 'dashboard',
-        builder: (BuildContext context, GoRouterState state) {
-          return const DashboardScreen();
-        },
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const DashboardScreen(),
+            ),
       ),
       GoRoute(
         path: '/profile',
         name: 'profile',
-        builder: (BuildContext context, GoRouterState state) {
-          return const ProfileScreen();
-        },
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const ProfileScreen(),
+            ),
       ),
       GoRoute(
         path: '/profile/edit',
         name: 'profile-edit',
-        builder: (BuildContext context, GoRouterState state) {
-          return const EditProfileScreen();
-        },
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const EditProfileScreen(),
+            ),
       ),
       GoRoute(
         path: '/directory',
         name: 'directory',
-        builder: (BuildContext context, GoRouterState state) {
-          return const BusinessDirectoryScreen();
-        },
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const BusinessDirectoryScreen(),
+            ),
       ),
       GoRoute(
         path: '/network',
         name: 'network',
-        builder: (BuildContext context, GoRouterState state) {
+        pageBuilder: (BuildContext context, GoRouterState state) {
           int initialTab = 0;
           if (state.extra is int) {
             initialTab = state.extra as int;
           } else if (state.uri.queryParameters.containsKey('tab')) {
             initialTab = int.tryParse(state.uri.queryParameters['tab']!) ?? 0;
           }
-          return NetworkScreen(initialTab: initialTab);
+          return AppAnimations.buildPageTransition(
+            key: state.pageKey,
+            child: NetworkScreen(initialTab: initialTab),
+          );
         },
       ),
       GoRoute(
         path: '/registration',
         name: 'registration',
-        builder: (BuildContext context, GoRouterState state) {
-          return const RegistrationScreen();
-        },
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const RegistrationScreen(),
+            ),
       ),
       GoRoute(
         path: '/registration/step-2-placeholder',
         name: 'registration-step-2-placeholder',
-        builder: (BuildContext context, GoRouterState state) {
-          return const ProfileDetailsScreen();
-        },
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const ProfileDetailsScreen(),
+            ),
       ),
       GoRoute(
         path: '/registration/profile-details',
         name: 'registration-profile-details',
-        builder: (BuildContext context, GoRouterState state) {
-          return const ProfileDetailsScreen();
-        },
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const ProfileDetailsScreen(),
+            ),
       ),
       GoRoute(
         path: '/registration/step-3-placeholder',
         name: 'registration-step-3-placeholder',
-        builder: (BuildContext context, GoRouterState state) {
-          return const RegistrationReviewScreen();
-        },
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const RegistrationReviewScreen(),
+            ),
       ),
       GoRoute(
         path: '/registration/review',
         name: 'registration-review',
-        builder: (BuildContext context, GoRouterState state) {
-          return const RegistrationReviewScreen();
-        },
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const RegistrationReviewScreen(),
+            ),
       ),
       GoRoute(
         path: '/registration/phone-verification',
         name: 'registration-phone-verification',
-        builder: (BuildContext context, GoRouterState state) {
-          return const PhoneVerificationScreen();
-        },
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const PhoneVerificationScreen(),
+            ),
       ),
       GoRoute(
         path: '/registration/email-verification',
         name: 'registration-email-verification',
-        builder: (BuildContext context, GoRouterState state) {
-          return const EmailVerificationScreen();
-        },
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const EmailVerificationScreen(),
+            ),
       ),
       GoRoute(
         path: '/registration/success',
         name: 'registration-success',
-        builder: (BuildContext context, GoRouterState state) {
-          return const RegistrationSuccessScreen();
-        },
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const RegistrationSuccessScreen(),
+            ),
       ),
       GoRoute(
         path: '/design-preview',
         name: 'design-preview',
-        builder: (BuildContext context, GoRouterState state) {
-          return const _InitializationScreen();
-        },
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const _InitializationScreen(),
+            ),
       ),
     ],
   );

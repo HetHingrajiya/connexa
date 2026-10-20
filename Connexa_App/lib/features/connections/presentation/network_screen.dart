@@ -258,6 +258,10 @@ class _NetworkScreenState extends ConsumerState<NetworkScreen>
         ],
         bottom: TabBar(
           controller: _tabController,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
+          indicatorColor: AppColors.secondary,
+          indicatorWeight: 3.0,
           tabs: <Widget>[
             Tab(
               child: Row(
@@ -396,14 +400,47 @@ class _NetworkScreenState extends ConsumerState<NetworkScreen>
       );
     }
 
-    return ListView.builder(
-      physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-      itemCount: state.connections.length,
-      itemBuilder: (BuildContext context, int index) {
-        final ConnectedMemberItem item = state.connections[index];
-        return _buildConnectedMemberCard(context, item);
-      },
+    return ResponsiveBuilder(
+      builder:
+          (
+            BuildContext context,
+            DeviceType deviceType,
+            BoxConstraints constraints,
+          ) {
+            if (deviceType == DeviceType.desktop) {
+              return GridView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: AppSpacing.md,
+                  mainAxisSpacing: AppSpacing.md,
+                  childAspectRatio: 1.8,
+                ),
+                itemCount: state.connections.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final ConnectedMemberItem item = state.connections[index];
+                  return AppStaggeredEntrance(
+                    index: index,
+                    child: _buildConnectedMemberCard(context, item),
+                  );
+                },
+              );
+            }
+
+            return ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+              itemCount: state.connections.length,
+              itemBuilder: (BuildContext context, int index) {
+                final ConnectedMemberItem item = state.connections[index];
+                return AppStaggeredEntrance(
+                  index: index,
+                  child: _buildConnectedMemberCard(context, item),
+                );
+              },
+            );
+          },
     );
   }
 
@@ -596,124 +633,127 @@ class _NetworkScreenState extends ConsumerState<NetworkScreen>
           final bool isItemBusy =
               state.isProcessingAction && state.processingId == item.id;
 
-          return AppCard(
-            margin: const EdgeInsets.only(bottom: AppSpacing.md),
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    CircleAvatar(
-                      radius: 24,
-                      backgroundColor: AppColors.secondaryContainer,
-                      child: Text(
-                        item.companyName.isNotEmpty
-                            ? item.companyName.substring(0, 1).toUpperCase()
-                            : 'M',
-                        style: AppTextStyles.titleMedium.copyWith(
-                          color: AppColors.secondary,
-                          fontWeight: FontWeight.bold,
+          return AppStaggeredEntrance(
+            index: index,
+            child: AppCard(
+              margin: const EdgeInsets.only(bottom: AppSpacing.md),
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundColor: AppColors.secondaryContainer,
+                        child: Text(
+                          item.companyName.isNotEmpty
+                              ? item.companyName.substring(0, 1).toUpperCase()
+                              : 'M',
+                          style: AppTextStyles.titleMedium.copyWith(
+                            color: AppColors.secondary,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: AppSpacing.md),
-                    Expanded(
-                      child: Column(
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              item.companyName,
+                              style: AppTextStyles.titleMedium.copyWith(
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.1,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              item.fullName,
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${item.businessType} • ${item.displayLocation}',
+                              style: AppTextStyles.labelSmall.copyWith(
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  if (item.note != null &&
+                      item.note!.trim().isNotEmpty) ...<Widget>[
+                    const SizedBox(height: AppSpacing.md),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceContainerLow,
+                        borderRadius: AppSpacing.borderRadiusMd,
+                        border: Border.all(color: AppColors.border),
+                      ),
+                      child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text(
-                            item.companyName,
-                            style: AppTextStyles.titleMedium.copyWith(
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -0.1,
-                            ),
-                            overflow: TextOverflow.ellipsis,
+                          const Icon(
+                            Icons.format_quote_rounded,
+                            size: 16,
+                            color: AppColors.secondary,
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            item.fullName,
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '${item.businessType} • ${item.displayLocation}',
-                            style: AppTextStyles.labelSmall.copyWith(
-                              color: AppColors.textSecondary,
+                          const SizedBox(width: AppSpacing.xs),
+                          Expanded(
+                            child: Text(
+                              item.note!.trim(),
+                              style: AppTextStyles.bodySmall.copyWith(
+                                fontStyle: FontStyle.italic,
+                                color: AppColors.textPrimary,
+                                height: 1.4,
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
                   ],
-                ),
 
-                if (item.note != null &&
-                    item.note!.trim().isNotEmpty) ...<Widget>[
-                  const SizedBox(height: AppSpacing.md),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceContainerLow,
-                      borderRadius: AppSpacing.borderRadiusMd,
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        const Icon(
-                          Icons.format_quote_rounded,
-                          size: 16,
-                          color: AppColors.secondary,
+                  const SizedBox(height: AppSpacing.lg),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: AppButton.secondary(
+                          text: 'Decline',
+                          onPressed: isItemBusy
+                              ? null
+                              : () => _handleRejectRequest(item),
                         ),
-                        const SizedBox(width: AppSpacing.xs),
-                        Expanded(
-                          child: Text(
-                            item.note!.trim(),
-                            style: AppTextStyles.bodySmall.copyWith(
-                              fontStyle: FontStyle.italic,
-                              color: AppColors.textPrimary,
-                              height: 1.4,
-                            ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: AppButton.primary(
+                          text: 'Accept',
+                          isLoading: isItemBusy,
+                          leadingIcon: const Icon(
+                            Icons.check_circle_rounded,
+                            size: 18,
                           ),
+                          onPressed: isItemBusy
+                              ? null
+                              : () => _handleAcceptRequest(item),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ],
-
-                const SizedBox(height: AppSpacing.lg),
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: AppButton.secondary(
-                        text: 'Decline',
-                        onPressed: isItemBusy
-                            ? null
-                            : () => _handleRejectRequest(item),
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.md),
-                    Expanded(
-                      child: AppButton.primary(
-                        text: 'Accept',
-                        isLoading: isItemBusy,
-                        leadingIcon: const Icon(
-                          Icons.check_circle_rounded,
-                          size: 18,
-                        ),
-                        onPressed: isItemBusy
-                            ? null
-                            : () => _handleAcceptRequest(item),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
           );
         },
@@ -768,100 +808,106 @@ class _NetworkScreenState extends ConsumerState<NetworkScreen>
           final bool isItemBusy =
               state.isProcessingAction && state.processingId == item.id;
 
-          return AppCard(
-            margin: const EdgeInsets.only(bottom: AppSpacing.md),
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    CircleAvatar(
-                      radius: 24,
-                      backgroundColor: AppColors.primaryContainer,
+          return AppStaggeredEntrance(
+            index: index,
+            child: AppCard(
+              margin: const EdgeInsets.only(bottom: AppSpacing.md),
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundColor: AppColors.primaryContainer,
+                        child: Text(
+                          item.companyName.isNotEmpty
+                              ? item.companyName.substring(0, 1).toUpperCase()
+                              : 'M',
+                          style: AppTextStyles.titleMedium.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              item.companyName,
+                              style: AppTextStyles.titleMedium.copyWith(
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.1,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              item.fullName,
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${item.businessType} • ${item.displayLocation}',
+                              style: AppTextStyles.labelSmall.copyWith(
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const AppBadge.warning(label: 'Pending'),
+                    ],
+                  ),
+
+                  if (item.note != null &&
+                      item.note!.trim().isNotEmpty) ...<Widget>[
+                    const SizedBox(height: AppSpacing.md),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceContainerLow,
+                        borderRadius: AppSpacing.borderRadiusMd,
+                        border: Border.all(color: AppColors.border),
+                      ),
                       child: Text(
-                        item.companyName.isNotEmpty
-                            ? item.companyName.substring(0, 1).toUpperCase()
-                            : 'M',
-                        style: AppTextStyles.titleMedium.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
+                        'Note: "${item.note!.trim()}"',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          fontStyle: FontStyle.italic,
+                          color: AppColors.textPrimary,
+                          height: 1.4,
                         ),
                       ),
                     ),
-                    const SizedBox(width: AppSpacing.md),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            item.companyName,
-                            style: AppTextStyles.titleMedium.copyWith(
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -0.1,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            item.fullName,
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '${item.businessType} • ${item.displayLocation}',
-                            style: AppTextStyles.labelSmall.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const AppBadge.warning(label: 'Pending'),
                   ],
-                ),
 
-                if (item.note != null &&
-                    item.note!.trim().isNotEmpty) ...<Widget>[
                   const SizedBox(height: AppSpacing.md),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceContainerLow,
-                      borderRadius: AppSpacing.borderRadiusMd,
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: Text(
-                      'Note: "${item.note!.trim()}"',
-                      style: AppTextStyles.bodySmall.copyWith(
-                        fontStyle: FontStyle.italic,
-                        color: AppColors.textPrimary,
-                        height: 1.4,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      AppButton.secondary(
+                        text: 'Cancel Request',
+                        height: 38,
+                        isLoading: isItemBusy,
+                        leadingIcon: const Icon(
+                          Icons.cancel_outlined,
+                          size: 16,
+                        ),
+                        onPressed: isItemBusy
+                            ? null
+                            : () => _handleCancelRequest(item),
                       ),
-                    ),
+                    ],
                   ),
                 ],
-
-                const SizedBox(height: AppSpacing.md),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    AppButton.secondary(
-                      text: 'Cancel Request',
-                      height: 38,
-                      isLoading: isItemBusy,
-                      leadingIcon: const Icon(Icons.cancel_outlined, size: 16),
-                      onPressed: isItemBusy
-                          ? null
-                          : () => _handleCancelRequest(item),
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
           );
         },

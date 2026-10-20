@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\connexa\\Connexa_API\\src\\Connexa.Api\\Connexa.Api.csproj": {}
+    "E:\\Connexa\\Connexa_API\\src\\Connexa.Api\\Connexa.Api.csproj": {}
   },
   "projects": {
-    "E:\\connexa\\Connexa_API\\src\\Connexa.Api\\Connexa.Api.csproj": {
+    "E:\\Connexa\\Connexa_API\\src\\Connexa.Api\\Connexa.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\connexa\\Connexa_API\\src\\Connexa.Api\\Connexa.Api.csproj",
+        "projectUniqueName": "E:\\Connexa\\Connexa_API\\src\\Connexa.Api\\Connexa.Api.csproj",
         "projectName": "Connexa.Api",
-        "projectPath": "E:\\connexa\\Connexa_API\\src\\Connexa.Api\\Connexa.Api.csproj",
+        "projectPath": "E:\\Connexa\\Connexa_API\\src\\Connexa.Api\\Connexa.Api.csproj",
         "packagesPath": "C:\\Users\\HETH.H.H\\.nuget\\packages\\",
-        "outputPath": "E:\\connexa\\Connexa_API\\src\\Connexa.Api\\obj\\",
+        "outputPath": "E:\\Connexa\\Connexa_API\\src\\Connexa.Api\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

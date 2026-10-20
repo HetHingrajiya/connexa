@@ -79,16 +79,19 @@ class _AppSearchFieldState extends State<AppSearchField> {
       textInputAction: TextInputAction.search,
       decoration: InputDecoration(
         hintText: widget.hintText,
+        hintStyle: AppTextStyles.bodyMedium.copyWith(
+          color: AppColors.textMuted,
+        ),
         prefixIcon: const Icon(
           Icons.search_rounded,
-          color: AppColors.textMuted,
+          color: AppColors.textSecondary,
           size: 20,
         ),
         suffixIcon: _showClear
             ? IconButton(
                 icon: const Icon(
                   Icons.close_rounded,
-                  color: AppColors.textMuted,
+                  color: AppColors.textSecondary,
                   size: 18,
                 ),
                 onPressed: _clearSearch,
@@ -111,7 +114,7 @@ class _AppSearchFieldState extends State<AppSearchField> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppSpacing.borderRadiusLg,
-          borderSide: const BorderSide(color: AppColors.secondary, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
       ),
     );

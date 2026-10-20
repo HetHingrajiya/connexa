@@ -60,51 +60,167 @@ class ProfileScreen extends ConsumerWidget {
             onRefresh: () => ref.read(authProvider.notifier).refreshProfile(),
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  const SizedBox(height: AppSpacing.sm),
+              child: ResponsiveBuilder(
+                builder:
+                    (
+                      BuildContext context,
+                      DeviceType deviceType,
+                      BoxConstraints constraints,
+                    ) {
+                      if (deviceType == DeviceType.desktop) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: AppSpacing.sm,
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              // Left Profile Identity & Actions Column
+                              Expanded(
+                                flex: 4,
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: <Widget>[
+                                    AppStaggeredEntrance(
+                                      index: 0,
+                                      child: _buildHeroCard(context, profile),
+                                    ),
+                                    const SizedBox(height: AppSpacing.lg),
+                                    AppStaggeredEntrance(
+                                      index: 1,
+                                      child: _buildCompletionCard(
+                                        completionPercent,
+                                      ),
+                                    ),
+                                    const SizedBox(height: AppSpacing.lg),
+                                    AppStaggeredEntrance(
+                                      index: 2,
+                                      child: AppButton.primary(
+                                        key: const Key('profileEditButton'),
+                                        text: 'Edit Profile Details',
+                                        leadingIcon: const Icon(
+                                          Icons.edit_rounded,
+                                          size: 18,
+                                        ),
+                                        isFullWidth: true,
+                                        onPressed: () =>
+                                            context.push('/profile/edit'),
+                                      ),
+                                    ),
+                                    const SizedBox(height: AppSpacing.md),
+                                    AppStaggeredEntrance(
+                                      index: 3,
+                                      child: AppButton.secondary(
+                                        text: 'Back to Dashboard',
+                                        leadingIcon: const Icon(
+                                          Icons.dashboard_outlined,
+                                          size: 18,
+                                        ),
+                                        isFullWidth: true,
+                                        onPressed: () =>
+                                            context.go('/dashboard'),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: AppSpacing.lg),
+                              // Right Details & Classification Column
+                              Expanded(
+                                flex: 6,
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: <Widget>[
+                                    AppStaggeredEntrance(
+                                      index: 1,
+                                      child: _buildContactCard(profile),
+                                    ),
+                                    const SizedBox(height: AppSpacing.lg),
+                                    AppStaggeredEntrance(
+                                      index: 2,
+                                      child: _buildDomainDetailsCard(profile),
+                                    ),
+                                    if (_hasIndustryHierarchy(
+                                      profile,
+                                    )) ...<Widget>[
+                                      const SizedBox(height: AppSpacing.lg),
+                                      AppStaggeredEntrance(
+                                        index: 3,
+                                        child: _buildHierarchyCard(profile),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
 
-                  // Hero Identity Card
-                  _buildHeroCard(context, profile),
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // Profile Completion Card
-                  _buildCompletionCard(completionPercent),
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // Contact Details Card
-                  _buildContactCard(profile),
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // Domain Profile Details (Business / Trade / Worker)
-                  _buildDomainDetailsCard(profile),
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // 4-Tier Hierarchy Card (if applicable)
-                  if (_hasIndustryHierarchy(profile)) ...<Widget>[
-                    _buildHierarchyCard(profile),
-                    const SizedBox(height: AppSpacing.lg),
-                  ],
-
-                  // Edit Profile Primary Action
-                  AppButton.primary(
-                    key: const Key('profileEditButton'),
-                    text: 'Edit Profile Details',
-                    leadingIcon: const Icon(Icons.edit_rounded, size: 18),
-                    isFullWidth: true,
-                    onPressed: () => context.push('/profile/edit'),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-
-                  AppButton.secondary(
-                    text: 'Back to Dashboard',
-                    leadingIcon: const Icon(Icons.dashboard_outlined, size: 18),
-                    isFullWidth: true,
-                    onPressed: () => context.go('/dashboard'),
-                  ),
-                  const SizedBox(height: AppSpacing.xxl),
-                ],
+                      // Mobile and Tablet single column
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          const SizedBox(height: AppSpacing.sm),
+                          AppStaggeredEntrance(
+                            index: 0,
+                            child: _buildHeroCard(context, profile),
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+                          AppStaggeredEntrance(
+                            index: 1,
+                            child: _buildCompletionCard(completionPercent),
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+                          AppStaggeredEntrance(
+                            index: 2,
+                            child: _buildContactCard(profile),
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+                          AppStaggeredEntrance(
+                            index: 3,
+                            child: _buildDomainDetailsCard(profile),
+                          ),
+                          if (_hasIndustryHierarchy(profile)) ...<Widget>[
+                            const SizedBox(height: AppSpacing.lg),
+                            AppStaggeredEntrance(
+                              index: 4,
+                              child: _buildHierarchyCard(profile),
+                            ),
+                          ],
+                          const SizedBox(height: AppSpacing.lg),
+                          AppStaggeredEntrance(
+                            index: 5,
+                            child: AppButton.primary(
+                              key: const Key('profileEditButton'),
+                              text: 'Edit Profile Details',
+                              leadingIcon: const Icon(
+                                Icons.edit_rounded,
+                                size: 18,
+                              ),
+                              isFullWidth: true,
+                              onPressed: () => context.push('/profile/edit'),
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          AppStaggeredEntrance(
+                            index: 6,
+                            child: AppButton.secondary(
+                              text: 'Back to Dashboard',
+                              leadingIcon: const Icon(
+                                Icons.dashboard_outlined,
+                                size: 18,
+                              ),
+                              isFullWidth: true,
+                              onPressed: () => context.go('/dashboard'),
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.xxl),
+                        ],
+                      );
+                    },
               ),
             ),
           ),

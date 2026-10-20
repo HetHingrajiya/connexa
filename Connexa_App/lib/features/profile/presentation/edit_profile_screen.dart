@@ -250,147 +250,90 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     const SizedBox(height: AppSpacing.md),
                   ],
 
-                  // Identity Section Card
-                  AppCard(
-                    title: 'Personal Identity',
-                    subtitle: 'Full name and verified identifiers',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        AppTextField(
-                          controller: _fullNameController,
-                          label: 'Full Name *',
-                          hintText: 'Enter your full name',
-                          prefixIcon: const Icon(Icons.person_outline_rounded),
-                          validator: (String? val) {
-                            if (val == null || val.trim().isEmpty) {
-                              return 'Full name cannot be blank';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        Container(
-                          padding: const EdgeInsets.all(AppSpacing.sm),
-                          decoration: BoxDecoration(
-                            color: AppColors.surfaceContainerLow,
-                            borderRadius: AppSpacing.borderRadiusSm,
-                            border: Border.all(color: AppColors.borderSubtle),
-                          ),
-                          child: Row(
-                            children: <Widget>[
-                              const Icon(
-                                Icons.lock_outline_rounded,
-                                size: 16,
-                                color: AppColors.textMuted,
-                              ),
-                              const SizedBox(width: AppSpacing.xs),
-                              Expanded(
-                                child: Text(
-                                  'Email (${profile.email}) and Phone (${profile.phoneNumber}) are verified credentials and cannot be edited directly.',
-                                  style: AppTextStyles.bodySmall.copyWith(
-                                    color: AppColors.textSecondary,
+                  LayoutBuilder(
+                    builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                          final bool isDesktop = constraints.maxWidth >= 900;
+
+                          if (isDesktop) {
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                // Left Column: Identity & Action Controls
+                                Expanded(
+                                  flex: 5,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: <Widget>[
+                                      AppStaggeredEntrance(
+                                        index: 0,
+                                        child: _buildIdentityCard(profile),
+                                      ),
+                                      const SizedBox(height: AppSpacing.lg),
+                                      AppStaggeredEntrance(
+                                        index: 1,
+                                        child: _buildActionButtonsCard(
+                                          authState,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
+                                const SizedBox(width: AppSpacing.lg),
+                                // Right Column: Business & Hierarchy
+                                Expanded(
+                                  flex: 7,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: <Widget>[
+                                      AppStaggeredEntrance(
+                                        index: 1,
+                                        child: _buildBusinessCard(isBusiness),
+                                      ),
+                                      if (isBusiness) ...<Widget>[
+                                        const SizedBox(height: AppSpacing.lg),
+                                        AppStaggeredEntrance(
+                                          index: 2,
+                                          child: _buildHierarchyDropdownsCard(),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
+
+                          // Mobile & Tablet Single Column
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: <Widget>[
+                              AppStaggeredEntrance(
+                                index: 0,
+                                child: _buildIdentityCard(profile),
+                              ),
+                              const SizedBox(height: AppSpacing.lg),
+                              AppStaggeredEntrance(
+                                index: 1,
+                                child: _buildBusinessCard(isBusiness),
+                              ),
+                              if (isBusiness) ...<Widget>[
+                                const SizedBox(height: AppSpacing.lg),
+                                AppStaggeredEntrance(
+                                  index: 2,
+                                  child: _buildHierarchyDropdownsCard(),
+                                ),
+                              ],
+                              const SizedBox(height: AppSpacing.lg),
+                              AppStaggeredEntrance(
+                                index: 3,
+                                child: _buildActionButtonsCard(authState),
                               ),
                             ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // Business Details Card
-                  AppCard(
-                    title: 'Business Information',
-                    subtitle:
-                        'Visible to verified Connexa members in Business Directory',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        AppTextField(
-                          controller: _companyOrWorkController,
-                          label: isBusiness
-                              ? 'Company / Business Name *'
-                              : 'Job Title / Specialization *',
-                          hintText: 'e.g. Acme Industrial Solutions',
-                          prefixIcon: const Icon(
-                            Icons.business_outlined,
-                            size: 20,
-                          ),
-                          validator: (String? val) {
-                            if (val == null || val.trim().isEmpty) {
-                              return 'This field is required';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-                        AppTextField(
-                          controller: _descriptionController,
-                          label: 'Description & Capabilities',
-                          hintText:
-                              'Describe your business operations, specialized equipment, products, or service offerings...',
-                          maxLines: 3,
-                          prefixIcon: const Icon(Icons.notes_rounded, size: 20),
-                        ),
-                        if (isBusiness) ...<Widget>[
-                          const SizedBox(height: AppSpacing.lg),
-                          const Text(
-                            'Business Capabilities',
-                            style: AppTextStyles.labelMedium,
-                          ),
-                          const SizedBox(height: AppSpacing.xs),
-                          Wrap(
-                            spacing: AppSpacing.xs,
-                            runSpacing: AppSpacing.xs,
-                            children: _availableCapabilities.map((String cap) {
-                              final bool isSelected = _selectedCapabilities
-                                  .contains(cap);
-                              return FilterChip(
-                                label: Text(cap),
-                                selected: isSelected,
-                                showCheckmark: false,
-                                onSelected: (bool selected) {
-                                  setState(() {
-                                    if (selected) {
-                                      _selectedCapabilities.add(cap);
-                                    } else {
-                                      _selectedCapabilities.remove(cap);
-                                    }
-                                  });
-                                },
-                              );
-                            }).toList(),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // 4-Tier Hierarchy Card (for Business / Contractor)
-                  if (isBusiness) ...<Widget>[
-                    _buildHierarchyDropdownsCard(),
-                    const SizedBox(height: AppSpacing.lg),
-                  ],
-
-                  // Action Buttons
-                  AppButton.primary(
-                    key: const Key('editProfileSaveButton'),
-                    text: 'Save Changes',
-                    isLoading: authState.isLoading,
-                    isFullWidth: true,
-                    leadingIcon: const Icon(Icons.save_rounded, size: 18),
-                    onPressed: authState.isLoading ? null : _handleSubmit,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-
-                  AppButton.secondary(
-                    text: 'Cancel',
-                    isFullWidth: true,
-                    onPressed: () => context.pop(),
+                          );
+                        },
                   ),
                   const SizedBox(height: AppSpacing.xxl),
                 ],
@@ -398,6 +341,145 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildIdentityCard(MemberProfile profile) {
+    return AppCard(
+      title: 'Personal Identity',
+      subtitle: 'Full name and verified identifiers',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          AppTextField(
+            controller: _fullNameController,
+            label: 'Full Name *',
+            hintText: 'Enter your full name',
+            prefixIcon: const Icon(Icons.person_outline_rounded),
+            validator: (String? val) {
+              if (val == null || val.trim().isEmpty) {
+                return 'Full name cannot be blank';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.sm),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceContainerLow,
+              borderRadius: AppSpacing.borderRadiusSm,
+              border: Border.all(color: AppColors.borderSubtle),
+            ),
+            child: Row(
+              children: <Widget>[
+                const Icon(
+                  Icons.lock_outline_rounded,
+                  size: 16,
+                  color: AppColors.textMuted,
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                Expanded(
+                  child: Text(
+                    'Email (${profile.email}) and Phone (${profile.phoneNumber}) are verified credentials and cannot be edited directly.',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBusinessCard(bool isBusiness) {
+    return AppCard(
+      title: 'Business Information',
+      subtitle: 'Visible to verified Connexa members in Business Directory',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          AppTextField(
+            controller: _companyOrWorkController,
+            label: isBusiness
+                ? 'Company / Business Name *'
+                : 'Job Title / Specialization *',
+            hintText: 'e.g. Acme Industrial Solutions',
+            prefixIcon: const Icon(Icons.business_outlined, size: 20),
+            validator: (String? val) {
+              if (val == null || val.trim().isEmpty) {
+                return 'This field is required';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          AppTextField(
+            controller: _descriptionController,
+            label: 'Description & Capabilities',
+            hintText:
+                'Describe your business operations, specialized equipment, products, or service offerings...',
+            maxLines: 3,
+            prefixIcon: const Icon(Icons.notes_rounded, size: 20),
+          ),
+          if (isBusiness) ...<Widget>[
+            const SizedBox(height: AppSpacing.lg),
+            const Text(
+              'Business Capabilities',
+              style: AppTextStyles.labelMedium,
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Wrap(
+              spacing: AppSpacing.xs,
+              runSpacing: AppSpacing.xs,
+              children: _availableCapabilities.map((String cap) {
+                final bool isSelected = _selectedCapabilities.contains(cap);
+                return FilterChip(
+                  label: Text(cap),
+                  selected: isSelected,
+                  showCheckmark: false,
+                  onSelected: (bool selected) {
+                    setState(() {
+                      if (selected) {
+                        _selectedCapabilities.add(cap);
+                      } else {
+                        _selectedCapabilities.remove(cap);
+                      }
+                    });
+                  },
+                );
+              }).toList(),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButtonsCard(AuthState authState) {
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          AppButton.primary(
+            key: const Key('editProfileSaveButton'),
+            text: 'Save Changes',
+            isLoading: authState.isLoading,
+            isFullWidth: true,
+            leadingIcon: const Icon(Icons.save_rounded, size: 18),
+            onPressed: authState.isLoading ? null : _handleSubmit,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          AppButton.secondary(
+            text: 'Cancel',
+            isFullWidth: true,
+            onPressed: () => context.pop(),
+          ),
+        ],
       ),
     );
   }

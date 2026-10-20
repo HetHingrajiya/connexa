@@ -14,6 +14,9 @@ import 'package:connexa/features/directory/models/directory_models.dart';
 import 'package:connexa/features/directory/presentation/directory_screen.dart';
 import 'package:connexa/features/directory/providers/directory_provider.dart';
 import 'package:connexa/features/profile/presentation/profile_screen.dart';
+import 'package:connexa/features/profile/presentation/edit_profile_screen.dart';
+import 'package:connexa/features/auth/presentation/login_screen.dart';
+import 'package:connexa/features/registration/presentation/registration_screen.dart';
 
 MemberProfile _createMockProfile() {
   return MemberProfile(
@@ -430,6 +433,149 @@ void main() {
         expect(tester.takeException(), isNull);
       },
     );
+
+    testWidgets(
+      'EditProfileScreen renders cleanly without overflow on 360x640 mobile',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(360, 640);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final MemberProfile profile = _createMockProfile();
+        final AuthState mockAuthState = AuthState(
+          isAuthenticated: true,
+          profile: profile,
+        );
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: <Override>[
+              authProvider.overrideWith(
+                (Ref ref) => MockAuthNotifier(mockAuthState),
+              ),
+            ],
+            child: MaterialApp(
+              theme: AppTheme.lightTheme,
+              home: const EditProfileScreen(),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Edit Profile'), findsOneWidget);
+        expect(find.text('Personal Identity'), findsOneWidget);
+        expect(find.byKey(const Key('editProfileSaveButton')), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      'EditProfileScreen renders 2-column desktop layout on 1280x800 desktop',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1280, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final MemberProfile profile = _createMockProfile();
+        final AuthState mockAuthState = AuthState(
+          isAuthenticated: true,
+          profile: profile,
+        );
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: <Override>[
+              authProvider.overrideWith(
+                (Ref ref) => MockAuthNotifier(mockAuthState),
+              ),
+            ],
+            child: MaterialApp(
+              theme: AppTheme.lightTheme,
+              home: const EditProfileScreen(),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Edit Profile'), findsOneWidget);
+        expect(find.text('Personal Identity'), findsOneWidget);
+        expect(find.text('Business Information'), findsOneWidget);
+        expect(find.byKey(const Key('editProfileSaveButton')), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      'LoginScreen renders cleanly on 360x640 mobile and 1280x800 desktop',
+      (WidgetTester tester) async {
+        // Mobile Viewport
+        tester.view.physicalSize = const Size(360, 640);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final AuthState mockAuthState = const AuthState();
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: <Override>[
+              authProvider.overrideWith(
+                (Ref ref) => MockAuthNotifier(mockAuthState),
+              ),
+            ],
+            child: MaterialApp(
+              theme: AppTheme.lightTheme,
+              home: const LoginScreen(),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Welcome Back to Connexa'), findsOneWidget);
+        expect(find.byKey(const Key('loginIdentifierField')), findsOneWidget);
+        expect(find.byKey(const Key('loginPasswordField')), findsOneWidget);
+        expect(find.byKey(const Key('loginSubmitButton')), findsOneWidget);
+        expect(tester.takeException(), isNull);
+
+        // Desktop Viewport
+        tester.view.physicalSize = const Size(1280, 800);
+        await tester.pumpAndSettle();
+
+        expect(find.text('Connexa Business Network'), findsOneWidget);
+        expect(find.text('Verified Member Credentials'), findsOneWidget);
+        expect(find.byKey(const Key('loginSubmitButton')), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      'RegistrationScreen renders cleanly on 360x640 mobile and 1280x800 desktop',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1280, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        await tester.pumpWidget(
+          ProviderScope(
+            child: MaterialApp(
+              theme: AppTheme.lightTheme,
+              home: const RegistrationScreen(),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Create Your Connexa Account'), findsOneWidget);
+        expect(find.byKey(const Key('fullNameField')), findsOneWidget);
+        expect(find.byKey(const Key('phoneField')), findsOneWidget);
+        expect(find.byKey(const Key('emailField')), findsOneWidget);
+        expect(find.byKey(const Key('continueButton')), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
   });
 
   group('Brand Color System Verification', () {
@@ -456,6 +602,29 @@ void main() {
         expect(theme.colorScheme.primary, AppColors.primary);
         expect(theme.scaffoldBackgroundColor, AppColors.background);
         expect(theme.cardTheme.color, AppColors.surface);
+      },
+    );
+  });
+
+  group('Animation & Transition System Verification', () {
+    testWidgets(
+      'AppStaggeredEntrance renders child cleanly with slide & fade',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: AppStaggeredEntrance(
+                index: 0,
+                child: const Text('Animated Child Content'),
+              ),
+            ),
+          ),
+        );
+
+        // Initially rendered and animating
+        expect(find.text('Animated Child Content'), findsOneWidget);
+        await tester.pumpAndSettle();
+        expect(find.text('Animated Child Content'), findsOneWidget);
       },
     );
   });

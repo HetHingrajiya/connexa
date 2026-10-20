@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\connexa\\Connexa_API\\tests\\Connexa.Api.Tests\\Connexa.Api.Tests.csproj": {}
+    "E:\\Connexa\\Connexa_API\\tests\\Connexa.Api.Tests\\Connexa.Api.Tests.csproj": {}
   },
   "projects": {
-    "E:\\connexa\\Connexa_API\\src\\Connexa.Api\\Connexa.Api.csproj": {
+    "E:\\Connexa\\Connexa_API\\src\\Connexa.Api\\Connexa.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\connexa\\Connexa_API\\src\\Connexa.Api\\Connexa.Api.csproj",
+        "projectUniqueName": "E:\\Connexa\\Connexa_API\\src\\Connexa.Api\\Connexa.Api.csproj",
         "projectName": "Connexa.Api",
-        "projectPath": "E:\\connexa\\Connexa_API\\src\\Connexa.Api\\Connexa.Api.csproj",
+        "projectPath": "E:\\Connexa\\Connexa_API\\src\\Connexa.Api\\Connexa.Api.csproj",
         "packagesPath": "C:\\Users\\HETH.H.H\\.nuget\\packages\\",
-        "outputPath": "E:\\connexa\\Connexa_API\\src\\Connexa.Api\\obj\\",
+        "outputPath": "E:\\Connexa\\Connexa_API\\src\\Connexa.Api\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -103,14 +103,14 @@
         }
       }
     },
-    "E:\\connexa\\Connexa_API\\tests\\Connexa.Api.Tests\\Connexa.Api.Tests.csproj": {
+    "E:\\Connexa\\Connexa_API\\tests\\Connexa.Api.Tests\\Connexa.Api.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\connexa\\Connexa_API\\tests\\Connexa.Api.Tests\\Connexa.Api.Tests.csproj",
+        "projectUniqueName": "E:\\Connexa\\Connexa_API\\tests\\Connexa.Api.Tests\\Connexa.Api.Tests.csproj",
         "projectName": "Connexa.Api.Tests",
-        "projectPath": "E:\\connexa\\Connexa_API\\tests\\Connexa.Api.Tests\\Connexa.Api.Tests.csproj",
+        "projectPath": "E:\\Connexa\\Connexa_API\\tests\\Connexa.Api.Tests\\Connexa.Api.Tests.csproj",
         "packagesPath": "C:\\Users\\HETH.H.H\\.nuget\\packages\\",
-        "outputPath": "E:\\connexa\\Connexa_API\\tests\\Connexa.Api.Tests\\obj\\",
+        "outputPath": "E:\\Connexa\\Connexa_API\\tests\\Connexa.Api.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -133,8 +133,8 @@
             "framework": "net8.0",
             "targetAlias": "net8.0",
             "projectReferences": {
-              "E:\\connexa\\Connexa_API\\src\\Connexa.Api\\Connexa.Api.csproj": {
-                "projectPath": "E:\\connexa\\Connexa_API\\src\\Connexa.Api\\Connexa.Api.csproj"
+              "E:\\Connexa\\Connexa_API\\src\\Connexa.Api\\Connexa.Api.csproj": {
+                "projectPath": "E:\\Connexa\\Connexa_API\\src\\Connexa.Api\\Connexa.Api.csproj"
               }
             }
           }
