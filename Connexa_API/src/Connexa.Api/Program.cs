@@ -10,6 +10,7 @@ using Connexa.Api.Data;
 using Connexa.Api.Middleware;
 using Connexa.Api.Services;
 using Connexa.Api.Services.Auth;
+using Connexa.Api.Services.Connections;
 using Connexa.Api.Services.Directory;
 using Connexa.Api.Services.Email;
 using Connexa.Api.Services.Registration;
@@ -81,6 +82,7 @@ builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IDirectoryService, DirectoryService>();
+builder.Services.AddScoped<IConnectionService, ConnectionService>();
 
 // Configure JWT Bearer Authentication
 var jwtSection = builder.Configuration.GetSection(JwtOptions.SectionName);

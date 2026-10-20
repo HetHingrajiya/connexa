@@ -41,4 +41,9 @@ public class Member
 
     // Refresh Tokens navigation
     public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+
+    // Member Connections navigation
+    public ICollection<MemberConnection> SentConnections { get; set; } = new List<MemberConnection>();
+    public ICollection<MemberConnection> ReceivedConnections { get; set; } = new List<MemberConnection>();
 }
+

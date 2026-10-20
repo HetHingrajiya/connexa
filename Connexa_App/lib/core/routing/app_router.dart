@@ -14,6 +14,7 @@ import 'package:connexa/features/registration/presentation/phone_verification_sc
 import 'package:connexa/features/registration/presentation/profile_details_screen.dart';
 import 'package:connexa/features/registration/presentation/registration_review_screen.dart';
 import 'package:connexa/features/registration/presentation/registration_screen.dart';
+import 'package:connexa/features/connections/presentation/network_screen.dart';
 import 'package:connexa/features/directory/presentation/directory_screen.dart';
 import 'package:connexa/features/profile/presentation/edit_profile_screen.dart';
 import 'package:connexa/features/profile/presentation/profile_screen.dart';
@@ -56,7 +57,8 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((Ref ref) {
           loc == '/dashboard' ||
           loc == '/profile' ||
           loc == '/profile/edit' ||
-          loc == '/directory';
+          loc == '/directory' ||
+          loc == '/network';
       final bool isAuthRoute = loc == '/login';
 
       if (!isAuthenticated && isProtectedRoute) {
@@ -137,6 +139,19 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((Ref ref) {
         name: 'directory',
         builder: (BuildContext context, GoRouterState state) {
           return const BusinessDirectoryScreen();
+        },
+      ),
+      GoRoute(
+        path: '/network',
+        name: 'network',
+        builder: (BuildContext context, GoRouterState state) {
+          int initialTab = 0;
+          if (state.extra is int) {
+            initialTab = state.extra as int;
+          } else if (state.uri.queryParameters.containsKey('tab')) {
+            initialTab = int.tryParse(state.uri.queryParameters['tab']!) ?? 0;
+          }
+          return NetworkScreen(initialTab: initialTab);
         },
       ),
       GoRoute(

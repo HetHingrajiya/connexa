@@ -198,20 +198,34 @@ class _RegistrationReviewScreenState
       decoration: BoxDecoration(
         color: AppColors.primaryContainer,
         borderRadius: AppSpacing.borderRadiusMd,
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
       ),
       child: Row(
         children: <Widget>[
-          const Icon(
-            Icons.fact_check_outlined,
-            size: 16,
-            color: AppColors.primary,
+          Container(
+            width: 22,
+            height: 22,
+            decoration: const BoxDecoration(
+              color: AppColors.primary,
+              shape: BoxShape.circle,
+            ),
+            child: const Center(
+              child: Text(
+                '3',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
               'Step 3 of the registration process — Review & Confirm',
               style: AppTextStyles.labelSmall.copyWith(
-                color: AppColors.primaryLight,
+                color: AppColors.primary,
                 fontWeight: FontWeight.w700,
               ),
             ),

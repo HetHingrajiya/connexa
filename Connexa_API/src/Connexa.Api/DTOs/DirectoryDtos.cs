@@ -17,7 +17,12 @@ public record BusinessDirectoryItemDto(
     int CategoryId,
     string CategoryName,
     string VerifiedMethod,
-    DateTime MemberSinceUtc
+    DateTime MemberSinceUtc,
+    string BusinessType = "Manufacturer / Company",
+    string? Location = null,
+    string? MaskedEmail = null,
+    string? MaskedPhoneNumber = null,
+    string? ConnectionStatus = "Not Connected"
 );
 
 public record BusinessDirectoryResponseDto(
@@ -35,6 +40,9 @@ public record BusinessDirectoryFilterDto(
     int? SubGroupId = null,
     int? CategoryId = null,
     string? Capability = null,
+    string? BusinessType = null,
+    string? Location = null,
     int Page = 1,
     int PageSize = 10
 );
+

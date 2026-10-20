@@ -1,5 +1,794 @@
 [
   {
+    "ContainingType": "Connexa.Api.Controllers.AuthController",
+    "Method": "Login",
+    "RelativePath": "api/v1/auth/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Connexa.Api.DTOs.LoginRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.AuthResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.AuthResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.AuthResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 401
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.AuthResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 429
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.AuthController",
+    "Method": "Logout",
+    "RelativePath": "api/v1/auth/logout",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Connexa.Api.DTOs.LogoutRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.AuthController",
+    "Method": "Refresh",
+    "RelativePath": "api/v1/auth/refresh",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Connexa.Api.DTOs.RefreshTokenRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.AuthResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.AuthResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.AuthResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 401
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.AuthController",
+    "Method": "RequestSetupOtp",
+    "RelativePath": "api/v1/auth/request-setup-otp",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Connexa.Api.DTOs.RequestSetupOtpRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.RequestSetupOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.RequestSetupOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.RequestSetupOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.AuthController",
+    "Method": "SetupPassword",
+    "RelativePath": "api/v1/auth/setup-password",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Connexa.Api.DTOs.SetupPasswordRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.AuthResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.AuthResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.AuthResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.AuthController",
+    "Method": "VerifySetupOtp",
+    "RelativePath": "api/v1/auth/verify-setup-otp",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Connexa.Api.DTOs.VerifySetupOtpRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.VerifySetupOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.VerifySetupOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.VerifySetupOtpResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.ConnectionsController",
+    "Method": "GetConnections",
+    "RelativePath": "api/v1/connections",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "search",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.PaginatedConnectionsDto\u00601[[Connexa.Api.DTOs.ConnectedMemberItemDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.PaginatedConnectionsDto\u00601[[Connexa.Api.DTOs.ConnectedMemberItemDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 401
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.ConnectionsController",
+    "Method": "RemoveConnection",
+    "RelativePath": "api/v1/connections/{memberId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "memberId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 401
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.ConnectionsController",
+    "Method": "SendRequest",
+    "RelativePath": "api/v1/connections/requests",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "Connexa.Api.DTOs.CreateConnectionRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ConnectionDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ConnectionDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ConnectionDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 401
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.ConnectionsController",
+    "Method": "AcceptRequest",
+    "RelativePath": "api/v1/connections/requests/{id}/accept",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ConnectionDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ConnectionDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ConnectionDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 401
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ConnectionDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.ConnectionsController",
+    "Method": "CancelRequest",
+    "RelativePath": "api/v1/connections/requests/{id}/cancel",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ConnectionDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ConnectionDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ConnectionDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 401
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ConnectionDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.ConnectionsController",
+    "Method": "RejectRequest",
+    "RelativePath": "api/v1/connections/requests/{id}/reject",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ConnectionDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ConnectionDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ConnectionDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 401
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ConnectionDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.ConnectionsController",
+    "Method": "GetReceivedRequests",
+    "RelativePath": "api/v1/connections/requests/received",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.PaginatedConnectionsDto\u00601[[Connexa.Api.DTOs.ConnectionRequestItemDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.PaginatedConnectionsDto\u00601[[Connexa.Api.DTOs.ConnectionRequestItemDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 401
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.ConnectionsController",
+    "Method": "GetSentRequests",
+    "RelativePath": "api/v1/connections/requests/sent",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.PaginatedConnectionsDto\u00601[[Connexa.Api.DTOs.ConnectionRequestItemDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.PaginatedConnectionsDto\u00601[[Connexa.Api.DTOs.ConnectionRequestItemDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 401
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.ConnectionsController",
+    "Method": "GetSummary",
+    "RelativePath": "api/v1/connections/summary",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ConnectionsSummaryDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.ConnectionsSummaryDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 401
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.DirectoryController",
+    "Method": "GetBusinesses",
+    "RelativePath": "api/v1/directory/businesses",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Search",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "IndustryId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "BusinessGroupId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "SubGroupId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "CategoryId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "Capability",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "BusinessType",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Location",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "PageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.BusinessDirectoryResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.BusinessDirectoryResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 401
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.DirectoryController",
+    "Method": "GetBusinessById",
+    "RelativePath": "api/v1/directory/businesses/{memberId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "memberId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.BusinessDirectoryItemDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.BusinessDirectoryItemDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 401
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.BusinessDirectoryItemDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      }
+    ]
+  },
+  {
     "ContainingType": "Connexa.Api.Controllers.HealthController",
     "Method": "GetApiHealth",
     "RelativePath": "api/v1/health",
@@ -145,6 +934,97 @@
       }
     ],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.MembersController",
+    "Method": "GetCurrentMember",
+    "RelativePath": "api/v1/members/me",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.MemberProfileResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.MemberProfileResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 401
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.MemberProfileResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      }
+    ]
+  },
+  {
+    "ContainingType": "Connexa.Api.Controllers.MembersController",
+    "Method": "UpdateCurrentMemberProfile",
+    "RelativePath": "api/v1/members/me/profile",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Connexa.Api.DTOs.UpdateMemberProfileRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.MemberProfileResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.MemberProfileResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.MemberProfileResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 401
+      },
+      {
+        "Type": "Connexa.Api.DTOs.ApiResponse\u00601[[Connexa.Api.DTOs.MemberProfileResponseDto, Connexa.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      }
+    ]
   },
   {
     "ContainingType": "Connexa.Api.Controllers.RegistrationController",

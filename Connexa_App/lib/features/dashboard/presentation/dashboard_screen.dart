@@ -52,11 +52,26 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Icon(Icons.hub_rounded, color: AppColors.secondary, size: 24),
-            SizedBox(width: AppSpacing.sm),
-            Text('Connexa Dashboard'),
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: AppColors.primaryContainer,
+                borderRadius: AppSpacing.borderRadiusSm,
+              ),
+              child: const Icon(
+                Icons.hub_rounded,
+                color: AppColors.primary,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            const Flexible(
+              child: Text('Connexa Dashboard', overflow: TextOverflow.ellipsis),
+            ),
           ],
         ),
         actions: <Widget>[
@@ -67,13 +82,18 @@ class DashboardScreen extends ConsumerWidget {
             onPressed: () => context.push('/directory'),
           ),
           IconButton(
+            icon: const Icon(Icons.people_outline),
+            tooltip: 'My Network',
+            onPressed: () => context.push('/network'),
+          ),
+          IconButton(
             key: const Key('dashboardProfileNavButton'),
             icon: const Icon(Icons.account_circle_outlined),
             tooltip: 'My Profile',
             onPressed: () => context.push('/profile'),
           ),
           Padding(
-            padding: const EdgeInsets.only(right: AppSpacing.sm),
+            padding: const EdgeInsets.only(right: AppSpacing.xs),
             child: IconButton(
               key: const Key('dashboardLogoutButton'),
               icon: const Icon(Icons.logout_rounded, color: AppColors.error),
@@ -112,27 +132,27 @@ class DashboardScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
-                        const SizedBox(height: AppSpacing.md),
+                        const SizedBox(height: AppSpacing.sm),
 
-                        // Member Hero Card
+                        // Member Hero Header Card
                         _buildMemberHeroCard(context, profile, user),
                         const SizedBox(height: AppSpacing.lg),
 
-                        // Real Field Profile Completion Card
+                        // Profile Completion Status
                         _buildProfileCompletionCard(profile),
                         const SizedBox(height: AppSpacing.lg),
 
-                        // Quick Actions Grid (My Profile, Business Directory, Edit Profile, Logout)
+                        // Quick Actions Grid
                         _buildQuickActionsCard(context, ref),
                         const SizedBox(height: AppSpacing.lg),
 
-                        // Industry Hierarchy Summary
+                        // Industry 4-Tier Hierarchy Card
                         if (_hasIndustryHierarchy(profile)) ...<Widget>[
                           _buildHierarchySummaryCard(profile!),
                           const SizedBox(height: AppSpacing.lg),
                         ],
 
-                        // Profile Details Section
+                        // Member Details Section
                         _buildProfileDetailsCard(profile, user),
                         const SizedBox(height: AppSpacing.lg),
 
@@ -147,7 +167,10 @@ class DashboardScreen extends ConsumerWidget {
                           leadingIcon: const Icon(
                             Icons.logout_rounded,
                             size: 18,
+                            color: AppColors.error,
                           ),
+                          foregroundColor: AppColors.error,
+                          borderColor: AppColors.error.withValues(alpha: 0.3),
                           isFullWidth: true,
                           onPressed: () => _handleLogout(context, ref),
                         ),
@@ -177,117 +200,113 @@ class DashboardScreen extends ConsumerWidget {
     return AppCard(
       padding: const EdgeInsets.all(AppSpacing.xl),
       backgroundColor: AppColors.surface,
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          CircleAvatar(
-            radius: 32,
-            backgroundColor: AppColors.primaryContainer,
-            child: Text(
-              fullName.isNotEmpty
-                  ? fullName.substring(0, 1).toUpperCase()
-                  : 'M',
-              style: AppTextStyles.headlineMedium.copyWith(
-                color: AppColors.primary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.lg),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Flexible(
-                      child: Text(
-                        fullName,
-                        key: const Key('dashboardMemberName'),
-                        style: AppTextStyles.headlineSmall.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.xs),
-                    const Icon(
-                      Icons.verified_rounded,
-                      color: AppColors.secondary,
-                      size: 20,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                Wrap(
-                  spacing: AppSpacing.sm,
-                  runSpacing: AppSpacing.xs,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.sm,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.secondaryContainer,
-                        borderRadius: AppSpacing.borderRadiusSm,
-                      ),
-                      child: Text(
-                        'Member #$memberId',
-                        key: const Key('dashboardMemberId'),
-                        style: AppTextStyles.labelSmall.copyWith(
-                          color: AppColors.onSecondaryContainer,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.sm,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryContainer,
-                        borderRadius: AppSpacing.borderRadiusSm,
-                      ),
-                      child: Text(
-                        profileType.toUpperCase(),
-                        style: AppTextStyles.labelSmall.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                if (verifiedMethod.isNotEmpty) ...<Widget>[
-                  const SizedBox(height: AppSpacing.xs),
-                  Row(
-                    children: <Widget>[
-                      const Icon(
-                        Icons.check_circle_outline,
-                        color: AppColors.success,
-                        size: 15,
-                      ),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          verifiedDestination.isNotEmpty
-                              ? 'Verified via $verifiedMethod ($verifiedDestination)'
-                              : 'Verified via $verifiedMethod',
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.success,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              // Prominent Member Avatar with Subtle Double Border
+              Container(
+                padding: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppColors.secondary.withValues(alpha: 0.4),
+                    width: 2.0,
                   ),
-                ],
+                ),
+                child: CircleAvatar(
+                  radius: 32,
+                  backgroundColor: AppColors.primaryContainer,
+                  child: Text(
+                    fullName.isNotEmpty
+                        ? fullName.substring(0, 1).toUpperCase()
+                        : 'M',
+                    style: AppTextStyles.headlineMedium.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.lg),
+
+              // Member Identity & Badges
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Flexible(
+                          child: Text(
+                            fullName,
+                            key: const Key('dashboardMemberName'),
+                            style: AppTextStyles.headlineSmall.copyWith(
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.2,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.xs),
+                        const Icon(
+                          Icons.verified_rounded,
+                          color: AppColors.secondary,
+                          size: 20,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Wrap(
+                      spacing: AppSpacing.sm,
+                      runSpacing: AppSpacing.xs,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: <Widget>[
+                        AppBadge.primary(
+                          label: 'Member #$memberId',
+                          key: const Key('dashboardMemberId'),
+                        ),
+                        AppBadge.secondary(
+                          label: _formatProfileType(profileType),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          if (verifiedMethod.isNotEmpty) ...<Widget>[
+            const SizedBox(height: AppSpacing.md),
+            const Divider(),
+            const SizedBox(height: AppSpacing.sm),
+            Row(
+              children: <Widget>[
+                const Icon(
+                  Icons.check_circle_rounded,
+                  color: AppColors.success,
+                  size: 16,
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                Expanded(
+                  child: Text(
+                    verifiedDestination.isNotEmpty
+                        ? 'Authenticated via $verifiedMethod ($verifiedDestination)'
+                        : 'Authenticated via $verifiedMethod',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.success,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
             ),
-          ),
+          ],
         ],
       ),
     );
@@ -306,40 +325,62 @@ class DashboardScreen extends ConsumerWidget {
         children: <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              const Text(
-                'Profile Completion',
-                style: AppTextStyles.titleMedium,
-              ),
-              Text(
-                '$percent%',
-                key: const Key('dashboardCompletionPercent'),
-                style: AppTextStyles.titleMedium.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: percent == 100 ? AppColors.success : AppColors.primary,
+              Expanded(
+                child: Row(
+                  children: <Widget>[
+                    Icon(
+                      percent == 100
+                          ? Icons.task_alt_rounded
+                          : Icons.pending_actions_rounded,
+                      color: percent == 100
+                          ? AppColors.success
+                          : AppColors.primary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
+                    const Flexible(
+                      child: Text(
+                        'Profile Completion',
+                        style: AppTextStyles.titleMedium,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              AppBadge(
+                label: '$percent%',
+                key: const Key('dashboardCompletionPercent'),
+                variant: percent == 100
+                    ? AppBadgeVariant.success
+                    : AppBadgeVariant.primary,
+                isPill: true,
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacing.md),
           ClipRRect(
-            borderRadius: AppSpacing.borderRadiusSm,
+            borderRadius: AppSpacing.borderRadiusFull,
             child: LinearProgressIndicator(
               value: fraction,
               minHeight: 8,
               backgroundColor: AppColors.surfaceContainerHigh,
               valueColor: AlwaysStoppedAnimation<Color>(
-                percent == 100 ? AppColors.success : AppColors.primary,
+                percent == 100 ? AppColors.success : AppColors.secondary,
               ),
             ),
           ),
-          const SizedBox(height: AppSpacing.xs),
+          const SizedBox(height: AppSpacing.sm),
           Text(
             percent == 100
                 ? 'Your profile is fully completed based on real registered fields.'
-                : 'Tip: Add missing details to increase visibility across the Connexa directory.',
+                : 'Tip: Complete missing details to maximize discovery across the Connexa B2B directory.',
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.textSecondary,
+              height: 1.4,
             ),
           ),
         ],
@@ -350,46 +391,62 @@ class DashboardScreen extends ConsumerWidget {
   Widget _buildQuickActionsCard(BuildContext context, WidgetRef ref) {
     return AppCard(
       title: 'Quick Actions',
-      subtitle: 'Manage your verified profile and discover directory partners',
-      child: LayoutBuilder(
-        builder: (BuildContext ctx, BoxConstraints constraints) {
-          final bool isNarrow = constraints.maxWidth < 450;
-          return GridView.count(
-            crossAxisCount: isNarrow ? 2 : 4,
-            crossAxisSpacing: AppSpacing.sm,
-            mainAxisSpacing: AppSpacing.sm,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            childAspectRatio: isNarrow ? 1.4 : 1.2,
-            children: <Widget>[
-              _buildActionTile(
-                icon: Icons.person_outline,
-                label: 'My Profile',
-                key: 'dashboardQuickActionMyProfile',
-                onTap: () => context.push('/profile'),
-              ),
-              _buildActionTile(
-                icon: Icons.edit_outlined,
-                label: 'Edit Profile',
-                key: 'dashboardQuickActionEditProfile',
-                onTap: () => context.push('/profile/edit'),
-              ),
-              _buildActionTile(
-                icon: Icons.storefront_outlined,
-                label: 'Directory',
-                key: 'dashboardQuickActionDirectory',
-                onTap: () => context.push('/directory'),
-              ),
-              _buildActionTile(
-                icon: Icons.logout_rounded,
-                label: 'Sign Out',
-                color: AppColors.error,
-                key: 'dashboardQuickActionLogout',
-                onTap: () => _handleLogout(context, ref),
-              ),
-            ],
-          );
-        },
+      subtitle: 'Manage your verified business network and account profile',
+      child: ResponsiveBuilder(
+        builder:
+            (
+              BuildContext ctx,
+              DeviceType deviceType,
+              BoxConstraints constraints,
+            ) {
+              final int crossAxisCount = switch (deviceType) {
+                DeviceType.mobile => 2,
+                DeviceType.tablet => 4,
+                DeviceType.desktop => 5,
+              };
+
+              return GridView.count(
+                crossAxisCount: crossAxisCount,
+                crossAxisSpacing: AppSpacing.md,
+                mainAxisSpacing: AppSpacing.md,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                childAspectRatio: deviceType == DeviceType.mobile ? 1.35 : 1.25,
+                children: <Widget>[
+                  _buildActionTile(
+                    icon: Icons.person_outline_rounded,
+                    label: 'My Profile',
+                    key: 'dashboardQuickActionMyProfile',
+                    onTap: () => context.push('/profile'),
+                  ),
+                  _buildActionTile(
+                    icon: Icons.edit_note_rounded,
+                    label: 'Edit Profile',
+                    key: 'dashboardQuickActionEditProfile',
+                    onTap: () => context.push('/profile/edit'),
+                  ),
+                  _buildActionTile(
+                    icon: Icons.storefront_rounded,
+                    label: 'Directory',
+                    key: 'dashboardQuickActionDirectory',
+                    onTap: () => context.push('/directory'),
+                  ),
+                  _buildActionTile(
+                    icon: Icons.hub_rounded,
+                    label: 'My Network',
+                    key: 'dashboardQuickActionNetwork',
+                    onTap: () => context.push('/network'),
+                  ),
+                  _buildActionTile(
+                    icon: Icons.logout_rounded,
+                    label: 'Sign Out',
+                    color: AppColors.error,
+                    key: 'dashboardQuickActionLogout',
+                    onTap: () => _handleLogout(context, ref),
+                  ),
+                ],
+              );
+            },
       ),
     );
   }
@@ -401,33 +458,58 @@ class DashboardScreen extends ConsumerWidget {
     String? key,
     Color? color,
   }) {
-    return InkWell(
-      key: key != null ? Key(key) : null,
-      onTap: onTap,
-      borderRadius: AppSpacing.borderRadiusMd,
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: AppSpacing.md,
-        ),
-        decoration: BoxDecoration(
-          border: Border.all(color: AppColors.border),
-          borderRadius: AppSpacing.borderRadiusMd,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(icon, size: 28, color: color ?? AppColors.primary),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              label,
-              style: AppTextStyles.labelMedium.copyWith(
-                fontWeight: FontWeight.w600,
-                color: color ?? AppColors.textPrimary,
+    final Color effectiveColor = color ?? AppColors.primary;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        key: key != null ? Key(key) : null,
+        onTap: onTap,
+        borderRadius: AppSpacing.borderRadiusMd,
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.sm,
+            vertical: AppSpacing.md,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            border: Border.all(color: AppColors.border),
+            borderRadius: AppSpacing.borderRadiusMd,
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: AppColors.primary.withValues(alpha: 0.03),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
               ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: effectiveColor.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, size: 24, color: effectiveColor),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                label,
+                style: AppTextStyles.labelMedium.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: effectiveColor == AppColors.error
+                      ? AppColors.error
+                      : AppColors.textPrimary,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -448,20 +530,27 @@ class DashboardScreen extends ConsumerWidget {
     final String category = details?['category']?.toString() ?? '—';
 
     return AppCard(
-      title: 'Industry Hierarchy Classification',
-      subtitle: '4-Tier Master Data categorization',
+      title: 'Industry Classification',
+      subtitle: '4-Tier Master Data categorization on record',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           _buildHierarchyStep(1, 'Industry', industry),
-          const SizedBox(height: AppSpacing.sm),
+          _buildConnectingLine(),
           _buildHierarchyStep(2, 'Business Group', group),
-          const SizedBox(height: AppSpacing.sm),
+          _buildConnectingLine(),
           _buildHierarchyStep(3, 'SubGroup', subGroup),
-          const SizedBox(height: AppSpacing.sm),
+          _buildConnectingLine(),
           _buildHierarchyStep(4, 'Category', category, isLast: true),
         ],
       ),
+    );
+  }
+
+  Widget _buildConnectingLine() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 11),
+      child: Container(width: 2, height: 14, color: AppColors.border),
     );
   }
 
@@ -475,28 +564,43 @@ class DashboardScreen extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Container(
-          width: 22,
-          height: 22,
+          width: 24,
+          height: 24,
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: isLast ? AppColors.secondary : AppColors.primaryContainer,
             shape: BoxShape.circle,
+            border: Border.all(
+              color: isLast
+                  ? AppColors.secondaryDark
+                  : AppColors.primary.withValues(alpha: 0.3),
+              width: 1.5,
+            ),
           ),
           child: Text(
             '$level',
             style: AppTextStyles.labelSmall.copyWith(
               color: isLast ? AppColors.onSecondary : AppColors.primary,
-              fontWeight: FontWeight.bold,
-              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              fontSize: 11,
             ),
           ),
         ),
-        const SizedBox(width: AppSpacing.sm),
+        const SizedBox(width: AppSpacing.md),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(label, style: AppTextStyles.labelSmall),
+              Text(
+                label.toUpperCase(),
+                style: AppTextStyles.labelSmall.copyWith(
+                  color: AppColors.textSecondary,
+                  letterSpacing: 0.5,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 2),
               Text(
                 name,
                 style: AppTextStyles.bodyMedium.copyWith(
@@ -552,20 +656,21 @@ class DashboardScreen extends ConsumerWidget {
           ),
           if (profile?.profileDetails != null &&
               profile!.profileDetails!.isNotEmpty) ...<Widget>[
-            const Divider(height: AppSpacing.lg),
             ...profile.profileDetails!.entries.map((
               MapEntry<String, dynamic> e,
             ) {
               if (e.key.toLowerCase().endsWith('id')) {
                 return const SizedBox.shrink();
               }
-              return Padding(
-                padding: const EdgeInsets.only(top: AppSpacing.sm),
-                child: _buildInfoRow(
-                  Icons.business_outlined,
-                  _formatKey(e.key),
-                  e.value?.toString() ?? '—',
-                ),
+              return Column(
+                children: <Widget>[
+                  const Divider(height: AppSpacing.lg),
+                  _buildInfoRow(
+                    Icons.business_outlined,
+                    _formatKey(e.key),
+                    e.value?.toString() ?? '—',
+                  ),
+                ],
               );
             }),
           ],
@@ -625,7 +730,15 @@ class DashboardScreen extends ConsumerWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Icon(icon, size: 20, color: AppColors.textSecondary),
+        Container(
+          width: 36,
+          height: 36,
+          decoration: const BoxDecoration(
+            color: AppColors.surfaceContainer,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, size: 18, color: AppColors.primary),
+        ),
         const SizedBox(width: AppSpacing.md),
         Expanded(
           child: Column(
@@ -635,6 +748,7 @@ class DashboardScreen extends ConsumerWidget {
                 label,
                 style: AppTextStyles.labelSmall.copyWith(
                   color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 2),
@@ -699,5 +813,16 @@ class DashboardScreen extends ConsumerWidget {
           RegExp(r'^[a-z]'),
           (Match m) => m.group(0)!.toUpperCase(),
         );
+  }
+
+  String _formatProfileType(String raw) {
+    return switch (raw) {
+      'BusinessCompany' => 'Company',
+      'ContractorJobWorker' => 'Contractor',
+      'EmployeeJobSeeker' => 'Professional',
+      'ServiceEngineer' => 'Engineer',
+      'TraderSupplier' => 'Supplier',
+      _ => raw,
+    };
   }
 }

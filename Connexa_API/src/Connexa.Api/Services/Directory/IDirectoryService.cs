@@ -8,10 +8,10 @@ public interface IDirectoryService
     /// Searches and paginates registered businesses with multi-attribute filtering.
     /// Excludes sensitive credentials and inactive members.
     /// </summary>
-    Task<BusinessDirectoryResponseDto> SearchBusinessesAsync(BusinessDirectoryFilterDto filter, CancellationToken cancellationToken = default);
+    Task<BusinessDirectoryResponseDto> SearchBusinessesAsync(BusinessDirectoryFilterDto filter, int? currentMemberId = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Retrieves a single business directory profile by member ID.
     /// </summary>
-    Task<BusinessDirectoryItemDto?> GetBusinessByMemberIdAsync(int memberId, CancellationToken cancellationToken = default);
+    Task<BusinessDirectoryItemDto?> GetBusinessByMemberIdAsync(int memberId, int? currentMemberId = null, CancellationToken cancellationToken = default);
 }

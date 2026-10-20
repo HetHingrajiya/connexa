@@ -326,10 +326,22 @@ namespace Connexa.Api.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("SYSUTCDATETIME()");
 
+                    b.Property<string>("CredentialSetupToken")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime?>("CredentialSetupTokenExpiresAtUtc")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<int>("FailedLoginAttempts")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<string>("FullName")
                         .IsRequired()
@@ -340,6 +352,17 @@ namespace Connexa.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
+
+                    b.Property<DateTime?>("LockoutEndUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PasswordHash")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordSalt")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
@@ -371,6 +394,9 @@ namespace Connexa.Api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CredentialSetupToken")
+                        .HasDatabaseName("IX_Members_CredentialSetupToken");
+
                     b.HasIndex("Email")
                         .IsUnique()
                         .HasDatabaseName("IX_Members_Email");
@@ -380,6 +406,55 @@ namespace Connexa.Api.Migrations
                         .HasDatabaseName("IX_Members_PhoneNumber");
 
                     b.ToTable("Members", (string)null);
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.MemberConnection", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("RecipientMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RequesterMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("RespondedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RecipientMemberId")
+                        .HasDatabaseName("IX_MemberConnections_RecipientMemberId");
+
+                    b.HasIndex("RequesterMemberId")
+                        .HasDatabaseName("IX_MemberConnections_RequesterMemberId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_MemberConnections_Status");
+
+                    b.HasIndex("RequesterMemberId", "RecipientMemberId")
+                        .HasDatabaseName("IX_MemberConnections_Requester_Recipient");
+
+                    b.ToTable("MemberConnections", (string)null);
                 });
 
             modelBuilder.Entity("Connexa.Api.Entities.OtpChallenge", b =>
@@ -483,6 +558,61 @@ namespace Connexa.Api.Migrations
                         .HasDatabaseName("IX_OtpChallenges_Phone_Status");
 
                     b.ToTable("OtpChallenges", (string)null);
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<string>("CreatedByIp")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTime>("ExpiresAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("MemberId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReasonRevoked")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("ReplacedByTokenHash")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime?>("RevokedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RevokedByIp")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MemberId")
+                        .HasDatabaseName("IX_RefreshTokens_MemberId");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique()
+                        .HasDatabaseName("IX_RefreshTokens_TokenHash");
+
+                    b.ToTable("RefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("Connexa.Api.Entities.ServiceEngineerProfile", b =>
@@ -747,6 +877,39 @@ namespace Connexa.Api.Migrations
                     b.Navigation("Member");
                 });
 
+            modelBuilder.Entity("Connexa.Api.Entities.MemberConnection", b =>
+                {
+                    b.HasOne("Connexa.Api.Entities.Member", "RecipientMember")
+                        .WithMany("ReceivedConnections")
+                        .HasForeignKey("RecipientMemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_MemberConnections_RecipientMember");
+
+                    b.HasOne("Connexa.Api.Entities.Member", "RequesterMember")
+                        .WithMany("SentConnections")
+                        .HasForeignKey("RequesterMemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_MemberConnections_RequesterMember");
+
+                    b.Navigation("RecipientMember");
+
+                    b.Navigation("RequesterMember");
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("Connexa.Api.Entities.Member", "Member")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("MemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_RefreshTokens_Members");
+
+                    b.Navigation("Member");
+                });
+
             modelBuilder.Entity("Connexa.Api.Entities.ServiceEngineerProfile", b =>
                 {
                     b.HasOne("Connexa.Api.Entities.Member", "Member")
@@ -800,6 +963,12 @@ namespace Connexa.Api.Migrations
                     b.Navigation("ContractorProfile");
 
                     b.Navigation("EmployeeProfile");
+
+                    b.Navigation("ReceivedConnections");
+
+                    b.Navigation("RefreshTokens");
+
+                    b.Navigation("SentConnections");
 
                     b.Navigation("ServiceEngineerProfile");
 

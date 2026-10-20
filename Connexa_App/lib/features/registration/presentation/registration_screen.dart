@@ -278,20 +278,34 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
       decoration: BoxDecoration(
         color: AppColors.primaryContainer,
         borderRadius: AppSpacing.borderRadiusMd,
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
       ),
       child: Row(
         children: <Widget>[
-          const Icon(
-            Icons.info_outline_rounded,
-            size: 16,
-            color: AppColors.primary,
+          Container(
+            width: 22,
+            height: 22,
+            decoration: const BoxDecoration(
+              color: AppColors.primary,
+              shape: BoxShape.circle,
+            ),
+            child: const Center(
+              child: Text(
+                '1',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
               'Step 1 of the registration process — Basic Details',
               style: AppTextStyles.labelSmall.copyWith(
-                color: AppColors.primaryLight,
+                color: AppColors.primary,
                 fontWeight: FontWeight.w700,
               ),
             ),

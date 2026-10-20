@@ -21,6 +21,7 @@ public class ConnexaDbContext : DbContext
     public DbSet<TraderProfile> TraderProfiles => Set<TraderProfile>();
     public DbSet<ContractorProfile> ContractorProfiles => Set<ContractorProfile>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<MemberConnection> MemberConnections => Set<MemberConnection>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -339,5 +340,35 @@ public class ConnexaDbContext : DbContext
             entity.HasIndex(e => e.MemberId).HasDatabaseName("IX_RefreshTokens_MemberId");
             entity.HasIndex(e => e.TokenHash).IsUnique().HasDatabaseName("IX_RefreshTokens_TokenHash");
         });
+
+        // 13. MemberConnection
+        modelBuilder.Entity<MemberConnection>(entity =>
+        {
+            entity.ToTable("MemberConnections");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.RequesterMemberId).IsRequired();
+            entity.Property(e => e.RecipientMemberId).IsRequired();
+            entity.Property(e => e.Status).IsRequired();
+            entity.Property(e => e.Note).HasMaxLength(500);
+            entity.Property(e => e.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.RequesterMember)
+                  .WithMany(m => m.SentConnections)
+                  .HasForeignKey(e => e.RequesterMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_MemberConnections_RequesterMember");
+
+            entity.HasOne(e => e.RecipientMember)
+                  .WithMany(m => m.ReceivedConnections)
+                  .HasForeignKey(e => e.RecipientMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_MemberConnections_RecipientMember");
+
+            entity.HasIndex(e => e.RequesterMemberId).HasDatabaseName("IX_MemberConnections_RequesterMemberId");
+            entity.HasIndex(e => e.RecipientMemberId).HasDatabaseName("IX_MemberConnections_RecipientMemberId");
+            entity.HasIndex(e => e.Status).HasDatabaseName("IX_MemberConnections_Status");
+            entity.HasIndex(e => new { e.RequesterMemberId, e.RecipientMemberId }).HasDatabaseName("IX_MemberConnections_Requester_Recipient");
+        });
     }
-}
+}

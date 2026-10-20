@@ -19,6 +19,19 @@ public class DirectoryController : ControllerBase
         _logger = logger;
     }
 
+    private int? GetCurrentMemberId()
+    {
+        var memberIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+            ?? User.FindFirst("sub")?.Value;
+
+        if (int.TryParse(memberIdClaim, out var memberId))
+        {
+            return memberId;
+        }
+
+        return null;
+    }
+
     /// <summary>
     /// Searches and lists registered businesses with 4-tier hierarchy and capability filtering.
     /// Excludes internal credentials and unverified data.
@@ -29,7 +42,8 @@ public class DirectoryController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<BusinessDirectoryResponseDto>), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetBusinesses([FromQuery] BusinessDirectoryFilterDto filter, CancellationToken cancellationToken)
     {
-        var result = await _directoryService.SearchBusinessesAsync(filter, cancellationToken);
+        var currentMemberId = GetCurrentMemberId();
+        var result = await _directoryService.SearchBusinessesAsync(filter, currentMemberId, cancellationToken);
         return Ok(ApiResponse<BusinessDirectoryResponseDto>.Ok(result, result.TotalCount));
     }
 
@@ -43,7 +57,8 @@ public class DirectoryController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<BusinessDirectoryItemDto>), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetBusinessById(int memberId, CancellationToken cancellationToken)
     {
-        var item = await _directoryService.GetBusinessByMemberIdAsync(memberId, cancellationToken);
+        var currentMemberId = GetCurrentMemberId();
+        var item = await _directoryService.GetBusinessByMemberIdAsync(memberId, currentMemberId, cancellationToken);
         if (item == null)
         {
             return NotFound(ApiResponse<BusinessDirectoryItemDto>.Fail("Business directory entry not found."));

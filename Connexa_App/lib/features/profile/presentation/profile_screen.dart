@@ -63,13 +63,13 @@ class ProfileScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacing.sm),
 
                   // Hero Identity Card
                   _buildHeroCard(context, profile),
                   const SizedBox(height: AppSpacing.lg),
 
-                  // Real-Field Profile Completion Card
+                  // Profile Completion Card
                   _buildCompletionCard(completionPercent),
                   const SizedBox(height: AppSpacing.lg),
 
@@ -92,6 +92,7 @@ class ProfileScreen extends ConsumerWidget {
                     key: const Key('profileEditButton'),
                     text: 'Edit Profile Details',
                     leadingIcon: const Icon(Icons.edit_rounded, size: 18),
+                    isFullWidth: true,
                     onPressed: () => context.push('/profile/edit'),
                   ),
                   const SizedBox(height: AppSpacing.md),
@@ -99,6 +100,7 @@ class ProfileScreen extends ConsumerWidget {
                   AppButton.secondary(
                     text: 'Back to Dashboard',
                     leadingIcon: const Icon(Icons.dashboard_outlined, size: 18),
+                    isFullWidth: true,
                     onPressed: () => context.go('/dashboard'),
                   ),
                   const SizedBox(height: AppSpacing.xxl),
@@ -116,18 +118,28 @@ class ProfileScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.xl),
       backgroundColor: AppColors.surface,
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          CircleAvatar(
-            radius: 36,
-            backgroundColor: AppColors.primaryContainer,
-            child: Text(
-              profile.fullName.isNotEmpty
-                  ? profile.fullName.substring(0, 1).toUpperCase()
-                  : 'M',
-              style: AppTextStyles.headlineMedium.copyWith(
-                color: AppColors.primary,
-                fontWeight: FontWeight.bold,
+          Container(
+            padding: const EdgeInsets.all(3),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: AppColors.secondary.withValues(alpha: 0.4),
+                width: 2.0,
+              ),
+            ),
+            child: CircleAvatar(
+              radius: 34,
+              backgroundColor: AppColors.primaryContainer,
+              child: Text(
+                profile.fullName.isNotEmpty
+                    ? profile.fullName.substring(0, 1).toUpperCase()
+                    : 'M',
+                style: AppTextStyles.headlineMedium.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -136,12 +148,27 @@ class ProfileScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(
-                  profile.fullName,
-                  key: const Key('profileFullNameText'),
-                  style: AppTextStyles.headlineSmall.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  children: <Widget>[
+                    Flexible(
+                      child: Text(
+                        profile.fullName,
+                        key: const Key('profileFullNameText'),
+                        style: AppTextStyles.headlineSmall.copyWith(
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.2,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
+                    const Icon(
+                      Icons.verified_rounded,
+                      color: AppColors.secondary,
+                      size: 18,
+                    ),
+                  ],
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Wrap(
@@ -149,40 +176,12 @@ class ProfileScreen extends ConsumerWidget {
                   runSpacing: AppSpacing.xs,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: <Widget>[
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.sm,
-                        vertical: 3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.secondaryContainer,
-                        borderRadius: AppSpacing.borderRadiusSm,
-                      ),
-                      child: Text(
-                        'Member #${profile.memberId}',
-                        key: const Key('profileMemberIdBadge'),
-                        style: AppTextStyles.labelSmall.copyWith(
-                          color: AppColors.onSecondaryContainer,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
+                    AppBadge.primary(
+                      key: const Key('profileMemberIdBadge'),
+                      label: 'Member #${profile.memberId}',
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.sm,
-                        vertical: 3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryContainer,
-                        borderRadius: AppSpacing.borderRadiusSm,
-                      ),
-                      child: Text(
-                        profile.primaryProfileType.toUpperCase(),
-                        style: AppTextStyles.labelSmall.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
+                    AppBadge.secondary(
+                      label: _formatProfileType(profile.primaryProfileType),
                     ),
                   ],
                 ),
@@ -192,14 +191,17 @@ class ProfileScreen extends ConsumerWidget {
                     const Icon(
                       Icons.check_circle_rounded,
                       color: AppColors.success,
-                      size: 16,
+                      size: 15,
                     ),
                     const SizedBox(width: AppSpacing.xs),
-                    Text(
-                      'Verified via ${profile.verifiedMethod}',
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.success,
-                        fontWeight: FontWeight.w600,
+                    Expanded(
+                      child: Text(
+                        'Verified via ${profile.verifiedMethod}',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.success,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
@@ -220,40 +222,56 @@ class ProfileScreen extends ConsumerWidget {
         children: <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              const Text(
-                'Profile Completion',
-                style: AppTextStyles.titleMedium,
+              Row(
+                children: <Widget>[
+                  Icon(
+                    percent == 100
+                        ? Icons.task_alt_rounded
+                        : Icons.pending_actions_rounded,
+                    color: percent == 100
+                        ? AppColors.success
+                        : AppColors.primary,
+                    size: 20,
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  const Text(
+                    'Profile Completion',
+                    style: AppTextStyles.titleMedium,
+                  ),
+                ],
               ),
-              Text(
-                '$percent%',
+              AppBadge(
                 key: const Key('profileCompletionPercentText'),
-                style: AppTextStyles.titleMedium.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: percent == 100 ? AppColors.success : AppColors.primary,
-                ),
+                label: '$percent%',
+                variant: percent == 100
+                    ? AppBadgeVariant.success
+                    : AppBadgeVariant.primary,
+                isPill: true,
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacing.md),
           ClipRRect(
-            borderRadius: AppSpacing.borderRadiusSm,
+            borderRadius: AppSpacing.borderRadiusFull,
             child: LinearProgressIndicator(
               value: percent / 100.0,
               minHeight: 8,
               backgroundColor: AppColors.surfaceContainerHigh,
               valueColor: AlwaysStoppedAnimation<Color>(
-                percent == 100 ? AppColors.success : AppColors.primary,
+                percent == 100 ? AppColors.success : AppColors.secondary,
               ),
             ),
           ),
-          const SizedBox(height: AppSpacing.xs),
+          const SizedBox(height: AppSpacing.sm),
           Text(
             percent == 100
                 ? 'Your profile is fully completed and verified.'
-                : 'Complete all business and category attributes for maximum visibility.',
+                : 'Complete all business and category attributes for maximum visibility across the network.',
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.textSecondary,
+              height: 1.4,
             ),
           ),
         ],
@@ -301,7 +319,8 @@ class ProfileScreen extends ConsumerWidget {
     final Map<String, dynamic>? details = profile.profileDetails;
     if (details == null || details.isEmpty) {
       return const AppCard(
-        title: 'Profile Information',
+        title: 'Business & Specialty Details',
+        subtitle: 'Domain information retrieved from SQL Server',
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
           child: Text(
@@ -359,11 +378,7 @@ class ProfileScreen extends ConsumerWidget {
               spacing: AppSpacing.xs,
               runSpacing: AppSpacing.xs,
               children: capabilities.map((String cap) {
-                return Chip(
-                  label: Text(cap, style: AppTextStyles.labelSmall),
-                  backgroundColor: AppColors.secondaryContainer,
-                  visualDensity: VisualDensity.compact,
-                );
+                return AppBadge.secondary(label: cap, isPill: true);
               }).toList(),
             ),
           ],
@@ -400,16 +415,24 @@ class ProfileScreen extends ConsumerWidget {
       title: 'Industry Classification',
       subtitle: '4-Tier Industry Master Data Hierarchy',
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           _buildHierarchyStep(1, 'Industry', industry),
-          const SizedBox(height: AppSpacing.sm),
+          _buildConnectingLine(),
           _buildHierarchyStep(2, 'Business Group', group),
-          const SizedBox(height: AppSpacing.sm),
+          _buildConnectingLine(),
           _buildHierarchyStep(3, 'SubGroup', subGroup),
-          const SizedBox(height: AppSpacing.sm),
+          _buildConnectingLine(),
           _buildHierarchyStep(4, 'Category', category, isLast: true),
         ],
       ),
+    );
+  }
+
+  Widget _buildConnectingLine() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 11),
+      child: Container(width: 2, height: 14, color: AppColors.border),
     );
   }
 
@@ -429,12 +452,19 @@ class ProfileScreen extends ConsumerWidget {
           decoration: BoxDecoration(
             color: isLast ? AppColors.secondary : AppColors.primaryContainer,
             shape: BoxShape.circle,
+            border: Border.all(
+              color: isLast
+                  ? AppColors.secondaryDark
+                  : AppColors.primary.withValues(alpha: 0.3),
+              width: 1.5,
+            ),
           ),
           child: Text(
             '$level',
             style: AppTextStyles.labelSmall.copyWith(
               color: isLast ? AppColors.onSecondary : AppColors.primary,
               fontWeight: FontWeight.bold,
+              fontSize: 11,
             ),
           ),
         ),
@@ -443,7 +473,16 @@ class ProfileScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(label, style: AppTextStyles.labelSmall),
+              Text(
+                label.toUpperCase(),
+                style: AppTextStyles.labelSmall.copyWith(
+                  color: AppColors.textSecondary,
+                  letterSpacing: 0.5,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 2),
               Text(
                 name,
                 style: AppTextStyles.bodyMedium.copyWith(
@@ -464,13 +503,27 @@ class ProfileScreen extends ConsumerWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Icon(icon, size: 20, color: AppColors.textSecondary),
+        Container(
+          width: 36,
+          height: 36,
+          decoration: const BoxDecoration(
+            color: AppColors.surfaceContainer,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, size: 18, color: AppColors.primary),
+        ),
         const SizedBox(width: AppSpacing.md),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(label, style: AppTextStyles.labelSmall),
+              Text(
+                label,
+                style: AppTextStyles.labelSmall.copyWith(
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
               const SizedBox(height: 2),
               Text(
                 value,
@@ -522,5 +575,16 @@ class ProfileScreen extends ConsumerWidget {
     }
 
     return filled / total;
+  }
+
+  String _formatProfileType(String raw) {
+    return switch (raw) {
+      'BusinessCompany' => 'Company',
+      'ContractorJobWorker' => 'Contractor',
+      'EmployeeJobSeeker' => 'Professional',
+      'ServiceEngineer' => 'Engineer',
+      'TraderSupplier' => 'Supplier',
+      _ => raw,
+    };
   }
 }

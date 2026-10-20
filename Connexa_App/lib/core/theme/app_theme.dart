@@ -1,28 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:connexa/core/theme/app_colors.dart';
 import 'package:connexa/core/theme/app_spacing.dart';
 import 'package:connexa/core/theme/app_text_styles.dart';
 
-/// Centralized Material 3 theme configuration for Connexa.
+/// Centralized Material 3 theme configuration for Connexa Enterprise Platform.
 abstract final class AppTheme {
   /// Primary light theme for the application.
   static ThemeData get lightTheme {
     final ColorScheme colorScheme = const ColorScheme.light(
-      primary: AppColors.primary,
-      onPrimary: AppColors.onPrimary,
-      primaryContainer: AppColors.primaryContainer,
+      primary: AppColors.primary, // Royal Blue: #2563EB
+      onPrimary: AppColors.onPrimary, // White: #FFFFFF
+      primaryContainer: AppColors.primaryContainer, // #EFF6FF
       onPrimaryContainer: AppColors.onPrimaryContainer,
-      secondary: AppColors.secondary,
+      secondary: AppColors.secondary, // Professional Teal: #0D9488
       onSecondary: AppColors.onSecondary,
       secondaryContainer: AppColors.secondaryContainer,
       onSecondaryContainer: AppColors.onSecondaryContainer,
-      surface: AppColors.surface,
-      onSurface: AppColors.textPrimary,
+      surface: AppColors.surface, // Pure White: #FFFFFF
+      onSurface: AppColors.textPrimary, // Main Text: #1E293B
       surfaceContainerHighest: AppColors.surfaceContainerHigh,
       surfaceContainer: AppColors.surfaceContainer,
       surfaceContainerLow: AppColors.surfaceContainerLow,
-      error: AppColors.error,
+      error: AppColors.error, // #DC2626
       onError: AppColors.onError,
       errorContainer: AppColors.errorContainer,
       onErrorContainer: AppColors.onErrorContainer,
@@ -34,7 +35,7 @@ abstract final class AppTheme {
       useMaterial3: true,
       brightness: Brightness.light,
       colorScheme: colorScheme,
-      scaffoldBackgroundColor: AppColors.background,
+      scaffoldBackgroundColor: AppColors.background, // Main Background: #F8FAFC
       fontFamilyFallback: const <String>[
         'Roboto',
         'Segoe UI',
@@ -42,7 +43,7 @@ abstract final class AppTheme {
         'Arial',
       ],
 
-      // Typography
+      // Typography scale
       textTheme: const TextTheme(
         displayLarge: AppTextStyles.displayLarge,
         displayMedium: AppTextStyles.displayMedium,
@@ -61,18 +62,29 @@ abstract final class AppTheme {
         labelSmall: AppTextStyles.labelSmall,
       ),
 
-      // AppBar Theme
+      // AppBar Theme: Deep Navy (#0F2744) for brand identity and enterprise navigation
       appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: AppColors.brandNavy,
+        foregroundColor: Colors.white,
         elevation: 0,
-        scrolledUnderElevation: 1,
+        scrolledUnderElevation: 0,
         centerTitle: false,
-        titleTextStyle: AppTextStyles.titleLarge,
-        iconTheme: IconThemeData(color: AppColors.textPrimary),
+        titleTextStyle: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+          color: Colors.white,
+          letterSpacing: -0.2,
+        ),
+        iconTheme: IconThemeData(color: Colors.white),
+        actionsIconTheme: IconThemeData(color: Colors.white),
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
+        ),
       ),
 
-      // Card Theme
+      // Card Theme: Pure White with crisp border (#E2E8F0)
       cardTheme: CardThemeData(
         color: AppColors.surface,
         elevation: 0,
@@ -83,7 +95,7 @@ abstract final class AppTheme {
         ),
       ),
 
-      // Input Decoration Theme
+      // Input Decoration Theme: White fill, slate text, Royal Blue focus
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surface,
@@ -124,7 +136,7 @@ abstract final class AppTheme {
         ),
       ),
 
-      // Button Themes
+      // Primary Action Button Theme: Royal Blue (#2563EB)
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
@@ -141,12 +153,16 @@ abstract final class AppTheme {
           shape: const RoundedRectangleBorder(
             borderRadius: AppSpacing.borderRadiusMd,
           ),
-          textStyle: AppTextStyles.labelLarge,
+          textStyle: AppTextStyles.labelLarge.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
+
+      // Secondary / Outlined Button Theme: Slate text with #E2E8F0 border
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
+          foregroundColor: AppColors.textPrimary,
           disabledForegroundColor: AppColors.textDisabled,
           minimumSize: const Size(64, 48),
           side: const BorderSide(color: AppColors.border),
@@ -157,9 +173,13 @@ abstract final class AppTheme {
           shape: const RoundedRectangleBorder(
             borderRadius: AppSpacing.borderRadiusMd,
           ),
-          textStyle: AppTextStyles.labelLarge,
+          textStyle: AppTextStyles.labelLarge.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
+
+      // Subtle Text Button Theme
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primary,
@@ -170,7 +190,9 @@ abstract final class AppTheme {
           shape: const RoundedRectangleBorder(
             borderRadius: AppSpacing.borderRadiusSm,
           ),
-          textStyle: AppTextStyles.labelLarge,
+          textStyle: AppTextStyles.labelLarge.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
 
@@ -189,20 +211,107 @@ abstract final class AppTheme {
           borderRadius: AppSpacing.borderRadiusXl,
           side: const BorderSide(color: AppColors.border),
         ),
-        titleTextStyle: AppTextStyles.headlineSmall,
-        contentTextStyle: AppTextStyles.bodyMedium,
+        titleTextStyle: AppTextStyles.headlineSmall.copyWith(
+          color: AppColors.textPrimary,
+          fontWeight: FontWeight.w700,
+        ),
+        contentTextStyle: AppTextStyles.bodyMedium.copyWith(
+          color: AppColors.textSecondary,
+        ),
+      ),
+
+      // TabBar Theme: Royal Blue (#2563EB) active indicator
+      tabBarTheme: TabBarThemeData(
+        labelColor: AppColors.primary,
+        unselectedLabelColor: AppColors.textSecondary,
+        labelStyle: AppTextStyles.labelLarge.copyWith(
+          fontWeight: FontWeight.w700,
+        ),
+        unselectedLabelStyle: AppTextStyles.labelLarge.copyWith(
+          fontWeight: FontWeight.w500,
+        ),
+        indicatorColor: AppColors.primary,
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: AppColors.border,
+      ),
+
+      // Chip Theme
+      chipTheme: ChipThemeData(
+        backgroundColor: AppColors.surfaceContainer,
+        disabledColor: AppColors.surfaceContainerHigh,
+        selectedColor: AppColors.primaryContainer,
+        secondarySelectedColor: AppColors.secondaryContainer,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.xs,
+        ),
+        labelStyle: AppTextStyles.labelSmall.copyWith(
+          color: AppColors.textPrimary,
+          fontWeight: FontWeight.w600,
+        ),
+        secondaryLabelStyle: AppTextStyles.labelSmall.copyWith(
+          color: AppColors.primary,
+          fontWeight: FontWeight.w700,
+        ),
+        shape: const RoundedRectangleBorder(
+          borderRadius: AppSpacing.borderRadiusSm,
+          side: BorderSide(color: AppColors.border),
+        ),
+        side: const BorderSide(color: AppColors.border),
+      ),
+
+      // Bottom Sheet Theme
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: AppColors.surface,
+        surfaceTintColor: Colors.transparent,
+        elevation: 8,
+        modalElevation: 12,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppSpacing.radiusXl),
+          ),
+        ),
+        dragHandleColor: AppColors.outline,
+        dragHandleSize: Size(44, 4),
       ),
 
       // SnackBar Theme
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.brandNavy,
         contentTextStyle: AppTextStyles.bodyMedium.copyWith(
-          color: AppColors.onPrimary,
+          color: Colors.white,
         ),
         behavior: SnackBarBehavior.floating,
         shape: const RoundedRectangleBorder(
           borderRadius: AppSpacing.borderRadiusMd,
         ),
+      ),
+
+      // Navigation Bar / Navigation Rail Theme
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: AppColors.surface,
+        indicatorColor: AppColors.primaryContainer,
+        labelTextStyle: WidgetStateProperty.resolveWith<TextStyle?>((
+          Set<WidgetState> states,
+        ) {
+          if (states.contains(WidgetState.selected)) {
+            return AppTextStyles.labelSmall.copyWith(
+              color: AppColors.primary,
+              fontWeight: FontWeight.w700,
+            );
+          }
+          return AppTextStyles.labelSmall.copyWith(
+            color: AppColors.textSecondary,
+          );
+        }),
+        iconTheme: WidgetStateProperty.resolveWith<IconThemeData?>((
+          Set<WidgetState> states,
+        ) {
+          if (states.contains(WidgetState.selected)) {
+            return const IconThemeData(color: AppColors.primary);
+          }
+          return const IconThemeData(color: AppColors.textSecondary);
+        }),
       ),
     );
   }

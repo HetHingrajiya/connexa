@@ -25,13 +25,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _companyOrWorkController;
   late TextEditingController _descriptionController;
 
-  // Selected 4-Tier IDs
   int? _selectedIndustryId;
   int? _selectedBusinessGroupId;
   int? _selectedSubGroupId;
   int? _selectedCategoryId;
 
-  // Selected Capabilities
   final Set<String> _selectedCapabilities = <String>{};
 
   static const List<String> _availableCapabilities = <String>[
@@ -72,7 +70,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         text: details?['businessDescription']?.toString() ?? '',
       );
 
-      // Initialize Capabilities
       final dynamic rawCaps =
           details?['businessCapabilities'] ??
           details?['workCapabilities'] ??
@@ -85,7 +82,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         }
       }
 
-      // Initialize 4-Tier IDs
       _selectedIndustryId = (details?['industryId'] as num?)?.toInt();
       _selectedBusinessGroupId = (details?['businessGroupId'] as num?)?.toInt();
       _selectedSubGroupId = (details?['subGroupId'] as num?)?.toInt();
@@ -220,7 +216,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacing.sm),
 
                   // Error notification if any
                   if (_errorMessage != null) ...<Widget>[
@@ -229,12 +225,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       decoration: BoxDecoration(
                         color: AppColors.errorContainer,
                         borderRadius: AppSpacing.borderRadiusMd,
+                        border: Border.all(color: AppColors.error),
                       ),
                       child: Row(
                         children: <Widget>[
                           const Icon(
-                            Icons.error_outline,
+                            Icons.error_outline_rounded,
                             color: AppColors.error,
+                            size: 20,
                           ),
                           const SizedBox(width: AppSpacing.sm),
                           Expanded(
@@ -242,6 +240,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                               _errorMessage!,
                               style: AppTextStyles.bodyMedium.copyWith(
                                 color: AppColors.onErrorContainer,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
@@ -262,7 +261,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           controller: _fullNameController,
                           label: 'Full Name *',
                           hintText: 'Enter your full name',
-                          prefixIcon: const Icon(Icons.person_outline),
+                          prefixIcon: const Icon(Icons.person_outline_rounded),
                           validator: (String? val) {
                             if (val == null || val.trim().isEmpty) {
                               return 'Full name cannot be blank';
@@ -271,11 +270,30 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           },
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        Text(
-                          'Email (${profile.email}) and Phone (${profile.phoneNumber}) are verified credentials and cannot be edited directly.',
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.textSecondary,
-                            fontStyle: FontStyle.italic,
+                        Container(
+                          padding: const EdgeInsets.all(AppSpacing.sm),
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceContainerLow,
+                            borderRadius: AppSpacing.borderRadiusSm,
+                            border: Border.all(color: AppColors.borderSubtle),
+                          ),
+                          child: Row(
+                            children: <Widget>[
+                              const Icon(
+                                Icons.lock_outline_rounded,
+                                size: 16,
+                                color: AppColors.textMuted,
+                              ),
+                              const SizedBox(width: AppSpacing.xs),
+                              Expanded(
+                                child: Text(
+                                  'Email (${profile.email}) and Phone (${profile.phoneNumber}) are verified credentials and cannot be edited directly.',
+                                  style: AppTextStyles.bodySmall.copyWith(
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -287,7 +305,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   AppCard(
                     title: 'Business Information',
                     subtitle:
-                        'Visible to verified Connexa members in Directory',
+                        'Visible to verified Connexa members in Business Directory',
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
@@ -297,7 +315,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                               ? 'Company / Business Name *'
                               : 'Job Title / Specialization *',
                           hintText: 'e.g. Acme Industrial Solutions',
-                          prefixIcon: const Icon(Icons.business_outlined),
+                          prefixIcon: const Icon(
+                            Icons.business_outlined,
+                            size: 20,
+                          ),
                           validator: (String? val) {
                             if (val == null || val.trim().isEmpty) {
                               return 'This field is required';
@@ -305,17 +326,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: AppSpacing.md),
+                        const SizedBox(height: AppSpacing.lg),
                         AppTextField(
                           controller: _descriptionController,
                           label: 'Description & Capabilities',
                           hintText:
-                              'Describe your business operations, services, or equipment...',
+                              'Describe your business operations, specialized equipment, products, or service offerings...',
                           maxLines: 3,
-                          prefixIcon: const Icon(Icons.notes_outlined),
+                          prefixIcon: const Icon(Icons.notes_rounded, size: 20),
                         ),
                         if (isBusiness) ...<Widget>[
-                          const SizedBox(height: AppSpacing.md),
+                          const SizedBox(height: AppSpacing.lg),
                           const Text(
                             'Business Capabilities',
                             style: AppTextStyles.labelMedium,
@@ -330,6 +351,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                               return FilterChip(
                                 label: Text(cap),
                                 selected: isSelected,
+                                showCheckmark: false,
                                 onSelected: (bool selected) {
                                   setState(() {
                                     if (selected) {
@@ -359,6 +381,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     key: const Key('editProfileSaveButton'),
                     text: 'Save Changes',
                     isLoading: authState.isLoading,
+                    isFullWidth: true,
                     leadingIcon: const Icon(Icons.save_rounded, size: 18),
                     onPressed: authState.isLoading ? null : _handleSubmit,
                   ),
@@ -366,6 +389,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
                   AppButton.secondary(
                     text: 'Cancel',
+                    isFullWidth: true,
                     onPressed: () => context.pop(),
                   ),
                   const SizedBox(height: AppSpacing.xxl),
@@ -404,7 +428,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     : null,
                 decoration: const InputDecoration(
                   labelText: '1. Industry *',
-                  prefixIcon: Icon(Icons.factory_outlined),
+                  prefixIcon: Icon(Icons.domain_rounded),
                 ),
                 items: industries.map((Industry i) {
                   return DropdownMenuItem<int>(
@@ -449,7 +473,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           : null,
                       decoration: const InputDecoration(
                         labelText: '2. Business Group *',
-                        prefixIcon: Icon(Icons.category_outlined),
+                        prefixIcon: Icon(Icons.layers_rounded),
                       ),
                       items: groups.map((BusinessGroup g) {
                         return DropdownMenuItem<int>(
@@ -490,7 +514,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           : null,
                       decoration: const InputDecoration(
                         labelText: '3. SubGroup *',
-                        prefixIcon: Icon(Icons.account_tree_outlined),
+                        prefixIcon: Icon(Icons.account_tree_rounded),
                       ),
                       items: subGroups.map((SubGroup s) {
                         return DropdownMenuItem<int>(
@@ -531,7 +555,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           : null,
                       decoration: const InputDecoration(
                         labelText: '4. Category *',
-                        prefixIcon: Icon(Icons.grid_view_outlined),
+                        prefixIcon: Icon(Icons.category_rounded),
                       ),
                       items: categories.map((Category c) {
                         return DropdownMenuItem<int>(
