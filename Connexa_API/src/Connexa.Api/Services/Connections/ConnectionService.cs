@@ -3,17 +3,24 @@ using Connexa.Api.Data;
 using Connexa.Api.DTOs;
 using Connexa.Api.Entities;
 
+using Connexa.Api.Services.Notifications;
+
 namespace Connexa.Api.Services.Connections;
 
 public class ConnectionService : IConnectionService
 {
     private readonly ConnexaDbContext _dbContext;
     private readonly ILogger<ConnectionService> _logger;
+    private readonly INotificationService? _notificationService;
 
-    public ConnectionService(ConnexaDbContext dbContext, ILogger<ConnectionService> logger)
+    public ConnectionService(
+        ConnexaDbContext dbContext,
+        ILogger<ConnectionService> logger,
+        INotificationService? notificationService = null)
     {
         _dbContext = dbContext;
         _logger = logger;
+        _notificationService = notificationService;
     }
 
     public async Task<(bool Success, string Message, ConnectionDto? Connection)> SendRequestAsync(
@@ -73,6 +80,22 @@ public class ConnectionService : IConnectionService
             _logger.LogInformation("[Connections] Connection request #{Id} reactivated from Member {Req} to Member {Rec}.",
                 existing.Id, requesterMemberId, dto.RecipientMemberId);
 
+            if (_notificationService != null)
+            {
+                var requester = await _dbContext.Members.AsNoTracking().FirstOrDefaultAsync(m => m.Id == requesterMemberId, cancellationToken);
+                var requesterName = requester?.FullName ?? "A business member";
+                await _notificationService.CreateNotificationAsync(
+                    recipientMemberId: dto.RecipientMemberId,
+                    actorMemberId: requesterMemberId,
+                    eventType: NotificationEventType.ConnectionRequestReceived,
+                    title: "New Connection Request",
+                    message: $"{requesterName} sent you a connection request.",
+                    referenceType: "connection",
+                    referenceId: existing.Id,
+                    cancellationToken: cancellationToken
+                );
+            }
+
             return (true, "Connection request sent successfully.", MapToConnectionDto(existing));
         }
 
@@ -90,6 +113,22 @@ public class ConnectionService : IConnectionService
 
         _logger.LogInformation("[Connections] New connection request #{Id} created from Member {Req} to Member {Rec}.",
             newConnection.Id, requesterMemberId, dto.RecipientMemberId);
+
+        if (_notificationService != null)
+        {
+            var requester = await _dbContext.Members.AsNoTracking().FirstOrDefaultAsync(m => m.Id == requesterMemberId, cancellationToken);
+            var requesterName = requester?.FullName ?? "A business member";
+            await _notificationService.CreateNotificationAsync(
+                recipientMemberId: dto.RecipientMemberId,
+                actorMemberId: requesterMemberId,
+                eventType: NotificationEventType.ConnectionRequestReceived,
+                title: "New Connection Request",
+                message: $"{requesterName} sent you a connection request.",
+                referenceType: "connection",
+                referenceId: newConnection.Id,
+                cancellationToken: cancellationToken
+            );
+        }
 
         return (true, "Connection request sent successfully.", MapToConnectionDto(newConnection));
     }
@@ -131,7 +170,7 @@ public class ConnectionService : IConnectionService
         var items = rawList.Select(c =>
         {
             var other = c.RequesterMember;
-            var (companyName, businessType, industryId, industryName, location) = ResolveMemberDetails(other);
+            var (companyName, businessType, industryId, industryName, location, isVerified) = ResolveMemberDetails(other);
 
             return new ConnectionRequestItemDto(
                 Id: c.Id,
@@ -145,7 +184,8 @@ public class ConnectionService : IConnectionService
                 Note: c.Note,
                 CreatedAtUtc: c.CreatedAtUtc,
                 Status: "Pending",
-                Direction: "Received"
+                Direction: "Received",
+                IsVerified: isVerified
             );
         }).ToList();
 
@@ -195,7 +235,7 @@ public class ConnectionService : IConnectionService
         var items = rawList.Select(c =>
         {
             var other = c.RecipientMember;
-            var (companyName, businessType, industryId, industryName, location) = ResolveMemberDetails(other);
+            var (companyName, businessType, industryId, industryName, location, isVerified) = ResolveMemberDetails(other);
 
             return new ConnectionRequestItemDto(
                 Id: c.Id,
@@ -209,7 +249,8 @@ public class ConnectionService : IConnectionService
                 Note: c.Note,
                 CreatedAtUtc: c.CreatedAtUtc,
                 Status: "Pending",
-                Direction: "Sent"
+                Direction: "Sent",
+                IsVerified: isVerified
             );
         }).ToList();
 
@@ -252,6 +293,22 @@ public class ConnectionService : IConnectionService
         await _dbContext.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("[Connections] Connection request #{Id} accepted by Member {MemberId}.", requestId, currentMemberId);
 
+        if (_notificationService != null)
+        {
+            var recipient = await _dbContext.Members.AsNoTracking().FirstOrDefaultAsync(m => m.Id == currentMemberId, cancellationToken);
+            var recipientName = recipient?.FullName ?? "A business member";
+            await _notificationService.CreateNotificationAsync(
+                recipientMemberId: conn.RequesterMemberId,
+                actorMemberId: currentMemberId,
+                eventType: NotificationEventType.ConnectionRequestAccepted,
+                title: "Connection Request Accepted",
+                message: $"{recipientName} accepted your connection request.",
+                referenceType: "connection",
+                referenceId: conn.Id,
+                cancellationToken: cancellationToken
+            );
+        }
+
         return (true, "Connection request accepted successfully.", MapToConnectionDto(conn));
     }
 
@@ -284,6 +341,22 @@ public class ConnectionService : IConnectionService
 
         await _dbContext.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("[Connections] Connection request #{Id} rejected by Member {MemberId}.", requestId, currentMemberId);
+
+        if (_notificationService != null)
+        {
+            var recipient = await _dbContext.Members.AsNoTracking().FirstOrDefaultAsync(m => m.Id == currentMemberId, cancellationToken);
+            var recipientName = recipient?.FullName ?? "A business member";
+            await _notificationService.CreateNotificationAsync(
+                recipientMemberId: conn.RequesterMemberId,
+                actorMemberId: currentMemberId,
+                eventType: NotificationEventType.ConnectionRequestRejected,
+                title: "Connection Request Declined",
+                message: $"{recipientName} declined your connection request.",
+                referenceType: "connection",
+                referenceId: conn.Id,
+                cancellationToken: cancellationToken
+            );
+        }
 
         return (true, "Connection request rejected.", MapToConnectionDto(conn));
     }
@@ -368,7 +441,7 @@ public class ConnectionService : IConnectionService
         var mapped = rawList.Select(c =>
         {
             var other = c.RequesterMemberId == currentMemberId ? c.RecipientMember : c.RequesterMember;
-            var (companyName, businessType, industryId, industryName, location) = ResolveMemberDetails(other);
+            var (companyName, businessType, industryId, industryName, location, isVerified) = ResolveMemberDetails(other);
 
             return new ConnectedMemberItemDto(
                 ConnectionId: c.Id,
@@ -382,7 +455,8 @@ public class ConnectionService : IConnectionService
                 ConnectedSinceUtc: c.RespondedAtUtc ?? c.CreatedAtUtc,
                 MaskedEmail: MaskEmail(other.Email),
                 MaskedPhoneNumber: MaskPhoneNumber(other.CountryCode, other.PhoneNumber),
-                ConnectionStatus: "Connected"
+                ConnectionStatus: "Connected",
+                IsVerified: isVerified
             );
         });
 
@@ -464,16 +538,21 @@ public class ConnectionService : IConnectionService
         );
     }
 
-    private static (string CompanyName, string BusinessType, int IndustryId, string IndustryName, string Location) ResolveMemberDetails(Member m)
+    private static (string CompanyName, string BusinessType, int IndustryId, string IndustryName, string Location, bool IsVerified) ResolveMemberDetails(Member m)
     {
         if (m.BusinessProfile != null)
         {
+            var loc = (m.BusinessProfile.City != null && m.BusinessProfile.State != null && m.BusinessProfile.City != "" && m.BusinessProfile.State != "")
+                ? $"{m.BusinessProfile.City}, {m.BusinessProfile.State}"
+                : (m.BusinessProfile.City != null && m.BusinessProfile.City != "") ? m.BusinessProfile.City : "Gujarat, India";
+
             return (
                 CompanyName: m.BusinessProfile.CompanyName,
                 BusinessType: "Manufacturer / Company",
                 IndustryId: m.BusinessProfile.IndustryId,
                 IndustryName: m.BusinessProfile.Industry?.Name ?? "General",
-                Location: "Gujarat, India"
+                Location: loc,
+                IsVerified: m.BusinessProfile.VerificationStatus == BusinessVerificationStatus.Approved
             );
         }
 
@@ -484,7 +563,8 @@ public class ConnectionService : IConnectionService
                 BusinessType: "Contractor / Job Worker",
                 IndustryId: m.ContractorProfile.IndustryId,
                 IndustryName: m.ContractorProfile.Industry?.Name ?? "General",
-                Location: string.IsNullOrWhiteSpace(m.ContractorProfile.WorkCoverage) ? "Gujarat, India" : m.ContractorProfile.WorkCoverage
+                Location: string.IsNullOrWhiteSpace(m.ContractorProfile.WorkCoverage) ? "Gujarat, India" : m.ContractorProfile.WorkCoverage,
+                IsVerified: false
             );
         }
 
@@ -495,7 +575,8 @@ public class ConnectionService : IConnectionService
                 BusinessType: "Trader / Supplier",
                 IndustryId: 0,
                 IndustryName: "Trading & Supplies",
-                Location: string.IsNullOrWhiteSpace(m.TraderProfile.ServiceCoverage) ? "Gujarat, India" : m.TraderProfile.ServiceCoverage
+                Location: string.IsNullOrWhiteSpace(m.TraderProfile.ServiceCoverage) ? "Gujarat, India" : m.TraderProfile.ServiceCoverage,
+                IsVerified: false
             );
         }
 
@@ -506,7 +587,8 @@ public class ConnectionService : IConnectionService
                 BusinessType: "Service Engineer",
                 IndustryId: 0,
                 IndustryName: "Technical Services",
-                Location: string.IsNullOrWhiteSpace(m.ServiceEngineerProfile.ServiceCoverage) ? "Gujarat, India" : m.ServiceEngineerProfile.ServiceCoverage
+                Location: string.IsNullOrWhiteSpace(m.ServiceEngineerProfile.ServiceCoverage) ? "Gujarat, India" : m.ServiceEngineerProfile.ServiceCoverage,
+                IsVerified: false
             );
         }
 
@@ -517,7 +599,8 @@ public class ConnectionService : IConnectionService
                 BusinessType: "Employee / Job Seeker",
                 IndustryId: 0,
                 IndustryName: "Professional",
-                Location: "Gujarat, India"
+                Location: "Gujarat, India",
+                IsVerified: false
             );
         }
 
@@ -526,7 +609,8 @@ public class ConnectionService : IConnectionService
             BusinessType: "Member",
             IndustryId: 0,
             IndustryName: "General",
-            Location: "Gujarat, India"
+            Location: "Gujarat, India",
+            IsVerified: false
         );
     }
 

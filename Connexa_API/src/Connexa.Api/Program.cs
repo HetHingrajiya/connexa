@@ -16,6 +16,13 @@ using Connexa.Api.Services.Email;
 using Connexa.Api.Services.Registration;
 using Connexa.Api.Services.Verification;
 using Connexa.Api.Services.WhatsApp;
+using Connexa.Api.Services.Products;
+using Connexa.Api.Services.Notifications;
+using Connexa.Api.Services.Notifications.Fcm;
+using Connexa.Api.Services.BusinessVerification;
+using Connexa.Api.Services.Rfq;
+using Connexa.Api.Services.Orders;
+using Connexa.Api.Services.JobWork;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -83,6 +90,13 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IDirectoryService, DirectoryService>();
 builder.Services.AddScoped<IConnectionService, ConnectionService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddSingleton<IFcmPushService, FcmPushService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IBusinessVerificationService, BusinessVerificationService>();
+builder.Services.AddScoped<IRfqService, RfqService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IJobWorkService, JobWorkService>();
 
 // Configure JWT Bearer Authentication
 var jwtSection = builder.Configuration.GetSection(JwtOptions.SectionName);
@@ -233,6 +247,8 @@ else
 {
     app.UseCors("ProductionCorsPolicy");
 }
+
+app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();

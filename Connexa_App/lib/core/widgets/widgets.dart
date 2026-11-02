@@ -5,4 +5,5 @@ export 'app_dropdown.dart';
 export 'app_feedback_states.dart';
 export 'app_search_field.dart';
 export 'app_text_field.dart';
+export 'app_bottom_nav_bar.dart';
 export 'responsive_layout.dart';

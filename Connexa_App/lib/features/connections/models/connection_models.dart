@@ -15,6 +15,7 @@ class ConnectedMemberItem {
     this.maskedEmail,
     this.maskedPhoneNumber,
     this.connectionStatus = 'Connected',
+    this.isVerified = false,
   });
 
   final int connectionId;
@@ -29,6 +30,7 @@ class ConnectedMemberItem {
   final String? maskedEmail;
   final String? maskedPhoneNumber;
   final String connectionStatus;
+  final bool isVerified;
 
   String get displayEmail => maskedEmail ?? 'Protected';
 
@@ -54,6 +56,7 @@ class ConnectedMemberItem {
       maskedEmail: json['maskedEmail']?.toString(),
       maskedPhoneNumber: json['maskedPhoneNumber']?.toString(),
       connectionStatus: json['connectionStatus']?.toString() ?? 'Connected',
+      isVerified: json['isVerified'] == true,
     );
   }
 }
@@ -72,6 +75,7 @@ class ConnectionRequestItem {
     required this.createdAtUtc,
     required this.status,
     required this.direction,
+    this.isVerified = false,
   });
 
   final int id;
@@ -86,6 +90,7 @@ class ConnectionRequestItem {
   final DateTime createdAtUtc;
   final String status;
   final String direction; // 'Received' or 'Sent'
+  final bool isVerified;
 
   String get displayLocation =>
       location.trim().isNotEmpty ? location.trim() : 'Gujarat, India';
@@ -107,6 +112,7 @@ class ConnectionRequestItem {
           DateTime.now(),
       status: json['status']?.toString() ?? 'Pending',
       direction: json['direction']?.toString() ?? 'Received',
+      isVerified: json['isVerified'] == true,
     );
   }
 }

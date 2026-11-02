@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "504756452405",
+    "project_id": "connexa-d17f6",
+    "storage_bucket": "connexa-d17f6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:504756452405:android:c79b9f4e561d1923d8457c",
+        "android_client_info": {
+          "package_name": "com.example.connexa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCaPBDE48ntn5y2TPZYHGseRnTSSMBFyGY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

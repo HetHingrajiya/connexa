@@ -242,6 +242,7 @@ class _NetworkScreenState extends ConsumerState<NetworkScreen>
     );
 
     return Scaffold(
+      bottomNavigationBar: const AppBottomNavBar(currentIndex: 3),
       appBar: AppBar(
         title: const Text('My Network'),
         actions: <Widget>[
@@ -258,6 +259,7 @@ class _NetworkScreenState extends ConsumerState<NetworkScreen>
         ],
         bottom: TabBar(
           controller: _tabController,
+          labelPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white70,
           indicatorColor: AppColors.secondary,
@@ -266,13 +268,20 @@ class _NetworkScreenState extends ConsumerState<NetworkScreen>
             Tab(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  const Text('Connections'),
+                  const Flexible(
+                    child: Text('Connections', overflow: TextOverflow.ellipsis),
+                  ),
                   if (state.summary.totalConnected > 0) ...<Widget>[
                     const SizedBox(width: AppSpacing.xs),
                     AppBadge.primary(
                       label: state.summary.totalConnected.toString(),
                       isPill: true,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 1,
+                      ),
                     ),
                   ],
                 ],
@@ -281,13 +290,20 @@ class _NetworkScreenState extends ConsumerState<NetworkScreen>
             Tab(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  const Text('Received'),
+                  const Flexible(
+                    child: Text('Received', overflow: TextOverflow.ellipsis),
+                  ),
                   if (state.summary.receivedPendingCount > 0) ...<Widget>[
                     const SizedBox(width: AppSpacing.xs),
                     AppBadge.secondary(
                       label: state.summary.receivedPendingCount.toString(),
                       isPill: true,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 1,
+                      ),
                     ),
                   ],
                 ],
@@ -296,13 +312,20 @@ class _NetworkScreenState extends ConsumerState<NetworkScreen>
             Tab(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  const Text('Sent'),
+                  const Flexible(
+                    child: Text('Sent', overflow: TextOverflow.ellipsis),
+                  ),
                   if (state.summary.sentPendingCount > 0) ...<Widget>[
                     const SizedBox(width: AppSpacing.xs),
                     AppBadge.neutral(
                       label: state.summary.sentPendingCount.toString(),
                       isPill: true,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 1,
+                      ),
                     ),
                   ],
                 ],
@@ -485,13 +508,28 @@ class _NetworkScreenState extends ConsumerState<NetworkScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(
-                      item.companyName,
-                      style: AppTextStyles.titleMedium.copyWith(
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.1,
-                      ),
-                      overflow: TextOverflow.ellipsis,
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Text(
+                            item.companyName,
+                            style: AppTextStyles.titleMedium.copyWith(
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.1,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (item.isVerified) ...<Widget>[
+                          const SizedBox(width: AppSpacing.xs),
+                          const Icon(
+                            Icons.verified_rounded,
+                            key: Key('connectionVerifiedIcon'),
+                            size: 15,
+                            color: AppColors.secondary,
+                          ),
+                        ],
+                      ],
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -662,17 +700,34 @@ class _NetworkScreenState extends ConsumerState<NetworkScreen>
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Text(
-                              item.companyName,
-                              style: AppTextStyles.titleMedium.copyWith(
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: -0.1,
-                              ),
-                              overflow: TextOverflow.ellipsis,
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: Text(
+                                    item.companyName,
+                                    style: AppTextStyles.titleMedium.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: -0.1,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                if (item.isVerified) ...<Widget>[
+                                  const SizedBox(width: AppSpacing.xs),
+                                  const Icon(
+                                    Icons.verified_rounded,
+                                    key: Key('sentRequestVerifiedIcon'),
+                                    size: 15,
+                                    color: AppColors.secondary,
+                                  ),
+                                ],
+                              ],
                             ),
                             const SizedBox(height: 2),
                             Text(
                               item.fullName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: AppTextStyles.bodySmall.copyWith(
                                 color: AppColors.textSecondary,
                               ),
@@ -680,6 +735,8 @@ class _NetworkScreenState extends ConsumerState<NetworkScreen>
                             const SizedBox(height: 4),
                             Text(
                               '${item.businessType} • ${item.displayLocation}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: AppTextStyles.labelSmall.copyWith(
                                 color: AppColors.textSecondary,
                               ),
@@ -837,17 +894,34 @@ class _NetworkScreenState extends ConsumerState<NetworkScreen>
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Text(
-                              item.companyName,
-                              style: AppTextStyles.titleMedium.copyWith(
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: -0.1,
-                              ),
-                              overflow: TextOverflow.ellipsis,
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: Text(
+                                    item.companyName,
+                                    style: AppTextStyles.titleMedium.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: -0.1,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                if (item.isVerified) ...<Widget>[
+                                  const SizedBox(width: AppSpacing.xs),
+                                  const Icon(
+                                    Icons.verified_rounded,
+                                    key: Key('sentRequestVerifiedIcon'),
+                                    size: 15,
+                                    color: AppColors.secondary,
+                                  ),
+                                ],
+                              ],
                             ),
                             const SizedBox(height: 2),
                             Text(
                               item.fullName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: AppTextStyles.bodySmall.copyWith(
                                 color: AppColors.textSecondary,
                               ),
@@ -855,6 +929,8 @@ class _NetworkScreenState extends ConsumerState<NetworkScreen>
                             const SizedBox(height: 4),
                             Text(
                               '${item.businessType} • ${item.displayLocation}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: AppTextStyles.labelSmall.copyWith(
                                 color: AppColors.textSecondary,
                               ),

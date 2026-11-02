@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:connexa/core/storage/auth_storage.dart';
 import 'package:connexa/features/auth/models/auth_models.dart';
 import 'package:connexa/features/auth/services/auth_service.dart';
+import 'package:connexa/features/notifications/services/fcm_push_service.dart';
 
 /// State representation for authentication and user session.
 class AuthState {
@@ -44,13 +45,18 @@ class AuthState {
 
 /// State notifier managing login, password setup, session restoration, and logout.
 class AuthNotifier extends StateNotifier<AuthState> {
-  AuthNotifier(this._authService, this._authStorage)
-    : super(const AuthState(isRestoringSession: false)) {
+  AuthNotifier(
+    this._authService,
+    this._authStorage, {
+    FcmPushService? fcmPushService,
+  }) : _fcmPushService = fcmPushService,
+       super(const AuthState(isRestoringSession: false)) {
     restoreSession();
   }
 
   final AuthService _authService;
   final AuthStorage _authStorage;
+  final FcmPushService? _fcmPushService;
 
   /// Restores persistent user session on application launch.
   Future<void> restoreSession() async {
@@ -82,6 +88,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
           primaryProfileType: profile.primaryProfileType,
         ),
       );
+      _fcmPushService?.registerDeviceToken();
     } catch (_) {
       // Invalidation or network error: gracefully fall back to unauthenticated
       await _authStorage.clear();
@@ -115,6 +122,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         user: response.member,
         profile: profile,
       );
+      _fcmPushService?.registerDeviceToken();
       return true;
     } on AuthException catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.message);
@@ -161,6 +169,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         user: response.member,
         profile: profile,
       );
+      _fcmPushService?.registerDeviceToken();
       return true;
     } on AuthException catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.message);
@@ -229,6 +238,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
   /// Terminates active session and clears tokens.
   Future<void> logout() async {
     state = state.copyWith(isLoading: true);
+    try {
+      await _fcmPushService?.unregisterCurrentDeviceToken();
+    } catch (_) {}
     await _authService.logout();
     state = const AuthState(
       isAuthenticated: false,
@@ -250,7 +262,8 @@ final StateNotifierProvider<AuthNotifier, AuthState> authProvider =
     StateNotifierProvider<AuthNotifier, AuthState>((Ref ref) {
       final AuthService authService = ref.watch(authServiceProvider);
       final AuthStorage authStorage = ref.watch(authStorageProvider);
-      return AuthNotifier(authService, authStorage);
+      final FcmPushService fcmPushService = ref.watch(fcmPushServiceProvider);
+      return AuthNotifier(authService, authStorage, fcmPushService: fcmPushService);
     });
 
 /// In-memory holder for an authorized credential setup token across navigation flows.

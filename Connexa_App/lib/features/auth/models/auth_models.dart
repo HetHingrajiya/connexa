@@ -16,6 +16,8 @@ class AuthenticatedMember {
   final String role;
   final String primaryProfileType;
 
+  bool get isAdmin => role.toLowerCase() == 'admin';
+
   factory AuthenticatedMember.fromJson(Map<String, dynamic> json) {
     return AuthenticatedMember(
       memberId: (json['memberId'] as num?)?.toInt() ?? 0,
@@ -114,6 +116,24 @@ class MemberProfile {
       profileDetails: json['profileDetails'] as Map<String, dynamic>?,
     );
   }
+
+  String? get companyName => profileDetails?['companyName']?.toString();
+  String? get address => profileDetails?['address']?.toString();
+  String? get city => profileDetails?['city']?.toString();
+  String? get state => profileDetails?['state']?.toString();
+  String? get pincode => profileDetails?['pincode']?.toString();
+  String? get websiteUrl => profileDetails?['websiteUrl']?.toString();
+  String? get logoUrl => profileDetails?['logoUrl']?.toString();
+  List<String> get businessImages {
+    final dynamic imgs = profileDetails?['businessImages'];
+    if (imgs is List) {
+      return imgs.map((dynamic e) => e.toString()).toList();
+    }
+    return <String>[];
+  }
+  String get verificationStatus => profileDetails?['verificationStatus']?.toString() ?? 'NotSubmitted';
+  bool get isVerified => profileDetails?['isVerified'] == true || verificationStatus == 'Approved';
+  bool get isAdmin => role.toLowerCase() == 'admin';
 }
 
 /// Generic exception thrown during authentication actions.

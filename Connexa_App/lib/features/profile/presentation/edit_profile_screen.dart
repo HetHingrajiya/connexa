@@ -24,6 +24,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _fullNameController;
   late TextEditingController _companyOrWorkController;
   late TextEditingController _descriptionController;
+  late TextEditingController _addressController;
+  late TextEditingController _cityController;
+  late TextEditingController _stateController;
+  late TextEditingController _pincodeController;
+  late TextEditingController _websiteUrlController;
 
   int? _selectedIndustryId;
   int? _selectedBusinessGroupId;
@@ -69,6 +74,21 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       _descriptionController = TextEditingController(
         text: details?['businessDescription']?.toString() ?? '',
       );
+      _addressController = TextEditingController(
+        text: details?['address']?.toString() ?? '',
+      );
+      _cityController = TextEditingController(
+        text: details?['city']?.toString() ?? '',
+      );
+      _stateController = TextEditingController(
+        text: details?['state']?.toString() ?? '',
+      );
+      _pincodeController = TextEditingController(
+        text: details?['pincode']?.toString() ?? '',
+      );
+      _websiteUrlController = TextEditingController(
+        text: details?['websiteUrl']?.toString() ?? '',
+      );
 
       final dynamic rawCaps =
           details?['businessCapabilities'] ??
@@ -96,6 +116,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     _fullNameController.dispose();
     _companyOrWorkController.dispose();
     _descriptionController.dispose();
+    _addressController.dispose();
+    _cityController.dispose();
+    _stateController.dispose();
+    _pincodeController.dispose();
+    _websiteUrlController.dispose();
     super.dispose();
   }
 
@@ -135,6 +160,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         'businessGroupId': _selectedBusinessGroupId,
         'subGroupId': _selectedSubGroupId,
         'categoryId': _selectedCategoryId,
+        'address': _addressController.text.trim(),
+        'city': _cityController.text.trim(),
+        'state': _stateController.text.trim(),
+        'pincode': _pincodeController.text.trim(),
+        'websiteUrl': _websiteUrlController.text.trim(),
       };
     } else if (profileType == 'EmployeeJobSeeker') {
       payload['employeeDetails'] = <String, dynamic>{
@@ -211,6 +241,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           maxTabletWidth: AppSpacing.maxContentWidthTablet,
           maxDesktopWidth: AppSpacing.maxContentWidthDesktop,
           child: SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             child: Form(
               key: _formKey,
               child: Column(
@@ -453,6 +484,59 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   },
                 );
               }).toList(),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            const Divider(),
+            const SizedBox(height: AppSpacing.md),
+            const Text(
+              'Location & Web Presence',
+              style: AppTextStyles.labelLarge,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            AppTextField(
+              controller: _addressController,
+              label: 'Premises / Street Address',
+              hintText: 'e.g. 102 Industrial Area Phase 2',
+              prefixIcon: const Icon(Icons.location_on_outlined, size: 20),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  flex: 6,
+                  child: AppTextField(
+                    controller: _cityController,
+                    label: 'City',
+                    hintText: 'e.g. Surat',
+                    prefixIcon: const Icon(Icons.location_city_outlined, size: 20),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  flex: 4,
+                  child: AppTextField(
+                    controller: _pincodeController,
+                    label: 'Pincode',
+                    hintText: 'e.g. 395002',
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+            AppTextField(
+              controller: _stateController,
+              label: 'State / Province',
+              hintText: 'e.g. Gujarat',
+              prefixIcon: const Icon(Icons.map_outlined, size: 20),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            AppTextField(
+              controller: _websiteUrlController,
+              label: 'Official Website URL',
+              hintText: 'e.g. https://www.acmeind.com',
+              keyboardType: TextInputType.url,
+              prefixIcon: const Icon(Icons.language_rounded, size: 20),
             ),
           ],
         ],

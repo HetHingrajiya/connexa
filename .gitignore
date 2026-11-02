@@ -1,0 +1,26 @@
+# Secrets & Credentials
+*firebase-adminsdk*.json
+*serviceAccount*.json
+connexa-firebase-adminsdk.json
+*.p8
+*.p12
+*.pem
+
+# .NET
+bin/
+obj/
+.vs/
+*.user
+*.suo
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+*.lock
+
+# Private Uploads & Verification Documents
+**/App_Data/VerificationDocuments/*
+!**/App_Data/VerificationDocuments/.gitkeep
+**/wwwroot/uploads/**

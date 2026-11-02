@@ -28,7 +28,8 @@ public record ConnectedMemberItemDto(
     DateTime ConnectedSinceUtc,
     string? MaskedEmail,
     string? MaskedPhoneNumber,
-    string ConnectionStatus = "Connected"
+    string ConnectionStatus = "Connected",
+    bool IsVerified = false
 );
 
 public record ConnectionRequestItemDto(
@@ -43,7 +44,8 @@ public record ConnectionRequestItemDto(
     string? Note,
     DateTime CreatedAtUtc,
     string Status,
-    string Direction
+    string Direction,
+    bool IsVerified = false
 );
 
 public record PaginatedConnectionsDto<T>(

@@ -33,6 +33,7 @@ class RegistrationSuccessScreen extends ConsumerWidget {
           maxTabletWidth: AppSpacing.maxContentWidthTablet,
           maxDesktopWidth: AppSpacing.maxContentWidthDesktop,
           child: SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
@@ -41,7 +42,7 @@ class RegistrationSuccessScreen extends ConsumerWidget {
                 // Success Confirmation Card
                 AppCard(
                   key: const Key('registrationSuccessCard'),
-                  padding: const EdgeInsets.all(AppSpacing.xxl),
+                  padding: const EdgeInsets.all(AppSpacing.lg),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
@@ -251,11 +252,15 @@ class RegistrationSuccessScreen extends ConsumerWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
-        Text(
-          value,
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: isAccent ? AppColors.primary : AppColors.textPrimary,
-            fontWeight: isAccent ? FontWeight.w700 : FontWeight.w600,
+        const SizedBox(width: AppSpacing.sm),
+        Expanded(
+          child: Text(
+            value,
+            textAlign: TextAlign.end,
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: isAccent ? AppColors.primary : AppColors.textPrimary,
+              fontWeight: isAccent ? FontWeight.w700 : FontWeight.w600,
+            ),
           ),
         ),
       ],

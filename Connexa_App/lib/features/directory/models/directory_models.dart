@@ -23,6 +23,9 @@ class BusinessDirectoryItem {
     this.maskedEmail,
     this.maskedPhoneNumber,
     this.connectionStatus = 'Not Connected',
+    this.isVerified = false,
+    this.verificationStatus = 'NotSubmitted',
+    this.logoUrl,
   });
 
   final int memberId;
@@ -47,6 +50,9 @@ class BusinessDirectoryItem {
   final String? maskedEmail;
   final String? maskedPhoneNumber;
   final String connectionStatus;
+  final bool isVerified;
+  final String verificationStatus;
+  final String? logoUrl;
 
   /// Displayable email respecting privacy policy
   String get displayEmail =>
@@ -95,6 +101,11 @@ class BusinessDirectoryItem {
       maskedEmail: json['maskedEmail']?.toString(),
       maskedPhoneNumber: json['maskedPhoneNumber']?.toString(),
       connectionStatus: json['connectionStatus']?.toString() ?? 'Not Connected',
+      isVerified: json['isVerified'] == true ||
+          json['verificationStatus']?.toString().toLowerCase() == 'approved',
+      verificationStatus:
+          json['verificationStatus']?.toString() ?? 'NotSubmitted',
+      logoUrl: json['logoUrl']?.toString(),
     );
   }
 
@@ -121,6 +132,9 @@ class BusinessDirectoryItem {
     String? maskedEmail,
     String? maskedPhoneNumber,
     String? connectionStatus,
+    bool? isVerified,
+    String? verificationStatus,
+    String? logoUrl,
   }) {
     return BusinessDirectoryItem(
       memberId: memberId ?? this.memberId,
@@ -145,6 +159,9 @@ class BusinessDirectoryItem {
       maskedEmail: maskedEmail ?? this.maskedEmail,
       maskedPhoneNumber: maskedPhoneNumber ?? this.maskedPhoneNumber,
       connectionStatus: connectionStatus ?? this.connectionStatus,
+      isVerified: isVerified ?? this.isVerified,
+      verificationStatus: verificationStatus ?? this.verificationStatus,
+      logoUrl: logoUrl ?? this.logoUrl,
     );
   }
 }
@@ -195,6 +212,7 @@ class BusinessDirectoryFilter {
     this.capability,
     this.businessType,
     this.location,
+    this.verifiedOnly,
     this.page = 1,
     this.pageSize = 10,
   });
@@ -207,6 +225,7 @@ class BusinessDirectoryFilter {
   final String? capability;
   final String? businessType;
   final String? location;
+  final bool? verifiedOnly;
   final int page;
   final int pageSize;
 
@@ -220,7 +239,8 @@ class BusinessDirectoryFilter {
       (businessType != null &&
           businessType!.trim().isNotEmpty &&
           businessType != 'All') ||
-      (location != null && location!.trim().isNotEmpty);
+      (location != null && location!.trim().isNotEmpty) ||
+      (verifiedOnly == true);
 
   BusinessDirectoryFilter copyWith({
     String? search,
@@ -231,6 +251,7 @@ class BusinessDirectoryFilter {
     String? capability,
     String? businessType,
     String? location,
+    bool? verifiedOnly,
     int? page,
     int? pageSize,
     bool clearSearch = false,
@@ -241,6 +262,7 @@ class BusinessDirectoryFilter {
     bool clearCapability = false,
     bool clearBusinessType = false,
     bool clearLocation = false,
+    bool clearVerifiedOnly = false,
   }) {
     return BusinessDirectoryFilter(
       search: clearSearch ? null : (search ?? this.search),
@@ -255,6 +277,7 @@ class BusinessDirectoryFilter {
           ? null
           : (businessType ?? this.businessType),
       location: clearLocation ? null : (location ?? this.location),
+      verifiedOnly: clearVerifiedOnly ? null : (verifiedOnly ?? this.verifiedOnly),
       page: page ?? this.page,
       pageSize: pageSize ?? this.pageSize,
     );
@@ -290,6 +313,9 @@ class BusinessDirectoryFilter {
     }
     if (location != null && location!.trim().isNotEmpty) {
       params['location'] = location!.trim();
+    }
+    if (verifiedOnly == true) {
+      params['verifiedOnly'] = true;
     }
     return params;
   }

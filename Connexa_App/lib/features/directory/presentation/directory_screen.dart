@@ -60,6 +60,7 @@ class _BusinessDirectoryScreenState
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (BuildContext ctx) {
         return Container(
@@ -104,24 +105,33 @@ class _BusinessDirectoryScreenState
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: AppColors.secondary.withValues(alpha: 0.4),
+                              color: item.isVerified
+                                  ? AppColors.secondary
+                                  : AppColors.secondary.withValues(alpha: 0.4),
                               width: 2.0,
                             ),
                           ),
                           child: CircleAvatar(
                             radius: 32,
                             backgroundColor: AppColors.primaryContainer,
-                            child: Text(
-                              item.companyName.isNotEmpty
-                                  ? item.companyName
-                                        .substring(0, 1)
-                                        .toUpperCase()
-                                  : 'B',
-                              style: AppTextStyles.headlineSmall.copyWith(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                            backgroundImage: (item.logoUrl != null &&
+                                    item.logoUrl!.isNotEmpty)
+                                ? NetworkImage(item.logoUrl!)
+                                : null,
+                            child: (item.logoUrl != null &&
+                                    item.logoUrl!.isNotEmpty)
+                                ? null
+                                : Text(
+                                    item.companyName.isNotEmpty
+                                        ? item.companyName
+                                            .substring(0, 1)
+                                            .toUpperCase()
+                                        : 'B',
+                                    style: AppTextStyles.headlineSmall.copyWith(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                           ),
                         ),
                         const SizedBox(width: AppSpacing.md),
@@ -129,12 +139,26 @@ class _BusinessDirectoryScreenState
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Text(
-                                item.companyName,
-                                style: AppTextStyles.titleLarge.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: -0.2,
-                                ),
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Text(
+                                      item.companyName,
+                                      style: AppTextStyles.titleLarge.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: -0.2,
+                                      ),
+                                    ),
+                                  ),
+                                  if (item.isVerified) ...<Widget>[
+                                    const SizedBox(width: AppSpacing.xs),
+                                    const Icon(
+                                      Icons.verified_rounded,
+                                      color: AppColors.secondary,
+                                      size: 20,
+                                    ),
+                                  ],
+                                ],
                               ),
                               const SizedBox(height: AppSpacing.xxs),
                               Row(
@@ -162,14 +186,16 @@ class _BusinessDirectoryScreenState
                                 runSpacing: AppSpacing.xs,
                                 children: <Widget>[
                                   _buildBusinessTypeBadge(item.businessType),
-                                  const AppBadge.success(
-                                    label: 'Verified Member',
-                                    icon: Icon(
-                                      Icons.verified_rounded,
-                                      size: 13,
-                                      color: AppColors.onSuccessContainer,
+                                  if (item.isVerified)
+                                    const AppBadge.success(
+                                      key: Key('verifiedModalBadge'),
+                                      label: 'Verified Member',
+                                      icon: Icon(
+                                        Icons.verified_rounded,
+                                        size: 13,
+                                        color: AppColors.onSuccessContainer,
+                                      ),
                                     ),
-                                  ),
                                 ],
                               ),
                             ],
@@ -369,24 +395,34 @@ class _BusinessDirectoryScreenState
                             leading: Container(
                               width: 32,
                               height: 32,
-                              decoration: const BoxDecoration(
-                                color: AppColors.successContainer,
+                              decoration: BoxDecoration(
+                                color: item.isVerified
+                                    ? AppColors.successContainer
+                                    : AppColors.surfaceContainer,
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(
-                                Icons.verified_rounded,
+                              child: Icon(
+                                item.isVerified
+                                    ? Icons.verified_rounded
+                                    : Icons.badge_outlined,
                                 size: 18,
-                                color: AppColors.success,
+                                color: item.isVerified
+                                    ? AppColors.success
+                                    : AppColors.primary,
                               ),
                             ),
                             title: Text(
-                              'Verified Member #${item.memberId}',
+                              item.isVerified
+                                  ? 'Verified Member #${item.memberId}'
+                                  : 'Registered Member #${item.memberId}',
                               style: AppTextStyles.bodyMedium.copyWith(
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                             subtitle: Text(
-                              'Member since ${item.memberSinceUtc.day}/${item.memberSinceUtc.month}/${item.memberSinceUtc.year} (via ${item.verifiedMethod})',
+                              item.isVerified
+                                  ? 'Verified business since ${item.memberSinceUtc.day}/${item.memberSinceUtc.month}/${item.memberSinceUtc.year} (via ${item.verifiedMethod})'
+                                  : 'Member since ${item.memberSinceUtc.day}/${item.memberSinceUtc.month}/${item.memberSinceUtc.year}',
                             ),
                           ),
                         ],
@@ -771,6 +807,7 @@ class _BusinessDirectoryScreenState
     );
 
     return Scaffold(
+      bottomNavigationBar: const AppBottomNavBar(currentIndex: 1),
       appBar: AppBar(
         title: const Text('Business Directory'),
         actions: <Widget>[
@@ -920,24 +957,42 @@ class _BusinessDirectoryScreenState
                                 Wrap(
                                   spacing: AppSpacing.xs,
                                   runSpacing: AppSpacing.xs,
-                                  children: _businessTypeOptions.map((
-                                    String type,
-                                  ) {
-                                    final bool isSelected =
-                                        (state.filter.businessType == null &&
-                                            type == 'All') ||
-                                        state.filter.businessType == type;
-                                    return FilterChip(
-                                      label: Text(type),
-                                      selected: isSelected,
+                                  children: <Widget>[
+                                    FilterChip(
+                                      key: const Key('verifiedOnlyDesktopFilterChip'),
+                                      avatar: Icon(
+                                        Icons.verified_rounded,
+                                        size: 16,
+                                        color: state.filter.verifiedOnly == true
+                                            ? AppColors.primary
+                                            : AppColors.textSecondary,
+                                      ),
+                                      label: const Text('Verified Only'),
+                                      selected: state.filter.verifiedOnly == true,
                                       showCheckmark: false,
                                       onSelected: (bool selected) {
-                                        notifier.setBusinessType(
-                                          type == 'All' ? null : type,
-                                        );
+                                        notifier.toggleVerifiedOnly();
                                       },
-                                    );
-                                  }).toList(),
+                                    ),
+                                    ..._businessTypeOptions.map((
+                                      String type,
+                                    ) {
+                                      final bool isSelected =
+                                          (state.filter.businessType == null &&
+                                              type == 'All') ||
+                                          state.filter.businessType == type;
+                                      return FilterChip(
+                                        label: Text(type),
+                                        selected: isSelected,
+                                        showCheckmark: false,
+                                        onSelected: (bool selected) {
+                                          notifier.setBusinessType(
+                                            type == 'All' ? null : type,
+                                          );
+                                        },
+                                      );
+                                    }),
+                                  ],
                                 ),
                                 const SizedBox(height: AppSpacing.md),
 
@@ -1087,30 +1142,63 @@ class _BusinessDirectoryScreenState
                         ],
                       ),
                       const SizedBox(height: AppSpacing.sm),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: _businessTypeOptions.map((String type) {
-                            final bool isSelected =
-                                (state.filter.businessType == null &&
-                                    type == 'All') ||
-                                state.filter.businessType == type;
-                            return Padding(
-                              padding: const EdgeInsets.only(
-                                right: AppSpacing.xs,
-                              ),
+                      SizedBox(
+                        height: 42,
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          physics: const BouncingScrollPhysics(),
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(right: AppSpacing.xs),
                               child: FilterChip(
-                                label: Text(type),
-                                selected: isSelected,
+                                key: const Key('verifiedOnlyFilterChip'),
+                                avatar: Icon(
+                                  Icons.verified_rounded,
+                                  size: 16,
+                                  color: state.filter.verifiedOnly == true
+                                      ? AppColors.primary
+                                      : AppColors.textSecondary,
+                                ),
+                                label: const Text('Verified Only'),
+                                selected: state.filter.verifiedOnly == true,
                                 showCheckmark: false,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.xs,
+                                  vertical: 2,
+                                ),
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
                                 onSelected: (bool selected) {
-                                  notifier.setBusinessType(
-                                    type == 'All' ? null : type,
-                                  );
+                                  notifier.toggleVerifiedOnly();
                                 },
                               ),
-                            );
-                          }).toList(),
+                            ),
+                            ..._businessTypeOptions.map((String type) {
+                              final bool isSelected =
+                                  (state.filter.businessType == null &&
+                                      type == 'All') ||
+                                  state.filter.businessType == type;
+                              return Padding(
+                                padding: const EdgeInsets.only(right: AppSpacing.xs),
+                                child: FilterChip(
+                                  label: Text(type),
+                                  selected: isSelected,
+                                  showCheckmark: false,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: AppSpacing.xs,
+                                    vertical: 2,
+                                  ),
+                                  materialTapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                  onSelected: (bool selected) {
+                                    notifier.setBusinessType(
+                                      type == 'All' ? null : type,
+                                    );
+                                  },
+                                ),
+                              );
+                            }),
+                          ],
                         ),
                       ),
                       const SizedBox(height: AppSpacing.xs),
@@ -1232,6 +1320,7 @@ class _BusinessDirectoryScreenState
         itemBuilder: (BuildContext context, int index) {
           final BusinessDirectoryItem item = state.items[index];
           return AppStaggeredEntrance(
+            key: ValueKey<int>(item.memberId),
             index: index,
             child: _buildBusinessCard(context, item),
           );
@@ -1242,10 +1331,11 @@ class _BusinessDirectoryScreenState
     return ListView.builder(
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: state.items.length,
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+      padding: const EdgeInsets.fromLTRB(0, AppSpacing.xs, 0, AppSpacing.lg),
       itemBuilder: (BuildContext context, int index) {
         final BusinessDirectoryItem item = state.items[index];
         return AppStaggeredEntrance(
+          key: ValueKey<int>(item.memberId),
           index: index,
           child: _buildBusinessCard(context, item),
         );
@@ -1255,6 +1345,7 @@ class _BusinessDirectoryScreenState
 
   Widget _buildBusinessCard(BuildContext context, BusinessDirectoryItem item) {
     return AppCard(
+      key: ValueKey<String>('directoryCard_${item.memberId}'),
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       padding: const EdgeInsets.all(AppSpacing.lg),
       onTap: () => _showBusinessDetailsModal(context, item),
@@ -1270,22 +1361,30 @@ class _BusinessDirectoryScreenState
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: AppColors.secondary.withValues(alpha: 0.35),
+                    color: item.isVerified
+                        ? AppColors.secondary
+                        : AppColors.secondary.withValues(alpha: 0.35),
                     width: 1.5,
                   ),
                 ),
                 child: CircleAvatar(
                   radius: 24,
                   backgroundColor: AppColors.primaryContainer,
-                  child: Text(
-                    item.companyName.isNotEmpty
-                        ? item.companyName.substring(0, 1).toUpperCase()
-                        : 'B',
-                    style: AppTextStyles.titleMedium.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  backgroundImage: (item.logoUrl != null &&
+                          item.logoUrl!.isNotEmpty)
+                      ? NetworkImage(item.logoUrl!)
+                      : null,
+                  child: (item.logoUrl != null && item.logoUrl!.isNotEmpty)
+                      ? null
+                      : Text(
+                          item.companyName.isNotEmpty
+                              ? item.companyName.substring(0, 1).toUpperCase()
+                              : 'B',
+                          style: AppTextStyles.titleMedium.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
@@ -1303,15 +1402,19 @@ class _BusinessDirectoryScreenState
                               fontWeight: FontWeight.w700,
                               letterSpacing: -0.1,
                             ),
+                            maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        const SizedBox(width: AppSpacing.xs),
-                        const Icon(
-                          Icons.verified_rounded,
-                          color: AppColors.secondary,
-                          size: 16,
-                        ),
+                        if (item.isVerified) ...<Widget>[
+                          const SizedBox(width: AppSpacing.xs),
+                          const Icon(
+                            Icons.verified_rounded,
+                            key: Key('verifiedBadgeIcon'),
+                            color: AppColors.secondary,
+                            size: 16,
+                          ),
+                        ],
                       ],
                     ),
                     const SizedBox(height: 2),
@@ -1347,12 +1450,16 @@ class _BusinessDirectoryScreenState
           const SizedBox(height: AppSpacing.md),
 
           // Business Type, Location, and Connection Status Badges
-          Row(
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.xs,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: <Widget>[
               _buildBusinessTypeBadge(item.businessType),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 160),
                 child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     const Icon(
                       Icons.location_on_outlined,
@@ -1367,6 +1474,7 @@ class _BusinessDirectoryScreenState
                           color: AppColors.textSecondary,
                         ),
                         overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                     ),
                   ],
@@ -1411,6 +1519,21 @@ class _BusinessDirectoryScreenState
               ],
             ),
           ),
+
+          // Description Snippet Preview if present
+          if (item.businessDescription != null &&
+              item.businessDescription!.trim().isNotEmpty) ...<Widget>[
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              item.businessDescription!.trim(),
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.textSecondary,
+                height: 1.35,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
 
           // Capabilities Chips
           if (item.businessCapabilities.isNotEmpty) ...<Widget>[
@@ -1609,40 +1732,59 @@ class _BusinessDirectoryScreenState
   }
 
   Widget _buildPaginationBar(DirectoryState state, DirectoryNotifier notifier) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.sm,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          AppButton.secondary(
-            key: const Key('directoryPrevPageButton'),
-            leadingIcon: const Icon(Icons.chevron_left_rounded, size: 18),
-            text: 'Previous',
-            height: 38,
-            onPressed: (state.currentPage > 1 && !state.isLoading)
-                ? () => notifier.setPage(state.currentPage - 1)
-                : null,
-          ),
-          Text(
-            'Page ${state.currentPage} of ${state.totalPages}',
-            style: AppTextStyles.labelMedium.copyWith(
-              fontWeight: FontWeight.w600,
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.xs,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            AppButton.secondary(
+              key: const Key('directoryPrevPageButton'),
+              leadingIcon: const Icon(Icons.chevron_left_rounded, size: 18),
+              text: 'Previous',
+              height: 38,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.sm,
+                vertical: AppSpacing.xs,
+              ),
+              onPressed: (state.currentPage > 1 && !state.isLoading)
+                  ? () => notifier.setPage(state.currentPage - 1)
+                  : null,
             ),
-          ),
-          AppButton.secondary(
-            key: const Key('directoryNextPageButton'),
-            text: 'Next',
-            trailingIcon: const Icon(Icons.chevron_right_rounded, size: 18),
-            height: 38,
-            onPressed:
-                (state.currentPage < state.totalPages && !state.isLoading)
-                ? () => notifier.setPage(state.currentPage + 1)
-                : null,
-          ),
-        ],
+            Flexible(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                child: Text(
+                  'Page ${state.currentPage} of ${state.totalPages}',
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.labelMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+            AppButton.secondary(
+              key: const Key('directoryNextPageButton'),
+              text: 'Next',
+              trailingIcon: const Icon(Icons.chevron_right_rounded, size: 18),
+              height: 38,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.sm,
+                vertical: AppSpacing.xs,
+              ),
+              onPressed:
+                  (state.currentPage < state.totalPages && !state.isLoading)
+                  ? () => notifier.setPage(state.currentPage + 1)
+                  : null,
+            ),
+          ],
+        ),
       ),
     );
   }

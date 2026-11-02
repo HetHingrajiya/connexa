@@ -131,6 +131,7 @@ class _EmailVerificationScreenState
           maxTabletWidth: AppSpacing.maxContentWidthTablet,
           maxDesktopWidth: AppSpacing.maxContentWidthDesktop,
           child: SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
@@ -140,7 +141,7 @@ class _EmailVerificationScreenState
 
                 // Main Verification Card
                 AppCard(
-                  padding: const EdgeInsets.all(AppSpacing.xxl),
+                  padding: const EdgeInsets.all(AppSpacing.lg),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
@@ -339,8 +340,8 @@ class _EmailVerificationScreenState
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
-        SizedBox(
-          width: 280,
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 280),
           child: TextField(
             key: const Key('emailOtpInputField'),
             controller: _otpController,
@@ -353,7 +354,7 @@ class _EmailVerificationScreenState
               FilteringTextInputFormatter.digitsOnly,
             ],
             style: AppTextStyles.headlineMedium.copyWith(
-              letterSpacing: 12.0,
+              letterSpacing: 8.0,
               fontWeight: FontWeight.w700,
               color: AppColors.primary,
             ),
@@ -361,12 +362,12 @@ class _EmailVerificationScreenState
               counterText: '',
               hintText: '••••••',
               hintStyle: AppTextStyles.headlineMedium.copyWith(
-                letterSpacing: 12.0,
+                letterSpacing: 8.0,
                 color: AppColors.textMuted,
               ),
               contentPadding: const EdgeInsets.symmetric(
                 vertical: AppSpacing.md,
-                horizontal: AppSpacing.sm,
+                horizontal: AppSpacing.xs,
               ),
               filled: true,
               fillColor: AppColors.surfaceContainer,

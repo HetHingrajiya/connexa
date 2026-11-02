@@ -172,6 +172,7 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
           maxTabletWidth: AppSpacing.maxContentWidthTablet,
           maxDesktopWidth: AppSpacing.maxContentWidthDesktop,
           child: SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             child: Form(
               key: _formKey,
               child: LayoutBuilder(

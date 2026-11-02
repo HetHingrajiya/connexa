@@ -16,9 +16,22 @@ import 'package:connexa/features/registration/presentation/registration_review_s
 import 'package:connexa/features/registration/presentation/registration_screen.dart';
 import 'package:connexa/features/connections/presentation/network_screen.dart';
 import 'package:connexa/features/directory/presentation/directory_screen.dart';
+import 'package:connexa/features/products/models/product_models.dart';
+import 'package:connexa/features/products/presentation/inquiries_screen.dart';
+import 'package:connexa/features/products/presentation/inquiry_details_screen.dart';
+import 'package:connexa/features/products/presentation/product_details_screen.dart';
+import 'package:connexa/features/products/presentation/products_screen.dart';
+import 'package:connexa/features/profile/presentation/admin_verification_screen.dart';
+import 'package:connexa/features/profile/presentation/business_verification_screen.dart';
 import 'package:connexa/features/profile/presentation/edit_profile_screen.dart';
 import 'package:connexa/features/profile/presentation/profile_screen.dart';
+import 'package:connexa/features/notifications/presentation/notifications_screen.dart';
 import 'package:connexa/features/registration/presentation/registration_success_screen.dart';
+import 'package:connexa/features/rfq/models/rfq_models.dart';
+import 'package:connexa/features/rfq/presentation/rfqs_screen.dart';
+import 'package:connexa/features/rfq/presentation/rfq_details_screen.dart';
+import 'package:connexa/features/orders/presentation/orders_screen.dart';
+import 'package:connexa/features/orders/presentation/order_details_screen.dart';
 import 'package:connexa/features/splash/presentation/splash_screen.dart';
 
 /// Listenable notifier bridging Riverpod auth state updates to GoRouter redirection.
@@ -35,12 +48,17 @@ class AuthRouterNotifier extends ChangeNotifier {
   final Ref _ref;
 }
 
+/// Global root navigator key for deep-link push notification handling outside widget context.
+final GlobalKey<NavigatorState> rootNavigatorKey =
+    GlobalKey<NavigatorState>(debugLabel: 'rootNavigator');
+
 /// Riverpod provider exposing the application router configuration.
 final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((Ref ref) {
   final AuthRouterNotifier authNotifier = AuthRouterNotifier(ref);
   ref.onDispose(authNotifier.dispose);
 
   return GoRouter(
+    navigatorKey: rootNavigatorKey,
     initialLocation: '/',
     refreshListenable: authNotifier,
     redirect: (BuildContext context, GoRouterState state) {
@@ -56,9 +74,19 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((Ref ref) {
       final bool isProtectedRoute =
           loc == '/dashboard' ||
           loc == '/profile' ||
-          loc == '/profile/edit' ||
+          loc.startsWith('/profile/') ||
+          loc.startsWith('/admin/') ||
           loc == '/directory' ||
-          loc == '/network';
+          loc == '/network' ||
+          loc == '/products' ||
+          loc.startsWith('/products/') ||
+          loc == '/inquiries' ||
+          loc.startsWith('/inquiries/') ||
+          loc == '/rfqs' ||
+          loc.startsWith('/rfqs/') ||
+          loc == '/orders' ||
+          loc.startsWith('/orders/') ||
+          loc == '/notifications';
       final bool isAuthRoute = loc == '/login';
 
       if (!isAuthenticated && isProtectedRoute) {
@@ -132,6 +160,15 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((Ref ref) {
             ),
       ),
       GoRoute(
+        path: '/notifications',
+        name: 'notifications',
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const NotificationsScreen(),
+            ),
+      ),
+      GoRoute(
         path: '/profile',
         name: 'profile',
         pageBuilder: (BuildContext context, GoRouterState state) =>
@@ -147,6 +184,24 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((Ref ref) {
             AppAnimations.buildPageTransition(
               key: state.pageKey,
               child: const EditProfileScreen(),
+            ),
+      ),
+      GoRoute(
+        path: '/profile/verification',
+        name: 'profile-verification',
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const BusinessVerificationScreen(),
+            ),
+      ),
+      GoRoute(
+        path: '/admin/verifications',
+        name: 'admin-verifications',
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const AdminVerificationScreen(),
             ),
       ),
       GoRoute(
@@ -171,6 +226,128 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((Ref ref) {
           return AppAnimations.buildPageTransition(
             key: state.pageKey,
             child: NetworkScreen(initialTab: initialTab),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/products',
+        name: 'products',
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const ProductsScreen(),
+            ),
+      ),
+      GoRoute(
+        path: '/products/:id',
+        name: 'product-details',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          final int productId =
+              int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+          final Product? initialProduct = state.extra is Product
+              ? state.extra as Product
+              : null;
+          return AppAnimations.buildPageTransition(
+            key: state.pageKey,
+            child: ProductDetailsScreen(
+              productId: productId,
+              initialProduct: initialProduct,
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/inquiries',
+        name: 'inquiries',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          int initialTab = 0;
+          if (state.extra is int) {
+            initialTab = state.extra as int;
+          } else if (state.uri.queryParameters.containsKey('tab')) {
+            initialTab = int.tryParse(state.uri.queryParameters['tab']!) ?? 0;
+          }
+          return AppAnimations.buildPageTransition(
+            key: state.pageKey,
+            child: InquiriesScreen(initialTab: initialTab),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/inquiries/:id',
+        name: 'inquiry-details',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          final int inquiryId =
+              int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+          final ProductInquiry? initialInquiry = state.extra is ProductInquiry
+              ? state.extra as ProductInquiry
+              : null;
+          return AppAnimations.buildPageTransition(
+            key: state.pageKey,
+            child: InquiryDetailsScreen(
+              inquiryId: inquiryId,
+              initialInquiry: initialInquiry,
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/rfqs',
+        name: 'rfqs',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          int initialTab = 0;
+          if (state.extra is int) {
+            initialTab = state.extra as int;
+          } else if (state.uri.queryParameters.containsKey('tab')) {
+            initialTab = int.tryParse(state.uri.queryParameters['tab']!) ?? 0;
+          }
+          return AppAnimations.buildPageTransition(
+            key: state.pageKey,
+            child: RfqsScreen(initialTab: initialTab),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/rfqs/:id',
+        name: 'rfq-details',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          final int rfqId =
+              int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+          final Rfq? initialRfq =
+              state.extra is Rfq ? state.extra as Rfq : null;
+          return AppAnimations.buildPageTransition(
+            key: state.pageKey,
+            child: RfqDetailsScreen(
+              rfqId: rfqId,
+              initialRfq: initialRfq,
+            ),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/orders',
+        name: 'orders',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          int initialTab = 0;
+          if (state.extra is int) {
+            initialTab = state.extra as int;
+          } else if (state.uri.queryParameters.containsKey('tab')) {
+            initialTab = int.tryParse(state.uri.queryParameters['tab']!) ?? 0;
+          }
+          return AppAnimations.buildPageTransition(
+            key: state.pageKey,
+            child: OrdersScreen(initialTab: initialTab),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/orders/:id',
+        name: 'order-details',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          final int orderId =
+              int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+          return AppAnimations.buildPageTransition(
+            key: state.pageKey,
+            child: OrderDetailsScreen(orderId: orderId),
           );
         },
       ),

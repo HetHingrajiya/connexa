@@ -22,7 +22,10 @@ public record BusinessDirectoryItemDto(
     string? Location = null,
     string? MaskedEmail = null,
     string? MaskedPhoneNumber = null,
-    string? ConnectionStatus = "Not Connected"
+    string? ConnectionStatus = "Not Connected",
+    bool IsVerified = false,
+    string VerificationStatus = "NotSubmitted",
+    string? LogoUrl = null
 );
 
 public record BusinessDirectoryResponseDto(
@@ -42,6 +45,7 @@ public record BusinessDirectoryFilterDto(
     string? Capability = null,
     string? BusinessType = null,
     string? Location = null,
+    bool? VerifiedOnly = null,
     int Page = 1,
     int PageSize = 10
 );

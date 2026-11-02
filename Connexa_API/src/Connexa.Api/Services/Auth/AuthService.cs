@@ -426,7 +426,18 @@ public class AuthService : IAuthService
                 member.BusinessProfile.SubGroupId,
                 SubGroup = member.BusinessProfile.SubGroup?.Name,
                 member.BusinessProfile.CategoryId,
-                Category = member.BusinessProfile.Category?.Name
+                Category = member.BusinessProfile.Category?.Name,
+                member.BusinessProfile.Address,
+                member.BusinessProfile.City,
+                member.BusinessProfile.State,
+                member.BusinessProfile.Pincode,
+                member.BusinessProfile.WebsiteUrl,
+                member.BusinessProfile.LogoUrl,
+                BusinessImages = string.IsNullOrWhiteSpace(member.BusinessProfile.BusinessImagesJson)
+                    ? new List<string>()
+                    : System.Text.Json.JsonSerializer.Deserialize<List<string>>(member.BusinessProfile.BusinessImagesJson) ?? new List<string>(),
+                VerificationStatus = member.BusinessProfile.VerificationStatus.ToString(),
+                IsVerified = member.BusinessProfile.VerificationStatus == BusinessVerificationStatus.Approved
             },
             ProfileTypeEnum.EmployeeJobSeeker when member.EmployeeProfile != null => new
             {
@@ -476,7 +487,7 @@ public class AuthService : IAuthService
             PrimaryProfileType: member.PrimaryProfileType.ToString(),
             VerifiedMethod: member.VerifiedMethod,
             VerifiedDestination: member.VerifiedDestination,
-            Role: "Member",
+            Role: member.Role ?? "Member",
             IsActive: member.IsActive,
             CreatedAtUtc: member.CreatedAtUtc,
             ProfileDetails: profileData
@@ -751,6 +762,21 @@ public class AuthService : IAuthService
                 member.BusinessProfile.BusinessGroupId = request.BusinessDetails.BusinessGroupId;
                 member.BusinessProfile.SubGroupId = request.BusinessDetails.SubGroupId;
                 member.BusinessProfile.CategoryId = request.BusinessDetails.CategoryId;
+
+                if (request.BusinessDetails.Address != null)
+                    member.BusinessProfile.Address = request.BusinessDetails.Address.Trim();
+                if (request.BusinessDetails.City != null)
+                    member.BusinessProfile.City = request.BusinessDetails.City.Trim();
+                if (request.BusinessDetails.State != null)
+                    member.BusinessProfile.State = request.BusinessDetails.State.Trim();
+                if (request.BusinessDetails.Pincode != null)
+                    member.BusinessProfile.Pincode = request.BusinessDetails.Pincode.Trim();
+                if (request.BusinessDetails.WebsiteUrl != null)
+                    member.BusinessProfile.WebsiteUrl = request.BusinessDetails.WebsiteUrl.Trim();
+                if (request.BusinessDetails.LogoUrl != null)
+                    member.BusinessProfile.LogoUrl = request.BusinessDetails.LogoUrl.Trim();
+                if (request.BusinessDetails.BusinessImages != null)
+                    member.BusinessProfile.BusinessImagesJson = System.Text.Json.JsonSerializer.Serialize(request.BusinessDetails.BusinessImages);
                 break;
 
             case ProfileTypeEnum.EmployeeJobSeeker:

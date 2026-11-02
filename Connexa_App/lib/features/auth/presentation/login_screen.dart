@@ -202,6 +202,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               maxTabletWidth: AppSpacing.maxContentWidthTablet,
               maxDesktopWidth: 480,
               child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 child: AppStaggeredEntrance(
                   index: 0,
                   child: _buildFormContent(authState),
@@ -400,14 +402,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         const SizedBox(height: AppSpacing.sm),
 
         Center(
-          child: TextButton.icon(
+          child: TextButton(
             key: const Key('goToSetupPasswordLink'),
-            icon: const Icon(Icons.key_outlined, size: 16),
-            label: const Text(
-              'Set up password for existing account',
-              textAlign: TextAlign.center,
-            ),
             onPressed: () => context.go('/setup-password'),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Icon(Icons.key_outlined, size: 16),
+                SizedBox(width: AppSpacing.xs),
+                Flexible(
+                  child: Text(
+                    'Set up password for existing account',
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: AppSpacing.xxl),

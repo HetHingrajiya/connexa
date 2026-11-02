@@ -92,7 +92,14 @@ public record UpdateBusinessProfileDto(
     int IndustryId,
     int BusinessGroupId,
     int SubGroupId,
-    int CategoryId
+    int CategoryId,
+    string? Address = null,
+    string? City = null,
+    string? State = null,
+    string? Pincode = null,
+    string? WebsiteUrl = null,
+    string? LogoUrl = null,
+    List<string>? BusinessImages = null
 );
 
 public record UpdateEmployeeProfileDto(

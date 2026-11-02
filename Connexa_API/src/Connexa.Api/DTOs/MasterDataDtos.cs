@@ -46,8 +46,11 @@ public class ApiResponse<T>
     public T Data { get; set; } = default!;
     public string? Message { get; set; }
 
-    public static ApiResponse<T> Ok(T data, int count, ParentRefDto? parent = null) =>
+    public static ApiResponse<T> Ok(T data, int count = 1, ParentRefDto? parent = null) =>
         new() { Success = true, Data = data, Count = count, Parent = parent };
+
+    public static ApiResponse<T> WithMessage(T data, string message, int count = 1) =>
+        new() { Success = true, Data = data, Count = count, Message = message };
 
     public static ApiResponse<T> Fail(string message) =>
         new() { Success = false, Message = message };

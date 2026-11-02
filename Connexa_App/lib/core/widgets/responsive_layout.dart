@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 /// Layout classification based on logical pixel breakpoints.
@@ -53,11 +54,12 @@ typedef ResponsiveWidgetBuilder =
 
 /// A reusable responsive container that evaluates constraints via [LayoutBuilder]
 /// and exposes the classified [DeviceType] and width.
+/// Prefers available parent width constraints by default.
 class ResponsiveBuilder extends StatelessWidget {
   const ResponsiveBuilder({
     super.key,
     required this.builder,
-    this.useScreenWidth = true,
+    this.useScreenWidth = false,
   });
 
   final ResponsiveWidgetBuilder builder;
@@ -80,13 +82,14 @@ class ResponsiveBuilder extends StatelessWidget {
 }
 
 /// Convenience widget allowing separate builders for mobile, tablet, and desktop layouts.
+/// Defaults to evaluating local parent constraints rather than blind screen width.
 class ResponsiveLayout extends StatelessWidget {
   const ResponsiveLayout({
     super.key,
     required this.mobile,
     this.tablet,
     this.desktop,
-    this.useScreenWidth = true,
+    this.useScreenWidth = false,
   });
 
   final Widget Function(BuildContext context, BoxConstraints constraints)
@@ -121,7 +124,7 @@ class ResponsiveLayout extends StatelessWidget {
 }
 
 /// A responsive center container that constrains content to a maximum width
-/// on tablet and desktop/web viewports.
+/// on tablet and desktop/web viewports, and clamps to actual parent width.
 class ResponsiveCenterBox extends StatelessWidget {
   const ResponsiveCenterBox({
     super.key,
@@ -130,6 +133,7 @@ class ResponsiveCenterBox extends StatelessWidget {
     this.maxTabletWidth = 680.0,
     this.maxDesktopWidth = 920.0,
     this.padding,
+    this.useScreenWidth = false,
   });
 
   final Widget child;
@@ -137,21 +141,29 @@ class ResponsiveCenterBox extends StatelessWidget {
   final double maxTabletWidth;
   final double maxDesktopWidth;
   final EdgeInsetsGeometry? padding;
+  final bool useScreenWidth;
 
   @override
   Widget build(BuildContext context) {
     return ResponsiveBuilder(
+      useScreenWidth: useScreenWidth,
       builder:
           (
             BuildContext context,
             DeviceType deviceType,
             BoxConstraints constraints,
           ) {
-            final double maxWidth = switch (deviceType) {
+            final double targetMaxWidth = switch (deviceType) {
               DeviceType.mobile => maxMobileWidth,
               DeviceType.tablet => maxTabletWidth,
               DeviceType.desktop => maxDesktopWidth,
             };
+
+            final double effectiveMaxWidth = constraints.maxWidth.isFinite
+                ? (targetMaxWidth.isFinite
+                      ? math.min(targetMaxWidth, constraints.maxWidth)
+                      : constraints.maxWidth)
+                : targetMaxWidth;
 
             Widget content = child;
             if (padding != null) {
@@ -160,7 +172,7 @@ class ResponsiveCenterBox extends StatelessWidget {
 
             return Center(
               child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: maxWidth),
+                constraints: BoxConstraints(maxWidth: effectiveMaxWidth),
                 child: content,
               ),
             );

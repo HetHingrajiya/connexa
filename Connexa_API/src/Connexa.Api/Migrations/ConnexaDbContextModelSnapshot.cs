@@ -70,6 +70,10 @@ namespace Connexa.Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Address")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<string>("BusinessCapabilities")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -83,8 +87,16 @@ namespace Connexa.Api.Migrations
                     b.Property<int>("BusinessGroupId")
                         .HasColumnType("int");
 
+                    b.Property<string>("BusinessImagesJson")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
+
+                    b.Property<string>("City")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("CompanyName")
                         .IsRequired()
@@ -99,11 +111,32 @@ namespace Connexa.Api.Migrations
                     b.Property<int>("IndustryId")
                         .HasColumnType("int");
 
+                    b.Property<string>("LogoUrl")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
                     b.Property<int>("MemberId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Pincode")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("State")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<int>("SubGroupId")
                         .HasColumnType("int");
+
+                    b.Property<int>("VerificationStatus")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("WebsiteUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.HasKey("Id");
 
@@ -119,7 +152,139 @@ namespace Connexa.Api.Migrations
 
                     b.HasIndex("SubGroupId");
 
+                    b.HasIndex("VerificationStatus")
+                        .HasDatabaseName("IX_BusinessProfiles_VerificationStatus");
+
                     b.ToTable("BusinessProfiles", (string)null);
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.BusinessVerificationDocument", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("DocumentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("FileExtension")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<long>("FileSizeBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("OriginalFileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("StoredFileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("UploadedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int>("VerificationRequestId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VerificationRequestId")
+                        .HasDatabaseName("IX_BusinessVerificationDocuments_VerificationRequestId");
+
+                    b.ToTable("BusinessVerificationDocuments", (string)null);
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.BusinessVerificationRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BusinessProfileId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("BusinessRegistrationNumber")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("MemberId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Pincode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("RegisteredAddress")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("ReviewedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ReviewedByMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("SubmittedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BusinessProfileId")
+                        .HasDatabaseName("IX_BusinessVerificationRequests_BusinessProfileId");
+
+                    b.HasIndex("MemberId")
+                        .HasDatabaseName("IX_BusinessVerificationRequests_MemberId");
+
+                    b.HasIndex("ReviewedByMemberId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_BusinessVerificationRequests_Status");
+
+                    b.ToTable("BusinessVerificationRequests", (string)null);
                 });
 
             modelBuilder.Entity("Connexa.Api.Entities.Category", b =>
@@ -227,6 +392,48 @@ namespace Connexa.Api.Migrations
                     b.ToTable("ContractorProfiles", (string)null);
                 });
 
+            modelBuilder.Entity("Connexa.Api.Entities.DeviceToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int>("MemberId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Platform")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("android");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MemberId", "Token")
+                        .IsUnique()
+                        .HasDatabaseName("UQ_DeviceTokens_Member_Token");
+
+                    b.ToTable("DeviceTokens", (string)null);
+                });
+
             modelBuilder.Entity("Connexa.Api.Entities.EmployeeProfile", b =>
                 {
                     b.Property<int>("Id")
@@ -304,6 +511,475 @@ namespace Connexa.Api.Migrations
                         .HasDatabaseName("IX_Industries_Name");
 
                     b.ToTable("Industries", (string)null);
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.JobWorkAttachment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("FileExtension")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<long>("FileSizeBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("JobWorkQuotationId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("JobWorkRequirementId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OriginalFileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("StoredFileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("UploadedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int>("UploadedByMemberId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JobWorkQuotationId")
+                        .HasDatabaseName("IX_JobWorkAttachments_QuotationId");
+
+                    b.HasIndex("JobWorkRequirementId")
+                        .HasDatabaseName("IX_JobWorkAttachments_RequirementId");
+
+                    b.HasIndex("UploadedByMemberId");
+
+                    b.ToTable("JobWorkAttachments", (string)null);
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.JobWorkOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("AgreedUnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("BuyerMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CancellationReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("CompletedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ConfirmedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ContractorMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<string>("DeliveryLocation")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("JobTitle")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("JobWorkQuotationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("JobWorkRequirementId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LeadTimeDays")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("OrderNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("OtherCharges")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Process")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("ProcessingStartedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Subtotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TaxAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("UnitOfMeasurement")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BuyerMemberId")
+                        .HasDatabaseName("IX_JobWorkOrders_BuyerMemberId");
+
+                    b.HasIndex("ContractorMemberId")
+                        .HasDatabaseName("IX_JobWorkOrders_ContractorMemberId");
+
+                    b.HasIndex("JobWorkQuotationId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_JobWorkOrders_QuotationId");
+
+                    b.HasIndex("JobWorkRequirementId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_JobWorkOrders_RequirementId");
+
+                    b.HasIndex("OrderNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_JobWorkOrders_OrderNumber");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_JobWorkOrders_Status");
+
+                    b.ToTable("JobWorkOrders", (string)null);
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.JobWorkOrderStatusHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ChangedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int>("ChangedByMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("JobWorkOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NewStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PreviousStatus")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Remarks")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChangedByMemberId")
+                        .HasDatabaseName("IX_JobWorkOrderStatusHistories_ChangedByMemberId");
+
+                    b.HasIndex("JobWorkOrderId")
+                        .HasDatabaseName("IX_JobWorkOrderStatusHistories_OrderId");
+
+                    b.ToTable("JobWorkOrderStatusHistories", (string)null);
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.JobWorkQuotation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ContractorMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int>("JobWorkRequirementId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LeadTimeDays")
+                        .HasColumnType("int");
+
+                    b.Property<string>("MachineProposed")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<decimal>("OfferedUnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("OtherCharges")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0.00m);
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("QuotationNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("RevisionNotes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("RevisionNumber")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Subtotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TaxAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TaxRatePercent")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)")
+                        .HasDefaultValue(18.00m);
+
+                    b.Property<string>("TechnicalRemarks")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("TermsAndConditions")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContractorMemberId")
+                        .HasDatabaseName("IX_JobWorkQuotations_ContractorMemberId");
+
+                    b.HasIndex("JobWorkRequirementId")
+                        .HasDatabaseName("IX_JobWorkQuotations_RequirementId");
+
+                    b.HasIndex("QuotationNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_JobWorkQuotations_QuotationNumber");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_JobWorkQuotations_Status");
+
+                    b.ToTable("JobWorkQuotations", (string)null);
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.JobWorkRequirement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("BusinessGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<string>("DeliveryTerms")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(3000)
+                        .HasColumnType("nvarchar(3000)");
+
+                    b.Property<DateTime?>("ExpectedCompletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("IndustryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("JobWorkProcess")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("MachineCategory")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("MachineType")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("MaterialResponsibility")
+                        .HasColumnType("int");
+
+                    b.Property<string>("MaterialType")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int?>("NumberOfAxes")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OwnerMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("RequiredMachineCapacity")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("RequiredTolerance")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("RequirementNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SubGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("TargetBudget")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("TechnicalSpecifications")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("UnitOfMeasurement")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BusinessGroupId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("IndustryId")
+                        .HasDatabaseName("IX_JobWorkRequirements_IndustryId");
+
+                    b.HasIndex("JobWorkProcess")
+                        .HasDatabaseName("IX_JobWorkRequirements_JobWorkProcess");
+
+                    b.HasIndex("OwnerMemberId")
+                        .HasDatabaseName("IX_JobWorkRequirements_OwnerMemberId");
+
+                    b.HasIndex("RequirementNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_JobWorkRequirements_RequirementNumber");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_JobWorkRequirements_Status");
+
+                    b.HasIndex("SubGroupId");
+
+                    b.ToTable("JobWorkRequirements", (string)null);
                 });
 
             modelBuilder.Entity("Connexa.Api.Entities.Member", b =>
@@ -457,6 +1133,269 @@ namespace Connexa.Api.Migrations
                     b.ToTable("MemberConnections", (string)null);
                 });
 
+            modelBuilder.Entity("Connexa.Api.Entities.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("ActorMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int>("EventType")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsRead")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("PayloadJson")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<DateTime?>("ReadAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RecipientMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReferenceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReferenceType")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActorMemberId");
+
+                    b.HasIndex("RecipientMemberId")
+                        .HasDatabaseName("IX_Notifications_RecipientMemberId");
+
+                    b.HasIndex("RecipientMemberId", "CreatedAtUtc")
+                        .HasDatabaseName("IX_Notifications_Recipient_CreatedAt");
+
+                    b.HasIndex("RecipientMemberId", "IsRead")
+                        .HasDatabaseName("IX_Notifications_Recipient_IsRead");
+
+                    b.HasIndex("ReferenceType", "ReferenceId", "EventType")
+                        .HasDatabaseName("IX_Notifications_Ref_Event");
+
+                    b.ToTable("Notifications", (string)null);
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BuyerMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CancellationReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("CancelledAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CarrierName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("ConfirmedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<DateTime?>("DeliveredAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeliveryAddress")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("ExpectedDeliveryDateUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("OrderNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("QuotationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("RfqId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ShippedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("ShippingCharges")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Subtotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("SupplierMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TaxAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TaxRatePercent")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<string>("TermsAndConditionsSnapshot")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("TrackingNumber")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("TrackingUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("UnitOfMeasurement")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BuyerMemberId")
+                        .HasDatabaseName("IX_Orders_BuyerMemberId");
+
+                    b.HasIndex("OrderNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Orders_OrderNumber");
+
+                    b.HasIndex("ProductId")
+                        .HasDatabaseName("IX_Orders_ProductId");
+
+                    b.HasIndex("QuotationId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Orders_QuotationId");
+
+                    b.HasIndex("RfqId")
+                        .HasDatabaseName("IX_Orders_RfqId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_Orders_Status");
+
+                    b.HasIndex("SupplierMemberId")
+                        .HasDatabaseName("IX_Orders_SupplierMemberId");
+
+                    b.ToTable("Orders", (string)null);
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.OrderStatusHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ChangedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int>("ChangedByMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NewStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PreviousStatus")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Remarks")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChangedByMemberId")
+                        .HasDatabaseName("IX_OrderStatusHistories_ChangedByMemberId");
+
+                    b.HasIndex("OrderId")
+                        .HasDatabaseName("IX_OrderStatusHistories_OrderId");
+
+                    b.ToTable("OrderStatusHistories", (string)null);
+                });
+
             modelBuilder.Entity("Connexa.Api.Entities.OtpChallenge", b =>
                 {
                     b.Property<int>("Id")
@@ -560,6 +1499,288 @@ namespace Connexa.Api.Migrations
                     b.ToTable("OtpChallenges", (string)null);
                 });
 
+            modelBuilder.Entity("Connexa.Api.Entities.Product", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int?>("IndustryId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<int>("MemberId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("SpecificationsJson")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<string>("SubCategory")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("TagsJson")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ViewCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Category")
+                        .HasDatabaseName("IX_Products_Category");
+
+                    b.HasIndex("IndustryId")
+                        .HasDatabaseName("IX_Products_IndustryId");
+
+                    b.HasIndex("MemberId")
+                        .HasDatabaseName("IX_Products_MemberId");
+
+                    b.ToTable("Products", (string)null);
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.ProductInquiry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RecipientMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("RespondedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ResponseMessage")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int>("SenderMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("Pending");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId")
+                        .HasDatabaseName("IX_ProductInquiries_ProductId");
+
+                    b.HasIndex("RecipientMemberId")
+                        .HasDatabaseName("IX_ProductInquiries_RecipientMemberId");
+
+                    b.HasIndex("SenderMemberId")
+                        .HasDatabaseName("IX_ProductInquiries_SenderMemberId");
+
+                    b.ToTable("ProductInquiries", (string)null);
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.ProfileView", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ViewedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<int>("ViewedMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ViewerMemberId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ViewedMemberId")
+                        .HasDatabaseName("IX_ProfileViews_ViewedMemberId");
+
+                    b.ToTable("ProfileViews", (string)null);
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.Quotation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BuyerMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<DateTime?>("DecidedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DocumentUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("EstimatedDeliveryTime")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("QuotationNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("RevisionNotes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("RfqId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("ShippingCharges")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0.00m);
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("SubmittedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Subtotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("SupplierMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TaxAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TaxRatePercent")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)")
+                        .HasDefaultValue(18.00m);
+
+                    b.Property<string>("TermsAndConditions")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("ValidUntilUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Version")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BuyerMemberId")
+                        .HasDatabaseName("IX_Quotations_BuyerMemberId");
+
+                    b.HasIndex("QuotationNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Quotations_QuotationNumber");
+
+                    b.HasIndex("RfqId")
+                        .HasDatabaseName("IX_Quotations_RfqId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_Quotations_Status");
+
+                    b.HasIndex("SupplierMemberId")
+                        .HasDatabaseName("IX_Quotations_SupplierMemberId");
+
+                    b.ToTable("Quotations", (string)null);
+                });
+
             modelBuilder.Entity("Connexa.Api.Entities.RefreshToken", b =>
                 {
                     b.Property<int>("Id")
@@ -613,6 +1834,102 @@ namespace Connexa.Api.Migrations
                         .HasDatabaseName("IX_RefreshTokens_TokenHash");
 
                     b.ToTable("RefreshTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.Rfq", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AdditionalSpecifications")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("AttachmentUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("BuyerMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ClosedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<string>("DeliveryLocation")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProductInquiryId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("RequiredDeliveryDateUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RfqNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SupplierMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("TargetPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("UnitOfMeasurement")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BuyerMemberId")
+                        .HasDatabaseName("IX_Rfqs_BuyerMemberId");
+
+                    b.HasIndex("ProductId")
+                        .HasDatabaseName("IX_Rfqs_ProductId");
+
+                    b.HasIndex("ProductInquiryId");
+
+                    b.HasIndex("RfqNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Rfqs_RfqNumber");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_Rfqs_Status");
+
+                    b.HasIndex("SupplierMemberId")
+                        .HasDatabaseName("IX_Rfqs_SupplierMemberId");
+
+                    b.ToTable("Rfqs", (string)null);
                 });
 
             modelBuilder.Entity("Connexa.Api.Entities.ServiceEngineerProfile", b =>
@@ -805,6 +2122,47 @@ namespace Connexa.Api.Migrations
                     b.Navigation("SubGroup");
                 });
 
+            modelBuilder.Entity("Connexa.Api.Entities.BusinessVerificationDocument", b =>
+                {
+                    b.HasOne("Connexa.Api.Entities.BusinessVerificationRequest", "VerificationRequest")
+                        .WithMany("Documents")
+                        .HasForeignKey("VerificationRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_BusinessVerificationDocuments_VerificationRequests");
+
+                    b.Navigation("VerificationRequest");
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.BusinessVerificationRequest", b =>
+                {
+                    b.HasOne("Connexa.Api.Entities.BusinessProfile", "BusinessProfile")
+                        .WithMany("VerificationRequests")
+                        .HasForeignKey("BusinessProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_BusinessVerificationRequests_BusinessProfiles");
+
+                    b.HasOne("Connexa.Api.Entities.Member", "Member")
+                        .WithMany("VerificationRequests")
+                        .HasForeignKey("MemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_BusinessVerificationRequests_Members");
+
+                    b.HasOne("Connexa.Api.Entities.Member", "ReviewedByMember")
+                        .WithMany("ReviewedVerificationRequests")
+                        .HasForeignKey("ReviewedByMemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_BusinessVerificationRequests_Reviewer");
+
+                    b.Navigation("BusinessProfile");
+
+                    b.Navigation("Member");
+
+                    b.Navigation("ReviewedByMember");
+                });
+
             modelBuilder.Entity("Connexa.Api.Entities.Category", b =>
                 {
                     b.HasOne("Connexa.Api.Entities.SubGroup", "SubGroup")
@@ -865,6 +2223,18 @@ namespace Connexa.Api.Migrations
                     b.Navigation("SubGroup");
                 });
 
+            modelBuilder.Entity("Connexa.Api.Entities.DeviceToken", b =>
+                {
+                    b.HasOne("Connexa.Api.Entities.Member", "Member")
+                        .WithMany("DeviceTokens")
+                        .HasForeignKey("MemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_DeviceTokens_Member");
+
+                    b.Navigation("Member");
+                });
+
             modelBuilder.Entity("Connexa.Api.Entities.EmployeeProfile", b =>
                 {
                     b.HasOne("Connexa.Api.Entities.Member", "Member")
@@ -875,6 +2245,160 @@ namespace Connexa.Api.Migrations
                         .HasConstraintName("FK_EmployeeProfiles_Members");
 
                     b.Navigation("Member");
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.JobWorkAttachment", b =>
+                {
+                    b.HasOne("Connexa.Api.Entities.JobWorkQuotation", "JobWorkQuotation")
+                        .WithMany("Attachments")
+                        .HasForeignKey("JobWorkQuotationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_JobWorkAttachments_JobWorkQuotations");
+
+                    b.HasOne("Connexa.Api.Entities.JobWorkRequirement", "JobWorkRequirement")
+                        .WithMany("Attachments")
+                        .HasForeignKey("JobWorkRequirementId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_JobWorkAttachments_JobWorkRequirements");
+
+                    b.HasOne("Connexa.Api.Entities.Member", "UploadedByMember")
+                        .WithMany()
+                        .HasForeignKey("UploadedByMemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_JobWorkAttachments_UploadedByMember");
+
+                    b.Navigation("JobWorkQuotation");
+
+                    b.Navigation("JobWorkRequirement");
+
+                    b.Navigation("UploadedByMember");
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.JobWorkOrder", b =>
+                {
+                    b.HasOne("Connexa.Api.Entities.Member", "BuyerMember")
+                        .WithMany("PlacedJobWorkOrders")
+                        .HasForeignKey("BuyerMemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_JobWorkOrders_BuyerMember");
+
+                    b.HasOne("Connexa.Api.Entities.Member", "ContractorMember")
+                        .WithMany("ReceivedJobWorkOrders")
+                        .HasForeignKey("ContractorMemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_JobWorkOrders_ContractorMember");
+
+                    b.HasOne("Connexa.Api.Entities.JobWorkQuotation", "Quotation")
+                        .WithOne("Order")
+                        .HasForeignKey("Connexa.Api.Entities.JobWorkOrder", "JobWorkQuotationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_JobWorkOrders_JobWorkQuotations");
+
+                    b.HasOne("Connexa.Api.Entities.JobWorkRequirement", "Requirement")
+                        .WithOne("Order")
+                        .HasForeignKey("Connexa.Api.Entities.JobWorkOrder", "JobWorkRequirementId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_JobWorkOrders_JobWorkRequirements");
+
+                    b.Navigation("BuyerMember");
+
+                    b.Navigation("ContractorMember");
+
+                    b.Navigation("Quotation");
+
+                    b.Navigation("Requirement");
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.JobWorkOrderStatusHistory", b =>
+                {
+                    b.HasOne("Connexa.Api.Entities.Member", "ChangedByMember")
+                        .WithMany()
+                        .HasForeignKey("ChangedByMemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_JobWorkOrderStatusHistories_ChangedByMember");
+
+                    b.HasOne("Connexa.Api.Entities.JobWorkOrder", "Order")
+                        .WithMany("StatusHistory")
+                        .HasForeignKey("JobWorkOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_JobWorkOrderStatusHistories_JobWorkOrders");
+
+                    b.Navigation("ChangedByMember");
+
+                    b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.JobWorkQuotation", b =>
+                {
+                    b.HasOne("Connexa.Api.Entities.Member", "ContractorMember")
+                        .WithMany("SubmittedJobWorkQuotations")
+                        .HasForeignKey("ContractorMemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_JobWorkQuotations_ContractorMember");
+
+                    b.HasOne("Connexa.Api.Entities.JobWorkRequirement", "Requirement")
+                        .WithMany("Quotations")
+                        .HasForeignKey("JobWorkRequirementId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_JobWorkQuotations_JobWorkRequirements");
+
+                    b.Navigation("ContractorMember");
+
+                    b.Navigation("Requirement");
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.JobWorkRequirement", b =>
+                {
+                    b.HasOne("Connexa.Api.Entities.BusinessGroup", "BusinessGroup")
+                        .WithMany()
+                        .HasForeignKey("BusinessGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_JobWorkRequirements_BusinessGroups");
+
+                    b.HasOne("Connexa.Api.Entities.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_JobWorkRequirements_Categories");
+
+                    b.HasOne("Connexa.Api.Entities.Industry", "Industry")
+                        .WithMany()
+                        .HasForeignKey("IndustryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_JobWorkRequirements_Industries");
+
+                    b.HasOne("Connexa.Api.Entities.Member", "OwnerMember")
+                        .WithMany("PostedJobWorkRequirements")
+                        .HasForeignKey("OwnerMemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_JobWorkRequirements_OwnerMember");
+
+                    b.HasOne("Connexa.Api.Entities.SubGroup", "SubGroup")
+                        .WithMany()
+                        .HasForeignKey("SubGroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_JobWorkRequirements_SubGroups");
+
+                    b.Navigation("BusinessGroup");
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Industry");
+
+                    b.Navigation("OwnerMember");
+
+                    b.Navigation("SubGroup");
                 });
 
             modelBuilder.Entity("Connexa.Api.Entities.MemberConnection", b =>
@@ -898,6 +2422,187 @@ namespace Connexa.Api.Migrations
                     b.Navigation("RequesterMember");
                 });
 
+            modelBuilder.Entity("Connexa.Api.Entities.Notification", b =>
+                {
+                    b.HasOne("Connexa.Api.Entities.Member", "ActorMember")
+                        .WithMany("TriggeredNotifications")
+                        .HasForeignKey("ActorMemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_Notifications_ActorMember");
+
+                    b.HasOne("Connexa.Api.Entities.Member", "RecipientMember")
+                        .WithMany("ReceivedNotifications")
+                        .HasForeignKey("RecipientMemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_Notifications_RecipientMember");
+
+                    b.Navigation("ActorMember");
+
+                    b.Navigation("RecipientMember");
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.Order", b =>
+                {
+                    b.HasOne("Connexa.Api.Entities.Member", "BuyerMember")
+                        .WithMany("SentOrders")
+                        .HasForeignKey("BuyerMemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_Orders_BuyerMember");
+
+                    b.HasOne("Connexa.Api.Entities.Product", "Product")
+                        .WithMany("Orders")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_Orders_Products");
+
+                    b.HasOne("Connexa.Api.Entities.Quotation", "Quotation")
+                        .WithOne("Order")
+                        .HasForeignKey("Connexa.Api.Entities.Order", "QuotationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_Orders_Quotations");
+
+                    b.HasOne("Connexa.Api.Entities.Rfq", "Rfq")
+                        .WithMany()
+                        .HasForeignKey("RfqId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_Orders_Rfqs");
+
+                    b.HasOne("Connexa.Api.Entities.Member", "SupplierMember")
+                        .WithMany("ReceivedOrders")
+                        .HasForeignKey("SupplierMemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_Orders_SupplierMember");
+
+                    b.Navigation("BuyerMember");
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Quotation");
+
+                    b.Navigation("Rfq");
+
+                    b.Navigation("SupplierMember");
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.OrderStatusHistory", b =>
+                {
+                    b.HasOne("Connexa.Api.Entities.Member", "ChangedByMember")
+                        .WithMany()
+                        .HasForeignKey("ChangedByMemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_OrderStatusHistories_ChangedByMember");
+
+                    b.HasOne("Connexa.Api.Entities.Order", "Order")
+                        .WithMany("StatusHistory")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_OrderStatusHistories_Orders");
+
+                    b.Navigation("ChangedByMember");
+
+                    b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.Product", b =>
+                {
+                    b.HasOne("Connexa.Api.Entities.Industry", "Industry")
+                        .WithMany()
+                        .HasForeignKey("IndustryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_Products_Industries");
+
+                    b.HasOne("Connexa.Api.Entities.Member", "Member")
+                        .WithMany("Products")
+                        .HasForeignKey("MemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_Products_Members");
+
+                    b.Navigation("Industry");
+
+                    b.Navigation("Member");
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.ProductInquiry", b =>
+                {
+                    b.HasOne("Connexa.Api.Entities.Product", "Product")
+                        .WithMany("Inquiries")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_ProductInquiries_Products");
+
+                    b.HasOne("Connexa.Api.Entities.Member", "RecipientMember")
+                        .WithMany("ReceivedInquiries")
+                        .HasForeignKey("RecipientMemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_ProductInquiries_RecipientMember");
+
+                    b.HasOne("Connexa.Api.Entities.Member", "SenderMember")
+                        .WithMany("SentInquiries")
+                        .HasForeignKey("SenderMemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_ProductInquiries_SenderMember");
+
+                    b.Navigation("Product");
+
+                    b.Navigation("RecipientMember");
+
+                    b.Navigation("SenderMember");
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.ProfileView", b =>
+                {
+                    b.HasOne("Connexa.Api.Entities.Member", "ViewedMember")
+                        .WithMany("ProfileViews")
+                        .HasForeignKey("ViewedMemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_ProfileViews_ViewedMember");
+
+                    b.Navigation("ViewedMember");
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.Quotation", b =>
+                {
+                    b.HasOne("Connexa.Api.Entities.Member", "BuyerMember")
+                        .WithMany("ReceivedQuotations")
+                        .HasForeignKey("BuyerMemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_Quotations_BuyerMember");
+
+                    b.HasOne("Connexa.Api.Entities.Rfq", "Rfq")
+                        .WithMany("Quotations")
+                        .HasForeignKey("RfqId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_Quotations_Rfqs");
+
+                    b.HasOne("Connexa.Api.Entities.Member", "SupplierMember")
+                        .WithMany("SubmittedQuotations")
+                        .HasForeignKey("SupplierMemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_Quotations_SupplierMember");
+
+                    b.Navigation("BuyerMember");
+
+                    b.Navigation("Rfq");
+
+                    b.Navigation("SupplierMember");
+                });
+
             modelBuilder.Entity("Connexa.Api.Entities.RefreshToken", b =>
                 {
                     b.HasOne("Connexa.Api.Entities.Member", "Member")
@@ -908,6 +2613,44 @@ namespace Connexa.Api.Migrations
                         .HasConstraintName("FK_RefreshTokens_Members");
 
                     b.Navigation("Member");
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.Rfq", b =>
+                {
+                    b.HasOne("Connexa.Api.Entities.Member", "BuyerMember")
+                        .WithMany("SentRfqs")
+                        .HasForeignKey("BuyerMemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_Rfqs_BuyerMember");
+
+                    b.HasOne("Connexa.Api.Entities.Product", "Product")
+                        .WithMany("Rfqs")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_Rfqs_Products");
+
+                    b.HasOne("Connexa.Api.Entities.ProductInquiry", "ProductInquiry")
+                        .WithMany()
+                        .HasForeignKey("ProductInquiryId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_Rfqs_ProductInquiries");
+
+                    b.HasOne("Connexa.Api.Entities.Member", "SupplierMember")
+                        .WithMany("ReceivedRfqs")
+                        .HasForeignKey("SupplierMemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_Rfqs_SupplierMember");
+
+                    b.Navigation("BuyerMember");
+
+                    b.Navigation("Product");
+
+                    b.Navigation("ProductInquiry");
+
+                    b.Navigation("SupplierMember");
                 });
 
             modelBuilder.Entity("Connexa.Api.Entities.ServiceEngineerProfile", b =>
@@ -951,9 +2694,40 @@ namespace Connexa.Api.Migrations
                     b.Navigation("SubGroups");
                 });
 
+            modelBuilder.Entity("Connexa.Api.Entities.BusinessProfile", b =>
+                {
+                    b.Navigation("VerificationRequests");
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.BusinessVerificationRequest", b =>
+                {
+                    b.Navigation("Documents");
+                });
+
             modelBuilder.Entity("Connexa.Api.Entities.Industry", b =>
                 {
                     b.Navigation("BusinessGroups");
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.JobWorkOrder", b =>
+                {
+                    b.Navigation("StatusHistory");
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.JobWorkQuotation", b =>
+                {
+                    b.Navigation("Attachments");
+
+                    b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.JobWorkRequirement", b =>
+                {
+                    b.Navigation("Attachments");
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Quotations");
                 });
 
             modelBuilder.Entity("Connexa.Api.Entities.Member", b =>
@@ -962,17 +2736,79 @@ namespace Connexa.Api.Migrations
 
                     b.Navigation("ContractorProfile");
 
+                    b.Navigation("DeviceTokens");
+
                     b.Navigation("EmployeeProfile");
+
+                    b.Navigation("PlacedJobWorkOrders");
+
+                    b.Navigation("PostedJobWorkRequirements");
+
+                    b.Navigation("Products");
+
+                    b.Navigation("ProfileViews");
 
                     b.Navigation("ReceivedConnections");
 
+                    b.Navigation("ReceivedInquiries");
+
+                    b.Navigation("ReceivedJobWorkOrders");
+
+                    b.Navigation("ReceivedNotifications");
+
+                    b.Navigation("ReceivedOrders");
+
+                    b.Navigation("ReceivedQuotations");
+
+                    b.Navigation("ReceivedRfqs");
+
                     b.Navigation("RefreshTokens");
+
+                    b.Navigation("ReviewedVerificationRequests");
 
                     b.Navigation("SentConnections");
 
+                    b.Navigation("SentInquiries");
+
+                    b.Navigation("SentOrders");
+
+                    b.Navigation("SentRfqs");
+
                     b.Navigation("ServiceEngineerProfile");
 
+                    b.Navigation("SubmittedJobWorkQuotations");
+
+                    b.Navigation("SubmittedQuotations");
+
                     b.Navigation("TraderProfile");
+
+                    b.Navigation("TriggeredNotifications");
+
+                    b.Navigation("VerificationRequests");
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.Order", b =>
+                {
+                    b.Navigation("StatusHistory");
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.Product", b =>
+                {
+                    b.Navigation("Inquiries");
+
+                    b.Navigation("Orders");
+
+                    b.Navigation("Rfqs");
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.Quotation", b =>
+                {
+                    b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("Connexa.Api.Entities.Rfq", b =>
+                {
+                    b.Navigation("Quotations");
                 });
 
             modelBuilder.Entity("Connexa.Api.Entities.SubGroup", b =>

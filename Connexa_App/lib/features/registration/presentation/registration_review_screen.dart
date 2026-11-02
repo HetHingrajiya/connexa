@@ -115,6 +115,7 @@ class _RegistrationReviewScreenState
           maxTabletWidth: AppSpacing.maxContentWidthTablet,
           maxDesktopWidth: AppSpacing.maxContentWidthDesktop,
           child: SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
@@ -310,11 +311,13 @@ class _RegistrationReviewScreenState
                 size: 20,
               ),
               const SizedBox(width: AppSpacing.sm),
-              Text(
-                'Please correct the following before continuing:',
-                style: AppTextStyles.labelLarge.copyWith(
-                  color: AppColors.onErrorContainer,
-                  fontWeight: FontWeight.w700,
+              Expanded(
+                child: Text(
+                  'Please correct the following before continuing:',
+                  style: AppTextStyles.labelLarge.copyWith(
+                    color: AppColors.onErrorContainer,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],

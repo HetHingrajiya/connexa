@@ -7,6 +7,21 @@ import 'package:connexa/core/widgets/widgets.dart';
 import 'package:connexa/features/auth/models/auth_models.dart';
 import 'package:connexa/features/auth/providers/auth_provider.dart';
 
+/// Structured report summarizing profile completeness and recommended fields.
+class ProfileCompletenessReport {
+  const ProfileCompletenessReport({
+    required this.percent,
+    required this.missingRecommendedFields,
+    required this.completedCount,
+    required this.totalCount,
+  });
+
+  final int percent;
+  final List<String> missingRecommendedFields;
+  final int completedCount;
+  final int totalCount;
+}
+
 /// Screen displaying the authenticated member's verified profile details.
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -36,10 +51,11 @@ class ProfileScreen extends ConsumerWidget {
       );
     }
 
-    final double completionFraction = _calculateCompletion(profile);
-    final int completionPercent = (completionFraction * 100).round();
+    final ProfileCompletenessReport completenessReport =
+        _calculateCompletenessReport(profile);
 
     return Scaffold(
+      bottomNavigationBar: const AppBottomNavBar(currentIndex: 4),
       appBar: AppBar(
         title: const Text('My Profile'),
         actions: <Widget>[
@@ -49,17 +65,29 @@ class ProfileScreen extends ConsumerWidget {
             tooltip: 'Edit Profile',
             onPressed: () => context.push('/profile/edit'),
           ),
+          IconButton(
+            key: const Key('profileLogoutIconButton'),
+            icon: const Icon(Icons.logout_rounded),
+            tooltip: 'Sign Out',
+            onPressed: () => showLogoutConfirmationDialog(context, ref),
+          ),
         ],
       ),
       body: SafeArea(
         child: ResponsiveCenterBox(
-          padding: AppSpacing.screenPaddingMobile,
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
           maxTabletWidth: AppSpacing.maxContentWidthTablet,
           maxDesktopWidth: AppSpacing.maxContentWidthDesktop,
           child: RefreshIndicator(
             onRefresh: () => ref.read(authProvider.notifier).refreshProfile(),
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(
+                0,
+                AppSpacing.md,
+                0,
+                AppSpacing.xxxl,
+              ),
               child: ResponsiveBuilder(
                 builder:
                     (
@@ -89,8 +117,25 @@ class ProfileScreen extends ConsumerWidget {
                                     const SizedBox(height: AppSpacing.lg),
                                     AppStaggeredEntrance(
                                       index: 1,
+                                      child: _buildVerificationStatusCard(
+                                        context,
+                                        profile,
+                                      ),
+                                    ),
+                                    if (profile.isAdmin) ...<Widget>[
+                                      const SizedBox(height: AppSpacing.lg),
+                                      AppStaggeredEntrance(
+                                        index: 2,
+                                        child: _buildAdminActionCard(context),
+                                      ),
+                                    ],
+                                    const SizedBox(height: AppSpacing.lg),
+                                    AppStaggeredEntrance(
+                                      index: 3,
                                       child: _buildCompletionCard(
-                                        completionPercent,
+                                        context,
+                                        completenessReport,
+                                        profile,
                                       ),
                                     ),
                                     const SizedBox(height: AppSpacing.lg),
@@ -151,6 +196,14 @@ class ProfileScreen extends ConsumerWidget {
                                         child: _buildHierarchyCard(profile),
                                       ),
                                     ],
+                                    const SizedBox(height: AppSpacing.lg),
+                                    AppStaggeredEntrance(
+                                      index: 4,
+                                      child: _buildSecurityCard(
+                                        profile,
+                                        authState.user,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -163,7 +216,6 @@ class ProfileScreen extends ConsumerWidget {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: <Widget>[
-                          const SizedBox(height: AppSpacing.sm),
                           AppStaggeredEntrance(
                             index: 0,
                             child: _buildHeroCard(context, profile),
@@ -171,7 +223,26 @@ class ProfileScreen extends ConsumerWidget {
                           const SizedBox(height: AppSpacing.lg),
                           AppStaggeredEntrance(
                             index: 1,
-                            child: _buildCompletionCard(completionPercent),
+                            child: _buildVerificationStatusCard(
+                              context,
+                              profile,
+                            ),
+                          ),
+                          if (profile.isAdmin) ...<Widget>[
+                            const SizedBox(height: AppSpacing.lg),
+                            AppStaggeredEntrance(
+                              index: 2,
+                              child: _buildAdminActionCard(context),
+                            ),
+                          ],
+                          const SizedBox(height: AppSpacing.lg),
+                          AppStaggeredEntrance(
+                            index: 3,
+                            child: _buildCompletionCard(
+                              context,
+                              completenessReport,
+                              profile,
+                            ),
                           ),
                           const SizedBox(height: AppSpacing.lg),
                           AppStaggeredEntrance(
@@ -193,6 +264,11 @@ class ProfileScreen extends ConsumerWidget {
                           const SizedBox(height: AppSpacing.lg),
                           AppStaggeredEntrance(
                             index: 5,
+                            child: _buildSecurityCard(profile, authState.user),
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+                          AppStaggeredEntrance(
+                            index: 6,
                             child: AppButton.primary(
                               key: const Key('profileEditButton'),
                               text: 'Edit Profile Details',
@@ -206,7 +282,7 @@ class ProfileScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: AppSpacing.md),
                           AppStaggeredEntrance(
-                            index: 6,
+                            index: 7,
                             child: AppButton.secondary(
                               text: 'Back to Dashboard',
                               leadingIcon: const Icon(
@@ -217,7 +293,23 @@ class ProfileScreen extends ConsumerWidget {
                               onPressed: () => context.go('/dashboard'),
                             ),
                           ),
-                          const SizedBox(height: AppSpacing.xxl),
+                          const SizedBox(height: AppSpacing.md),
+                          AppStaggeredEntrance(
+                            index: 8,
+                            child: AppButton.secondary(
+                              key: const Key('profileSignOutButton'),
+                              text: 'Sign Out',
+                              leadingIcon: const Icon(
+                                Icons.logout_rounded,
+                                size: 18,
+                                color: AppColors.error,
+                              ),
+                              isFullWidth: true,
+                              onPressed: () =>
+                                  showLogoutConfirmationDialog(context, ref),
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
                         ],
                       );
                     },
@@ -330,7 +422,12 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildCompletionCard(int percent) {
+  Widget _buildCompletionCard(
+    BuildContext context,
+    ProfileCompletenessReport report,
+    MemberProfile profile,
+  ) {
+    final int percent = report.percent;
     return AppCard(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
@@ -340,24 +437,30 @@ class ProfileScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Icon(
-                    percent == 100
-                        ? Icons.task_alt_rounded
-                        : Icons.pending_actions_rounded,
-                    color: percent == 100
-                        ? AppColors.success
-                        : AppColors.primary,
-                    size: 20,
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  const Text(
-                    'Profile Completion',
-                    style: AppTextStyles.titleMedium,
-                  ),
-                ],
+              Expanded(
+                child: Row(
+                  children: <Widget>[
+                    Icon(
+                      percent == 100
+                          ? Icons.task_alt_rounded
+                          : Icons.pending_actions_rounded,
+                      color: percent == 100
+                          ? AppColors.success
+                          : AppColors.primary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
+                    const Flexible(
+                      child: Text(
+                        'Profile Completeness',
+                        style: AppTextStyles.titleMedium,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: AppSpacing.sm),
               AppBadge(
                 key: const Key('profileCompletionPercentText'),
                 label: '$percent%',
@@ -368,7 +471,14 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            '${report.completedCount} of ${report.totalCount} attributes completed',
+            style: AppTextStyles.labelSmall.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
           ClipRRect(
             borderRadius: AppSpacing.borderRadiusFull,
             child: LinearProgressIndicator(
@@ -380,14 +490,85 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ),
           ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            percent == 100
-                ? 'Your profile is fully completed and verified.'
-                : 'Complete all business and category attributes for maximum visibility across the network.',
-            style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.textSecondary,
-              height: 1.4,
+          if (report.missingRecommendedFields.isNotEmpty) ...<Widget>[
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text(
+                  'Recommended to add:',
+                  style: AppTextStyles.labelSmall.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                InkWell(
+                  key: const Key('completeProfileLink'),
+                  onTap: () => context.push('/profile/edit'),
+                  child: Text(
+                    'Edit Profile →',
+                    style: AppTextStyles.labelSmall.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Wrap(
+              spacing: AppSpacing.xs,
+              runSpacing: AppSpacing.xs,
+              children: report.missingRecommendedFields.take(4).map((String field) {
+                return ActionChip(
+                  key: Key('missingFieldChip_$field'),
+                  avatar: const Icon(
+                    Icons.add_circle_outline_rounded,
+                    size: 14,
+                    color: AppColors.primary,
+                  ),
+                  label: Text(
+                    field,
+                    style: AppTextStyles.labelSmall.copyWith(
+                      color: AppColors.primary,
+                      fontSize: 11,
+                    ),
+                  ),
+                  backgroundColor: AppColors.primaryContainer.withValues(alpha: 0.5),
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  onPressed: () => context.push('/profile/edit'),
+                );
+              }).toList(),
+            ),
+          ],
+          const SizedBox(height: AppSpacing.md),
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.sm),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceContainerLow,
+              borderRadius: AppSpacing.borderRadiusSm,
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                const Icon(
+                  Icons.info_outline_rounded,
+                  size: 16,
+                  color: AppColors.textSecondary,
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                Expanded(
+                  child: Text(
+                    'Profile completeness is independent of official verification. To obtain the Verified badge, submit your business registration documents for admin review.',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      fontSize: 11,
+                      color: AppColors.textSecondary,
+                      height: 1.35,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -504,6 +685,24 @@ class ProfileScreen extends ConsumerWidget {
               Icons.description_outlined,
               'Description & Operations',
               description,
+            ),
+          ],
+          if (profile.address != null && profile.address!.isNotEmpty) ...<Widget>[
+            const Divider(height: AppSpacing.lg),
+            _buildRow(
+              Icons.location_on_outlined,
+              'Registered Address',
+              '${profile.address}${profile.city != null && profile.city!.isNotEmpty ? ', ${profile.city}' : ''}${profile.state != null && profile.state!.isNotEmpty ? ', ${profile.state}' : ''}${profile.pincode != null && profile.pincode!.isNotEmpty ? ' - ${profile.pincode}' : ''}',
+              key: 'profileAddressValue',
+            ),
+          ],
+          if (profile.websiteUrl != null && profile.websiteUrl!.isNotEmpty) ...<Widget>[
+            const Divider(height: AppSpacing.lg),
+            _buildRow(
+              Icons.language_rounded,
+              'Website',
+              profile.websiteUrl!,
+              key: 'profileWebsiteValue',
             ),
           ],
         ],
@@ -646,7 +845,9 @@ class ProfileScreen extends ConsumerWidget {
                 key: key != null ? Key(key) : null,
                 style: AppTextStyles.bodyMedium.copyWith(
                   fontWeight: FontWeight.w600,
+                  height: 1.4,
                 ),
+                softWrap: true,
               ),
             ],
           ),
@@ -655,42 +856,112 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  double _calculateCompletion(MemberProfile profile) {
-    int total = 5;
-    int filled = 0;
+  Widget _buildSecurityCard(MemberProfile profile, AuthenticatedMember? user) {
+    final String role = profile.role.isNotEmpty
+        ? profile.role
+        : (user?.role ?? 'Member');
+    final String formattedDate =
+        '${profile.createdAtUtc.day}/${profile.createdAtUtc.month}/${profile.createdAtUtc.year}';
 
-    if (profile.fullName.trim().isNotEmpty) filled++;
-    if (profile.email.trim().isNotEmpty) filled++;
-    if (profile.phoneNumber.trim().isNotEmpty) filled++;
-    if (profile.verifiedMethod.trim().isNotEmpty) filled++;
-    if (profile.primaryProfileType.trim().isNotEmpty) filled++;
+    return AppCard(
+      title: 'Session & Security',
+      subtitle: 'JWT token rotation and account authorization level',
+      child: Column(
+        children: <Widget>[
+          _buildRow(Icons.admin_panel_settings_outlined, 'Account Role', role),
+          const Divider(height: AppSpacing.lg),
+          _buildRow(
+            Icons.lock_clock_outlined,
+            'Session Type',
+            'Short-lived JWT (15 min) with Refresh Token Rotation',
+          ),
+          const Divider(height: AppSpacing.lg),
+          _buildRow(
+            Icons.calendar_today_outlined,
+            'Member Since',
+            formattedDate,
+          ),
+          const Divider(height: AppSpacing.lg),
+          _buildRow(
+            Icons.security_rounded,
+            'Authorization Status',
+            'Active (Strict Member Role)',
+          ),
+        ],
+      ),
+    );
+  }
 
-    final Map<String, dynamic>? details = profile.profileDetails;
-    if (details != null && details.isNotEmpty) {
-      total += 4;
-      if ((details['companyName'] ??
-              details['tradingName'] ??
-              details['workName'] ??
-              details['jobTitle']) !=
-          null) {
-        filled++;
-      }
-      if (details['industry'] != null ||
-          details['skills'] != null ||
-          details['specialization'] != null) {
-        filled++;
-      }
-      if (details['businessGroup'] != null || details['experience'] != null) {
-        filled++;
-      }
-      if (details['category'] != null ||
-          details['serviceCoverage'] != null ||
-          details['preferredJobType'] != null) {
-        filled++;
+  ProfileCompletenessReport _calculateCompletenessReport(MemberProfile profile) {
+    final List<String> missing = <String>[];
+    int total = 0;
+    int completed = 0;
+
+    void checkField(String fieldName, bool isFilled) {
+      total++;
+      if (isFilled) {
+        completed++;
+      } else {
+        missing.add(fieldName);
       }
     }
 
-    return filled / total;
+    // Basic Account Details
+    checkField('Full Name', profile.fullName.trim().isNotEmpty);
+    checkField('Email Address', profile.email.trim().isNotEmpty);
+    checkField('Phone Number', profile.phoneNumber.trim().isNotEmpty);
+
+    // Business Identity & Description
+    final Map<String, dynamic>? details = profile.profileDetails;
+    final String? company = profile.companyName ??
+        details?['tradingName']?.toString() ??
+        details?['workName']?.toString() ??
+        details?['jobTitle']?.toString();
+    checkField('Company Name', company != null && company.trim().isNotEmpty);
+
+    final String? desc = details?['businessDescription']?.toString();
+    checkField('Business Description', desc != null && desc.trim().isNotEmpty);
+
+    final dynamic capabilities = details?['businessCapabilities'];
+    final bool hasCapabilities = (capabilities is List && capabilities.isNotEmpty) ||
+        (capabilities is String && capabilities.trim().isNotEmpty);
+    checkField('Capabilities', hasCapabilities);
+
+    final bool hasIndustry = details?['industryId'] != null ||
+        details?['industry'] != null ||
+        details?['skills'] != null;
+    checkField('Industry', hasIndustry);
+
+    final String? address = profile.address;
+    checkField('Address', address != null && address.trim().isNotEmpty);
+
+    final String? city = profile.city;
+    final String? state = profile.state;
+    checkField(
+      'City & State',
+      city != null &&
+          city.trim().isNotEmpty &&
+          state != null &&
+          state.trim().isNotEmpty,
+    );
+
+    final String? pincode = profile.pincode;
+    checkField('Pincode', pincode != null && pincode.trim().isNotEmpty);
+
+    final String? logo = profile.logoUrl;
+    checkField('Company Logo', logo != null && logo.trim().isNotEmpty);
+
+    final String? website = profile.websiteUrl;
+    checkField('Website URL', website != null && website.trim().isNotEmpty);
+
+    final int percent = total > 0 ? ((completed / total) * 100).round() : 100;
+
+    return ProfileCompletenessReport(
+      percent: percent,
+      missingRecommendedFields: missing,
+      completedCount: completed,
+      totalCount: total,
+    );
   }
 
   String _formatProfileType(String raw) {
@@ -702,5 +973,162 @@ class ProfileScreen extends ConsumerWidget {
       'TraderSupplier' => 'Supplier',
       _ => raw,
     };
+  }
+
+  Widget _buildVerificationStatusCard(
+    BuildContext context,
+    MemberProfile profile,
+  ) {
+    final String statusStr = profile.verificationStatus;
+    final bool isBusiness = profile.primaryProfileType == 'BusinessCompany';
+
+    Widget statusBadge;
+    String title;
+    String description;
+    Color accentColor;
+    IconData iconData;
+
+    switch (statusStr.toLowerCase()) {
+      case 'approved':
+      case 'verified':
+        statusBadge = const AppBadge.success(
+          label: 'Verified Business',
+          icon: Icon(Icons.check_circle_rounded, size: 14),
+        );
+        title = 'Business Verified';
+        description =
+            'Your business credentials are officially verified. You enjoy priority search listing and verified trust badges.';
+        accentColor = AppColors.success;
+        iconData = Icons.verified_rounded;
+        break;
+      case 'pendingreview':
+      case 'pending_review':
+      case 'pending':
+        statusBadge = const AppBadge.warning(
+          label: 'Under Review',
+          icon: Icon(Icons.access_time_rounded, size: 14),
+        );
+        title = 'Verification Pending Review';
+        description =
+            'Our compliance team is verifying your registration documents.';
+        accentColor = AppColors.warning;
+        iconData = Icons.pending_actions_rounded;
+        break;
+      case 'rejected':
+        statusBadge = const AppBadge.error(
+          label: 'Action Required',
+          icon: Icon(Icons.error_outline_rounded, size: 14),
+        );
+        title = 'Verification Needs Attention';
+        description =
+            'Your verification was not approved. Please review remarks and update documents.';
+        accentColor = AppColors.error;
+        iconData = Icons.cancel_outlined;
+        break;
+      default:
+        statusBadge = const AppBadge.neutral(
+          label: 'Unverified',
+          icon: Icon(Icons.shield_outlined, size: 14),
+        );
+        title = 'Official Business Verification';
+        description =
+            'Verify your registration to build trust with buyers and unlock verified badges across Connexa.';
+        accentColor = AppColors.primary;
+        iconData = Icons.verified_user_outlined;
+        break;
+    }
+
+    return AppCard(
+      borderColor: accentColor.withValues(alpha: 0.3),
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Icon(iconData, color: accentColor, size: 24),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  title,
+                  style: AppTextStyles.titleMedium.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              statusBadge,
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            description,
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+          if (isBusiness) ...<Widget>[
+            const SizedBox(height: AppSpacing.md),
+            SizedBox(
+              width: double.infinity,
+              child: AppButton.secondary(
+                key: const Key('manageVerificationButton'),
+                text: statusStr.toLowerCase() == 'approved'
+                    ? 'View Verification Details'
+                    : 'Manage Business Verification',
+                leadingIcon: const Icon(Icons.verified_outlined, size: 16),
+                onPressed: () => context.push('/profile/verification'),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAdminActionCard(BuildContext context) {
+    return AppCard(
+      backgroundColor: AppColors.surfaceContainer,
+      borderColor: AppColors.primary.withValues(alpha: 0.3),
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          const Row(
+            children: <Widget>[
+              Icon(
+                Icons.admin_panel_settings_rounded,
+                color: AppColors.primary,
+                size: 22,
+              ),
+              SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  'Administrator Actions',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              AppBadge.brand(label: 'Admin Privileges'),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            'Review pending business verification applications and grant official badges.',
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          AppButton.primary(
+            key: const Key('adminVerificationsNavButton'),
+            text: 'Review Business Verifications',
+            leadingIcon: const Icon(Icons.assignment_turned_in_rounded, size: 16),
+            onPressed: () => context.push('/admin/verifications'),
+          ),
+        ],
+      ),
+    );
   }
 }

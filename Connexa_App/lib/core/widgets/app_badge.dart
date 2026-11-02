@@ -182,13 +182,17 @@ class AppBadge extends StatelessWidget {
             icon!,
             const SizedBox(width: AppSpacing.xs),
           ],
-          Text(
-            label,
-            style: AppTextStyles.labelSmall.copyWith(
-              color: fg,
-              fontSize: fontSize,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.2,
+          Flexible(
+            child: Text(
+              label,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              style: AppTextStyles.labelSmall.copyWith(
+                color: fg,
+                fontSize: fontSize,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.2,
+              ),
             ),
           ),
         ],

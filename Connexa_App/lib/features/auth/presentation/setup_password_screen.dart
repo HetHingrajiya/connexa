@@ -284,6 +284,7 @@ class _SetupPasswordScreenState extends ConsumerState<SetupPasswordScreen> {
           maxTabletWidth: AppSpacing.maxContentWidthTablet,
           maxDesktopWidth: 500,
           child: SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
@@ -409,8 +410,11 @@ class _SetupPasswordScreenState extends ConsumerState<SetupPasswordScreen> {
                 AppStaggeredEntrance(
                   index: 1,
                   child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    child: Wrap(
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: AppSpacing.xs,
+                      runSpacing: AppSpacing.xs,
                       children: <Widget>[
                         TextButton.icon(
                           key: const Key('returnToReviewButton'),
@@ -419,7 +423,7 @@ class _SetupPasswordScreenState extends ConsumerState<SetupPasswordScreen> {
                           onPressed: () => context.go('/registration/review'),
                         ),
                         const Text(
-                          ' • ',
+                          '•',
                           style: TextStyle(color: AppColors.textMuted),
                         ),
                         TextButton.icon(
@@ -568,7 +572,12 @@ class _SetupPasswordScreenState extends ConsumerState<SetupPasswordScreen> {
                     children: <Widget>[
                       Icon(Icons.email_outlined, size: 16),
                       SizedBox(width: AppSpacing.xs),
-                      Text('Email OTP'),
+                      Flexible(
+                        child: Text(
+                          'Email OTP',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ],
                   ),
                   selected: _selectedChannel == 'Email',
@@ -585,7 +594,12 @@ class _SetupPasswordScreenState extends ConsumerState<SetupPasswordScreen> {
                     children: <Widget>[
                       Icon(Icons.chat_outlined, size: 16),
                       SizedBox(width: AppSpacing.xs),
-                      Text('WhatsApp OTP'),
+                      Flexible(
+                        child: Text(
+                          'WhatsApp OTP',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ],
                   ),
                   selected: _selectedChannel == 'WhatsApp',
@@ -704,11 +718,15 @@ class _SetupPasswordScreenState extends ConsumerState<SetupPasswordScreen> {
             color: isSatisfied ? AppColors.success : AppColors.textMuted,
           ),
           const SizedBox(width: AppSpacing.xs),
-          Text(
-            label,
-            style: AppTextStyles.bodySmall.copyWith(
-              color: isSatisfied ? AppColors.textPrimary : AppColors.textMuted,
-              fontWeight: isSatisfied ? FontWeight.w600 : FontWeight.normal,
+          Expanded(
+            child: Text(
+              label,
+              style: AppTextStyles.bodySmall.copyWith(
+                color: isSatisfied
+                    ? AppColors.textPrimary
+                    : AppColors.textMuted,
+                fontWeight: isSatisfied ? FontWeight.w600 : FontWeight.normal,
+              ),
             ),
           ),
         ],

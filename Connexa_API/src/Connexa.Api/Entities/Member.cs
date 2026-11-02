@@ -45,5 +45,36 @@ public class Member
     // Member Connections navigation
     public ICollection<MemberConnection> SentConnections { get; set; } = new List<MemberConnection>();
     public ICollection<MemberConnection> ReceivedConnections { get; set; } = new List<MemberConnection>();
+
+    // Products & Analytics navigation
+    public ICollection<Product> Products { get; set; } = new List<Product>();
+    public ICollection<ProfileView> ProfileViews { get; set; } = new List<ProfileView>();
+    public ICollection<ProductInquiry> SentInquiries { get; set; } = new List<ProductInquiry>();
+    public ICollection<ProductInquiry> ReceivedInquiries { get; set; } = new List<ProductInquiry>();
+
+    // Notifications navigation
+    public ICollection<Notification> ReceivedNotifications { get; set; } = new List<Notification>();
+    public ICollection<Notification> TriggeredNotifications { get; set; } = new List<Notification>();
+    public ICollection<DeviceToken> DeviceTokens { get; set; } = new List<DeviceToken>();
+
+    // Business Verification navigation
+    public ICollection<BusinessVerificationRequest> VerificationRequests { get; set; } = new List<BusinessVerificationRequest>();
+    public ICollection<BusinessVerificationRequest> ReviewedVerificationRequests { get; set; } = new List<BusinessVerificationRequest>();
+
+    // B2B RFQ & Quotations navigation
+    public ICollection<Rfq> SentRfqs { get; set; } = new List<Rfq>();
+    public ICollection<Rfq> ReceivedRfqs { get; set; } = new List<Rfq>();
+    public ICollection<Quotation> SubmittedQuotations { get; set; } = new List<Quotation>();
+    public ICollection<Quotation> ReceivedQuotations { get; set; } = new List<Quotation>();
+
+    // B2B Orders navigation
+    public ICollection<Order> SentOrders { get; set; } = new List<Order>();
+    public ICollection<Order> ReceivedOrders { get; set; } = new List<Order>();
+
+    // Industrial Job Work navigation
+    public ICollection<JobWorkRequirement> PostedJobWorkRequirements { get; set; } = new List<JobWorkRequirement>();
+    public ICollection<JobWorkQuotation> SubmittedJobWorkQuotations { get; set; } = new List<JobWorkQuotation>();
+    public ICollection<JobWorkOrder> PlacedJobWorkOrders { get; set; } = new List<JobWorkOrder>();
+    public ICollection<JobWorkOrder> ReceivedJobWorkOrders { get; set; } = new List<JobWorkOrder>();
 }
 

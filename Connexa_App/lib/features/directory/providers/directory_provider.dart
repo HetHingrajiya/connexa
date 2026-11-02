@@ -196,6 +196,32 @@ class DirectoryNotifier extends StateNotifier<DirectoryState> {
     loadDirectory();
   }
 
+  void toggleVerifiedOnly() {
+    _searchDebounceTimer?.cancel();
+    final bool current = state.filter.verifiedOnly ?? false;
+    final bool next = !current;
+    state = state.copyWith(
+      filter: state.filter.copyWith(
+        verifiedOnly: next,
+        clearVerifiedOnly: !next,
+        page: 1,
+      ),
+    );
+    loadDirectory();
+  }
+
+  void setVerifiedOnly(bool? verifiedOnly) {
+    _searchDebounceTimer?.cancel();
+    state = state.copyWith(
+      filter: state.filter.copyWith(
+        verifiedOnly: verifiedOnly,
+        clearVerifiedOnly: verifiedOnly == null || !verifiedOnly,
+        page: 1,
+      ),
+    );
+    loadDirectory();
+  }
+
   void setPage(int page) {
     if (page == state.currentPage || state.isLoading) return;
     state = state.copyWith(filter: state.filter.copyWith(page: page));

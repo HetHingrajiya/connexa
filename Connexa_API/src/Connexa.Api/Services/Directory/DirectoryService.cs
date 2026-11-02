@@ -37,6 +37,9 @@ public class DirectoryService : IDirectoryService
         public DateTime MemberSinceUtc { get; set; }
         public string BusinessType { get; set; } = string.Empty;
         public string? Location { get; set; }
+        public bool IsVerified { get; set; }
+        public string VerificationStatus { get; set; } = "NotSubmitted";
+        public string? LogoUrl { get; set; }
     }
 
     private IQueryable<DirectoryEntryInternal> BuildCombinedDirectoryQuery()
@@ -66,7 +69,14 @@ public class DirectoryService : IDirectoryService
                 VerifiedMethod = b.Member.VerifiedMethod,
                 MemberSinceUtc = b.Member.CreatedAtUtc,
                 BusinessType = "Manufacturer / Company",
-                Location = "Gujarat, India"
+                Location = (b.City != null && b.State != null && b.City != "" && b.State != "")
+                    ? b.City + ", " + b.State
+                    : (b.City != null && b.City != "") ? b.City : "Gujarat, India",
+                IsVerified = b.VerificationStatus == Entities.BusinessVerificationStatus.Approved,
+                VerificationStatus = b.VerificationStatus == Entities.BusinessVerificationStatus.Approved ? "Approved" :
+                    (b.VerificationStatus == Entities.BusinessVerificationStatus.PendingReview ? "PendingReview" :
+                    (b.VerificationStatus == Entities.BusinessVerificationStatus.Rejected ? "Rejected" : "NotSubmitted")),
+                LogoUrl = b.LogoUrl
             });
 
         // 2. Contractor Profiles (Contractor / Job Worker)
@@ -95,7 +105,10 @@ public class DirectoryService : IDirectoryService
                 VerifiedMethod = c.Member.VerifiedMethod,
                 MemberSinceUtc = c.Member.CreatedAtUtc,
                 BusinessType = "Contractor / Job Worker",
-                Location = c.WorkCoverage
+                Location = c.WorkCoverage,
+                IsVerified = false,
+                VerificationStatus = "NotSubmitted",
+                LogoUrl = null
             });
 
         // 3. Trader Profiles (Trader / Supplier)
@@ -124,7 +137,10 @@ public class DirectoryService : IDirectoryService
                 VerifiedMethod = t.Member.VerifiedMethod,
                 MemberSinceUtc = t.Member.CreatedAtUtc,
                 BusinessType = "Trader / Supplier",
-                Location = t.ServiceCoverage
+                Location = t.ServiceCoverage,
+                IsVerified = false,
+                VerificationStatus = "NotSubmitted",
+                LogoUrl = null
             });
 
         return bpQuery.Concat(cpQuery).Concat(tpQuery);
@@ -182,6 +198,11 @@ public class DirectoryService : IDirectoryService
         {
             var loc = filter.Location.Trim();
             query = query.Where(b => b.Location != null && b.Location.Contains(loc));
+        }
+
+        if (filter.VerifiedOnly == true)
+        {
+            query = query.Where(b => b.IsVerified);
         }
 
         var totalCount = await query.CountAsync(cancellationToken);
@@ -323,7 +344,10 @@ public class DirectoryService : IDirectoryService
             Location: r.Location ?? "Gujarat, India",
             MaskedEmail: maskedEmail,
             MaskedPhoneNumber: maskedPhone,
-            ConnectionStatus: "Not Connected"
+            ConnectionStatus: "Not Connected",
+            IsVerified: r.IsVerified,
+            VerificationStatus: r.VerificationStatus,
+            LogoUrl: r.LogoUrl
         );
     }
 

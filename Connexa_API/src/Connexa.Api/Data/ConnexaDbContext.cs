@@ -22,6 +22,22 @@ public class ConnexaDbContext : DbContext
     public DbSet<ContractorProfile> ContractorProfiles => Set<ContractorProfile>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<MemberConnection> MemberConnections => Set<MemberConnection>();
+    public DbSet<Product> Products => Set<Product>();
+    public DbSet<ProductInquiry> ProductInquiries => Set<ProductInquiry>();
+    public DbSet<ProfileView> ProfileViews => Set<ProfileView>();
+    public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<DeviceToken> DeviceTokens => Set<DeviceToken>();
+    public DbSet<BusinessVerificationRequest> BusinessVerificationRequests => Set<BusinessVerificationRequest>();
+    public DbSet<BusinessVerificationDocument> BusinessVerificationDocuments => Set<BusinessVerificationDocument>();
+    public DbSet<Rfq> Rfqs => Set<Rfq>();
+    public DbSet<Quotation> Quotations => Set<Quotation>();
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<OrderStatusHistory> OrderStatusHistories => Set<OrderStatusHistory>();
+    public DbSet<JobWorkRequirement> JobWorkRequirements => Set<JobWorkRequirement>();
+    public DbSet<JobWorkAttachment> JobWorkAttachments => Set<JobWorkAttachment>();
+    public DbSet<JobWorkQuotation> JobWorkQuotations => Set<JobWorkQuotation>();
+    public DbSet<JobWorkOrder> JobWorkOrders => Set<JobWorkOrder>();
+    public DbSet<JobWorkOrderStatusHistory> JobWorkOrderStatusHistories => Set<JobWorkOrderStatusHistory>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -169,7 +185,17 @@ public class ConnexaDbContext : DbContext
             entity.Property(e => e.CompanyName).HasMaxLength(250).IsRequired();
             entity.Property(e => e.BusinessCapabilities).HasMaxLength(500);
             entity.Property(e => e.BusinessDescription).HasMaxLength(2000);
+            entity.Property(e => e.Address).HasMaxLength(500);
+            entity.Property(e => e.City).HasMaxLength(100);
+            entity.Property(e => e.State).HasMaxLength(100);
+            entity.Property(e => e.Pincode).HasMaxLength(20);
+            entity.Property(e => e.WebsiteUrl).HasMaxLength(500);
+            entity.Property(e => e.LogoUrl).HasMaxLength(1000);
+            entity.Property(e => e.BusinessImagesJson).HasMaxLength(4000);
+            entity.Property(e => e.VerificationStatus).HasConversion<int>().HasDefaultValue(BusinessVerificationStatus.NotSubmitted);
             entity.Property(e => e.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasIndex(e => e.VerificationStatus).HasDatabaseName("IX_BusinessProfiles_VerificationStatus");
 
             entity.HasOne(e => e.Member)
                   .WithOne(m => m.BusinessProfile)
@@ -370,5 +396,650 @@ public class ConnexaDbContext : DbContext
             entity.HasIndex(e => e.Status).HasDatabaseName("IX_MemberConnections_Status");
             entity.HasIndex(e => new { e.RequesterMemberId, e.RecipientMemberId }).HasDatabaseName("IX_MemberConnections_Requester_Recipient");
         });
+
+        // 14. Product
+        modelBuilder.Entity<Product>(entity =>
+        {
+            entity.ToTable("Products");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.MemberId).IsRequired();
+            entity.Property(e => e.Name).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(2000).IsRequired();
+            entity.Property(e => e.Category).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.SubCategory).HasMaxLength(200);
+            entity.Property(e => e.TagsJson).HasMaxLength(2000);
+            entity.Property(e => e.ImageUrl).HasMaxLength(1000);
+            entity.Property(e => e.SpecificationsJson).HasMaxLength(4000);
+            entity.Property(e => e.ViewCount).HasDefaultValue(0);
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.Property(e => e.IndustryId);
+
+            entity.HasOne(e => e.Member)
+                  .WithMany(m => m.Products)
+                  .HasForeignKey(e => e.MemberId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("FK_Products_Members");
+
+            entity.HasOne(e => e.Industry)
+                  .WithMany()
+                  .HasForeignKey(e => e.IndustryId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_Products_Industries");
+
+            entity.HasIndex(e => e.MemberId).HasDatabaseName("IX_Products_MemberId");
+            entity.HasIndex(e => e.Category).HasDatabaseName("IX_Products_Category");
+            entity.HasIndex(e => e.IndustryId).HasDatabaseName("IX_Products_IndustryId");
+        });
+
+
+        // 15. ProductInquiry
+        modelBuilder.Entity<ProductInquiry>(entity =>
+        {
+            entity.ToTable("ProductInquiries");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.ProductId).IsRequired();
+            entity.Property(e => e.SenderMemberId).IsRequired();
+            entity.Property(e => e.RecipientMemberId).IsRequired();
+            entity.Property(e => e.Subject).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.Message).HasMaxLength(2000).IsRequired();
+            entity.Property(e => e.Status).HasMaxLength(50).IsRequired().HasDefaultValue("Pending");
+            entity.Property(e => e.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+            entity.Property(e => e.ResponseMessage).HasMaxLength(2000);
+
+            entity.HasOne(e => e.Product)
+                  .WithMany(p => p.Inquiries)
+                  .HasForeignKey(e => e.ProductId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("FK_ProductInquiries_Products");
+
+            entity.HasOne(e => e.SenderMember)
+                  .WithMany(m => m.SentInquiries)
+                  .HasForeignKey(e => e.SenderMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_ProductInquiries_SenderMember");
+
+            entity.HasOne(e => e.RecipientMember)
+                  .WithMany(m => m.ReceivedInquiries)
+                  .HasForeignKey(e => e.RecipientMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_ProductInquiries_RecipientMember");
+
+            entity.HasIndex(e => e.ProductId).HasDatabaseName("IX_ProductInquiries_ProductId");
+            entity.HasIndex(e => e.SenderMemberId).HasDatabaseName("IX_ProductInquiries_SenderMemberId");
+            entity.HasIndex(e => e.RecipientMemberId).HasDatabaseName("IX_ProductInquiries_RecipientMemberId");
+        });
+
+        // 16. ProfileView
+        modelBuilder.Entity<ProfileView>(entity =>
+        {
+            entity.ToTable("ProfileViews");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.ViewedMemberId).IsRequired();
+            entity.Property(e => e.ViewedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.ViewedMember)
+                  .WithMany(m => m.ProfileViews)
+                  .HasForeignKey(e => e.ViewedMemberId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("FK_ProfileViews_ViewedMember");
+
+            entity.HasIndex(e => e.ViewedMemberId).HasDatabaseName("IX_ProfileViews_ViewedMemberId");
+        });
+
+        // 17. Notification
+        modelBuilder.Entity<Notification>(entity =>
+        {
+            entity.ToTable("Notifications");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.RecipientMemberId).IsRequired();
+            entity.Property(e => e.EventType).HasConversion<int>().IsRequired();
+            entity.Property(e => e.Title).HasMaxLength(150).IsRequired();
+            entity.Property(e => e.Message).HasMaxLength(500).IsRequired();
+            entity.Property(e => e.IsRead).HasDefaultValue(false).IsRequired();
+            entity.Property(e => e.ReferenceType).HasMaxLength(50);
+            entity.Property(e => e.PayloadJson).HasMaxLength(2000);
+            entity.Property(e => e.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.RecipientMember)
+                  .WithMany(m => m.ReceivedNotifications)
+                  .HasForeignKey(e => e.RecipientMemberId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("FK_Notifications_RecipientMember");
+
+            entity.HasOne(e => e.ActorMember)
+                  .WithMany(m => m.TriggeredNotifications)
+                  .HasForeignKey(e => e.ActorMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_Notifications_ActorMember");
+
+            entity.HasIndex(e => e.RecipientMemberId).HasDatabaseName("IX_Notifications_RecipientMemberId");
+            entity.HasIndex(e => new { e.RecipientMemberId, e.IsRead }).HasDatabaseName("IX_Notifications_Recipient_IsRead");
+            entity.HasIndex(e => new { e.RecipientMemberId, e.CreatedAtUtc }).HasDatabaseName("IX_Notifications_Recipient_CreatedAt");
+            entity.HasIndex(e => new { e.ReferenceType, e.ReferenceId, e.EventType }).HasDatabaseName("IX_Notifications_Ref_Event");
+        });
+
+        // 18. DeviceToken
+        modelBuilder.Entity<DeviceToken>(entity =>
+        {
+            entity.ToTable("DeviceTokens");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.MemberId).IsRequired();
+            entity.Property(e => e.Token).HasMaxLength(500).IsRequired();
+            entity.Property(e => e.Platform).HasMaxLength(50).HasDefaultValue("android").IsRequired();
+            entity.Property(e => e.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+            entity.Property(e => e.UpdatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.Member)
+                  .WithMany(m => m.DeviceTokens)
+                  .HasForeignKey(e => e.MemberId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("FK_DeviceTokens_Member");
+
+            entity.HasIndex(e => new { e.MemberId, e.Token }).IsUnique().HasDatabaseName("UQ_DeviceTokens_Member_Token");
+        });
+
+        // 19. BusinessVerificationRequest
+        modelBuilder.Entity<BusinessVerificationRequest>(entity =>
+        {
+            entity.ToTable("BusinessVerificationRequests");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.BusinessProfileId).IsRequired();
+            entity.Property(e => e.MemberId).IsRequired();
+            entity.Property(e => e.Status).HasConversion<int>().IsRequired();
+            entity.Property(e => e.BusinessRegistrationNumber).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.RegisteredAddress).HasMaxLength(500).IsRequired();
+            entity.Property(e => e.City).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.State).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Pincode).HasMaxLength(20).IsRequired();
+            entity.Property(e => e.Notes).HasMaxLength(1000);
+            entity.Property(e => e.RejectionReason).HasMaxLength(1000);
+            entity.Property(e => e.SubmittedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.BusinessProfile)
+                  .WithMany(b => b.VerificationRequests)
+                  .HasForeignKey(e => e.BusinessProfileId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("FK_BusinessVerificationRequests_BusinessProfiles");
+
+            entity.HasOne(e => e.Member)
+                  .WithMany(m => m.VerificationRequests)
+                  .HasForeignKey(e => e.MemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_BusinessVerificationRequests_Members");
+
+            entity.HasOne(e => e.ReviewedByMember)
+                  .WithMany(m => m.ReviewedVerificationRequests)
+                  .HasForeignKey(e => e.ReviewedByMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_BusinessVerificationRequests_Reviewer");
+
+            entity.HasIndex(e => e.BusinessProfileId).HasDatabaseName("IX_BusinessVerificationRequests_BusinessProfileId");
+            entity.HasIndex(e => e.MemberId).HasDatabaseName("IX_BusinessVerificationRequests_MemberId");
+            entity.HasIndex(e => e.Status).HasDatabaseName("IX_BusinessVerificationRequests_Status");
+        });
+
+        // 20. BusinessVerificationDocument
+        modelBuilder.Entity<BusinessVerificationDocument>(entity =>
+        {
+            entity.ToTable("BusinessVerificationDocuments");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.VerificationRequestId).IsRequired();
+            entity.Property(e => e.DocumentType).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.OriginalFileName).HasMaxLength(255).IsRequired();
+            entity.Property(e => e.StoredFileName).HasMaxLength(255).IsRequired();
+            entity.Property(e => e.FileExtension).HasMaxLength(20).IsRequired();
+            entity.Property(e => e.ContentType).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.FileSizeBytes).IsRequired();
+            entity.Property(e => e.UploadedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.VerificationRequest)
+                  .WithMany(vr => vr.Documents)
+                  .HasForeignKey(e => e.VerificationRequestId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("FK_BusinessVerificationDocuments_VerificationRequests");
+
+            entity.HasIndex(e => e.VerificationRequestId).HasDatabaseName("IX_BusinessVerificationDocuments_VerificationRequestId");
+        });
+
+        // 21. Rfq
+        modelBuilder.Entity<Rfq>(entity =>
+        {
+            entity.ToTable("Rfqs");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.RfqNumber).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.Title).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.Quantity).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.UnitOfMeasurement).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.TargetPrice).HasPrecision(18, 2);
+            entity.Property(e => e.DeliveryLocation).HasMaxLength(300).IsRequired();
+            entity.Property(e => e.AdditionalSpecifications).HasMaxLength(2000);
+            entity.Property(e => e.AttachmentUrl).HasMaxLength(500);
+            entity.Property(e => e.Status).HasConversion<int>().IsRequired();
+            entity.Property(e => e.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.Product)
+                  .WithMany(p => p.Rfqs)
+                  .HasForeignKey(e => e.ProductId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_Rfqs_Products");
+
+            entity.HasOne(e => e.BuyerMember)
+                  .WithMany(m => m.SentRfqs)
+                  .HasForeignKey(e => e.BuyerMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_Rfqs_BuyerMember");
+
+            entity.HasOne(e => e.SupplierMember)
+                  .WithMany(m => m.ReceivedRfqs)
+                  .HasForeignKey(e => e.SupplierMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_Rfqs_SupplierMember");
+
+            entity.HasOne(e => e.ProductInquiry)
+                  .WithMany()
+                  .HasForeignKey(e => e.ProductInquiryId)
+                  .OnDelete(DeleteBehavior.SetNull)
+                  .HasConstraintName("FK_Rfqs_ProductInquiries");
+
+            entity.HasIndex(e => e.RfqNumber).IsUnique().HasDatabaseName("IX_Rfqs_RfqNumber");
+            entity.HasIndex(e => e.BuyerMemberId).HasDatabaseName("IX_Rfqs_BuyerMemberId");
+            entity.HasIndex(e => e.SupplierMemberId).HasDatabaseName("IX_Rfqs_SupplierMemberId");
+            entity.HasIndex(e => e.ProductId).HasDatabaseName("IX_Rfqs_ProductId");
+            entity.HasIndex(e => e.Status).HasDatabaseName("IX_Rfqs_Status");
+        });
+
+        // 22. Quotation
+        modelBuilder.Entity<Quotation>(entity =>
+        {
+            entity.ToTable("Quotations");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.QuotationNumber).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.Version).HasDefaultValue(1).IsRequired();
+            entity.Property(e => e.UnitPrice).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.Quantity).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.Subtotal).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.TaxRatePercent).HasPrecision(5, 2).HasDefaultValue(18.00m).IsRequired();
+            entity.Property(e => e.TaxAmount).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.ShippingCharges).HasPrecision(18, 2).HasDefaultValue(0.00m).IsRequired();
+            entity.Property(e => e.TotalAmount).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.EstimatedDeliveryTime).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.TermsAndConditions).HasMaxLength(2000);
+            entity.Property(e => e.DocumentUrl).HasMaxLength(500);
+            entity.Property(e => e.Status).HasConversion<int>().IsRequired();
+            entity.Property(e => e.RejectionReason).HasMaxLength(1000);
+            entity.Property(e => e.RevisionNotes).HasMaxLength(1000);
+            entity.Property(e => e.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.Rfq)
+                  .WithMany(r => r.Quotations)
+                  .HasForeignKey(e => e.RfqId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("FK_Quotations_Rfqs");
+
+            entity.HasOne(e => e.SupplierMember)
+                  .WithMany(m => m.SubmittedQuotations)
+                  .HasForeignKey(e => e.SupplierMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_Quotations_SupplierMember");
+
+            entity.HasOne(e => e.BuyerMember)
+                  .WithMany(m => m.ReceivedQuotations)
+                  .HasForeignKey(e => e.BuyerMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_Quotations_BuyerMember");
+
+            entity.HasIndex(e => e.QuotationNumber).IsUnique().HasDatabaseName("IX_Quotations_QuotationNumber");
+            entity.HasIndex(e => e.RfqId).HasDatabaseName("IX_Quotations_RfqId");
+            entity.HasIndex(e => e.SupplierMemberId).HasDatabaseName("IX_Quotations_SupplierMemberId");
+            entity.HasIndex(e => e.BuyerMemberId).HasDatabaseName("IX_Quotations_BuyerMemberId");
+            entity.HasIndex(e => e.Status).HasDatabaseName("IX_Quotations_Status");
+        });
+
+        // 23. Order
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.ToTable("Orders");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.OrderNumber).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.QuotationId).IsRequired();
+            entity.Property(e => e.RfqId).IsRequired();
+            entity.Property(e => e.ProductId).IsRequired();
+            entity.Property(e => e.BuyerMemberId).IsRequired();
+            entity.Property(e => e.SupplierMemberId).IsRequired();
+
+            entity.Property(e => e.ProductName).HasMaxLength(250).IsRequired();
+            entity.Property(e => e.Quantity).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.UnitOfMeasurement).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.UnitPrice).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.Subtotal).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.TaxRatePercent).HasPrecision(5, 2).IsRequired();
+            entity.Property(e => e.TaxAmount).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.ShippingCharges).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.TotalAmount).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.TermsAndConditionsSnapshot).HasMaxLength(2000);
+
+            entity.Property(e => e.DeliveryAddress).HasMaxLength(500).IsRequired();
+            entity.Property(e => e.CarrierName).HasMaxLength(100);
+            entity.Property(e => e.TrackingNumber).HasMaxLength(100);
+            entity.Property(e => e.TrackingUrl).HasMaxLength(500);
+
+            entity.Property(e => e.Status).HasConversion<int>().IsRequired();
+            entity.Property(e => e.CancellationReason).HasMaxLength(1000);
+            entity.Property(e => e.RejectionReason).HasMaxLength(1000);
+            entity.Property(e => e.Notes).HasMaxLength(1000);
+            entity.Property(e => e.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            // Relationships
+            entity.HasOne(e => e.Quotation)
+                  .WithOne(q => q.Order)
+                  .HasForeignKey<Order>(e => e.QuotationId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_Orders_Quotations");
+
+            entity.HasOne(e => e.Rfq)
+                  .WithMany()
+                  .HasForeignKey(e => e.RfqId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_Orders_Rfqs");
+
+            entity.HasOne(e => e.Product)
+                  .WithMany(p => p.Orders)
+                  .HasForeignKey(e => e.ProductId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_Orders_Products");
+
+            entity.HasOne(e => e.BuyerMember)
+                  .WithMany(m => m.SentOrders)
+                  .HasForeignKey(e => e.BuyerMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_Orders_BuyerMember");
+
+            entity.HasOne(e => e.SupplierMember)
+                  .WithMany(m => m.ReceivedOrders)
+                  .HasForeignKey(e => e.SupplierMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_Orders_SupplierMember");
+
+            entity.HasIndex(e => e.OrderNumber).IsUnique().HasDatabaseName("IX_Orders_OrderNumber");
+            entity.HasIndex(e => e.QuotationId).IsUnique().HasDatabaseName("IX_Orders_QuotationId");
+            entity.HasIndex(e => e.RfqId).HasDatabaseName("IX_Orders_RfqId");
+            entity.HasIndex(e => e.ProductId).HasDatabaseName("IX_Orders_ProductId");
+            entity.HasIndex(e => e.BuyerMemberId).HasDatabaseName("IX_Orders_BuyerMemberId");
+            entity.HasIndex(e => e.SupplierMemberId).HasDatabaseName("IX_Orders_SupplierMemberId");
+            entity.HasIndex(e => e.Status).HasDatabaseName("IX_Orders_Status");
+        });
+
+        // 24. OrderStatusHistory
+        modelBuilder.Entity<OrderStatusHistory>(entity =>
+        {
+            entity.ToTable("OrderStatusHistories");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.OrderId).IsRequired();
+            entity.Property(e => e.PreviousStatus).HasConversion<int?>();
+            entity.Property(e => e.NewStatus).HasConversion<int>().IsRequired();
+            entity.Property(e => e.ChangedByMemberId).IsRequired();
+            entity.Property(e => e.ChangedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+            entity.Property(e => e.Remarks).HasMaxLength(1000);
+
+            entity.HasOne(e => e.Order)
+                  .WithMany(o => o.StatusHistory)
+                  .HasForeignKey(e => e.OrderId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("FK_OrderStatusHistories_Orders");
+
+            entity.HasOne(e => e.ChangedByMember)
+                  .WithMany()
+                  .HasForeignKey(e => e.ChangedByMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_OrderStatusHistories_ChangedByMember");
+
+            entity.HasIndex(e => e.OrderId).HasDatabaseName("IX_OrderStatusHistories_OrderId");
+            entity.HasIndex(e => e.ChangedByMemberId).HasDatabaseName("IX_OrderStatusHistories_ChangedByMemberId");
+        });
+
+        // 25. JobWorkRequirement
+        modelBuilder.Entity<JobWorkRequirement>(entity =>
+        {
+            entity.ToTable("JobWorkRequirements");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.RequirementNumber).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.OwnerMemberId).IsRequired();
+            entity.Property(e => e.Title).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(3000).IsRequired();
+            entity.Property(e => e.IndustryId).IsRequired();
+            entity.Property(e => e.JobWorkProcess).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.MachineType).HasMaxLength(100);
+            entity.Property(e => e.MachineCategory).HasMaxLength(100);
+            entity.Property(e => e.RequiredMachineCapacity).HasMaxLength(150);
+            entity.Property(e => e.TechnicalSpecifications).HasMaxLength(2000);
+            entity.Property(e => e.RequiredTolerance).HasMaxLength(100);
+            entity.Property(e => e.MaterialType).HasMaxLength(150);
+            entity.Property(e => e.MaterialResponsibility).HasConversion<int>().IsRequired();
+            entity.Property(e => e.Quantity).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.UnitOfMeasurement).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.TargetBudget).HasPrecision(18, 2);
+            entity.Property(e => e.Location).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.DeliveryTerms).HasMaxLength(500);
+            entity.Property(e => e.Status).HasConversion<int>().IsRequired();
+            entity.Property(e => e.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.OwnerMember)
+                  .WithMany(m => m.PostedJobWorkRequirements)
+                  .HasForeignKey(e => e.OwnerMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_JobWorkRequirements_OwnerMember");
+
+            entity.HasOne(e => e.Industry)
+                  .WithMany()
+                  .HasForeignKey(e => e.IndustryId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_JobWorkRequirements_Industries");
+
+            entity.HasOne(e => e.BusinessGroup)
+                  .WithMany()
+                  .HasForeignKey(e => e.BusinessGroupId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_JobWorkRequirements_BusinessGroups");
+
+            entity.HasOne(e => e.SubGroup)
+                  .WithMany()
+                  .HasForeignKey(e => e.SubGroupId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_JobWorkRequirements_SubGroups");
+
+            entity.HasOne(e => e.Category)
+                  .WithMany()
+                  .HasForeignKey(e => e.CategoryId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_JobWorkRequirements_Categories");
+
+            entity.HasIndex(e => e.RequirementNumber).IsUnique().HasDatabaseName("IX_JobWorkRequirements_RequirementNumber");
+            entity.HasIndex(e => e.OwnerMemberId).HasDatabaseName("IX_JobWorkRequirements_OwnerMemberId");
+            entity.HasIndex(e => e.IndustryId).HasDatabaseName("IX_JobWorkRequirements_IndustryId");
+            entity.HasIndex(e => e.JobWorkProcess).HasDatabaseName("IX_JobWorkRequirements_JobWorkProcess");
+            entity.HasIndex(e => e.Status).HasDatabaseName("IX_JobWorkRequirements_Status");
+        });
+
+        // 26. JobWorkAttachment
+        modelBuilder.Entity<JobWorkAttachment>(entity =>
+        {
+            entity.ToTable("JobWorkAttachments");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.OriginalFileName).HasMaxLength(255).IsRequired();
+            entity.Property(e => e.StoredFileName).HasMaxLength(255).IsRequired();
+            entity.Property(e => e.FileExtension).HasMaxLength(30).IsRequired();
+            entity.Property(e => e.ContentType).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.FileSizeBytes).IsRequired();
+            entity.Property(e => e.UploadedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.JobWorkRequirement)
+                  .WithMany(r => r.Attachments)
+                  .HasForeignKey(e => e.JobWorkRequirementId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_JobWorkAttachments_JobWorkRequirements");
+
+            entity.HasOne(e => e.JobWorkQuotation)
+                  .WithMany(q => q.Attachments)
+                  .HasForeignKey(e => e.JobWorkQuotationId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_JobWorkAttachments_JobWorkQuotations");
+
+            entity.HasOne(e => e.UploadedByMember)
+                  .WithMany()
+                  .HasForeignKey(e => e.UploadedByMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_JobWorkAttachments_UploadedByMember");
+
+            entity.HasIndex(e => e.JobWorkRequirementId).HasDatabaseName("IX_JobWorkAttachments_RequirementId");
+            entity.HasIndex(e => e.JobWorkQuotationId).HasDatabaseName("IX_JobWorkAttachments_QuotationId");
+        });
+
+        // 27. JobWorkQuotation
+        modelBuilder.Entity<JobWorkQuotation>(entity =>
+        {
+            entity.ToTable("JobWorkQuotations");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.QuotationNumber).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.JobWorkRequirementId).IsRequired();
+            entity.Property(e => e.ContractorMemberId).IsRequired();
+            entity.Property(e => e.OfferedUnitPrice).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.Quantity).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.Subtotal).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.TaxRatePercent).HasPrecision(5, 2).HasDefaultValue(18.00m).IsRequired();
+            entity.Property(e => e.TaxAmount).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.OtherCharges).HasPrecision(18, 2).HasDefaultValue(0.00m).IsRequired();
+            entity.Property(e => e.TotalAmount).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.LeadTimeDays).IsRequired();
+            entity.Property(e => e.MachineProposed).HasMaxLength(200);
+            entity.Property(e => e.TechnicalRemarks).HasMaxLength(2000);
+            entity.Property(e => e.TermsAndConditions).HasMaxLength(2000);
+            entity.Property(e => e.Status).HasConversion<int>().IsRequired();
+            entity.Property(e => e.RevisionNumber).HasDefaultValue(1).IsRequired();
+            entity.Property(e => e.RejectionReason).HasMaxLength(1000);
+            entity.Property(e => e.RevisionNotes).HasMaxLength(1000);
+            entity.Property(e => e.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.Requirement)
+                  .WithMany(r => r.Quotations)
+                  .HasForeignKey(e => e.JobWorkRequirementId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_JobWorkQuotations_JobWorkRequirements");
+
+            entity.HasOne(e => e.ContractorMember)
+                  .WithMany(m => m.SubmittedJobWorkQuotations)
+                  .HasForeignKey(e => e.ContractorMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_JobWorkQuotations_ContractorMember");
+
+            entity.HasIndex(e => e.QuotationNumber).IsUnique().HasDatabaseName("IX_JobWorkQuotations_QuotationNumber");
+            entity.HasIndex(e => e.JobWorkRequirementId).HasDatabaseName("IX_JobWorkQuotations_RequirementId");
+            entity.HasIndex(e => e.ContractorMemberId).HasDatabaseName("IX_JobWorkQuotations_ContractorMemberId");
+            entity.HasIndex(e => e.Status).HasDatabaseName("IX_JobWorkQuotations_Status");
+        });
+
+        // 28. JobWorkOrder
+        modelBuilder.Entity<JobWorkOrder>(entity =>
+        {
+            entity.ToTable("JobWorkOrders");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.OrderNumber).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.JobWorkRequirementId).IsRequired();
+            entity.Property(e => e.JobWorkQuotationId).IsRequired();
+            entity.Property(e => e.BuyerMemberId).IsRequired();
+            entity.Property(e => e.ContractorMemberId).IsRequired();
+            entity.Property(e => e.JobTitle).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.Process).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Quantity).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.UnitOfMeasurement).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.AgreedUnitPrice).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.Subtotal).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.TaxAmount).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.OtherCharges).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.TotalAmount).HasPrecision(18, 2).IsRequired();
+            entity.Property(e => e.LeadTimeDays).IsRequired();
+            entity.Property(e => e.DeliveryLocation).HasMaxLength(300).IsRequired();
+            entity.Property(e => e.Status).HasConversion<int>().IsRequired();
+            entity.Property(e => e.CancellationReason).HasMaxLength(1000);
+            entity.Property(e => e.RejectionReason).HasMaxLength(1000);
+            entity.Property(e => e.Notes).HasMaxLength(1000);
+            entity.Property(e => e.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.Requirement)
+                  .WithOne(r => r.Order)
+                  .HasForeignKey<JobWorkOrder>(e => e.JobWorkRequirementId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_JobWorkOrders_JobWorkRequirements");
+
+            entity.HasOne(e => e.Quotation)
+                  .WithOne(q => q.Order)
+                  .HasForeignKey<JobWorkOrder>(e => e.JobWorkQuotationId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_JobWorkOrders_JobWorkQuotations");
+
+            entity.HasOne(e => e.BuyerMember)
+                  .WithMany(m => m.PlacedJobWorkOrders)
+                  .HasForeignKey(e => e.BuyerMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_JobWorkOrders_BuyerMember");
+
+            entity.HasOne(e => e.ContractorMember)
+                  .WithMany(m => m.ReceivedJobWorkOrders)
+                  .HasForeignKey(e => e.ContractorMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_JobWorkOrders_ContractorMember");
+
+            entity.HasIndex(e => e.OrderNumber).IsUnique().HasDatabaseName("IX_JobWorkOrders_OrderNumber");
+            entity.HasIndex(e => e.JobWorkRequirementId).HasDatabaseName("IX_JobWorkOrders_RequirementId");
+            entity.HasIndex(e => e.JobWorkQuotationId).IsUnique().HasDatabaseName("IX_JobWorkOrders_QuotationId");
+            entity.HasIndex(e => e.BuyerMemberId).HasDatabaseName("IX_JobWorkOrders_BuyerMemberId");
+            entity.HasIndex(e => e.ContractorMemberId).HasDatabaseName("IX_JobWorkOrders_ContractorMemberId");
+            entity.HasIndex(e => e.Status).HasDatabaseName("IX_JobWorkOrders_Status");
+        });
+
+        // 29. JobWorkOrderStatusHistory
+        modelBuilder.Entity<JobWorkOrderStatusHistory>(entity =>
+        {
+            entity.ToTable("JobWorkOrderStatusHistories");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.JobWorkOrderId).IsRequired();
+            entity.Property(e => e.PreviousStatus).HasConversion<int?>();
+            entity.Property(e => e.NewStatus).HasConversion<int>().IsRequired();
+            entity.Property(e => e.ChangedByMemberId).IsRequired();
+            entity.Property(e => e.ChangedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+            entity.Property(e => e.Remarks).HasMaxLength(1000);
+
+            entity.HasOne(e => e.Order)
+                  .WithMany(o => o.StatusHistory)
+                  .HasForeignKey(e => e.JobWorkOrderId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("FK_JobWorkOrderStatusHistories_JobWorkOrders");
+
+            entity.HasOne(e => e.ChangedByMember)
+                  .WithMany()
+                  .HasForeignKey(e => e.ChangedByMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_JobWorkOrderStatusHistories_ChangedByMember");
+
+            entity.HasIndex(e => e.JobWorkOrderId).HasDatabaseName("IX_JobWorkOrderStatusHistories_OrderId");
+            entity.HasIndex(e => e.ChangedByMemberId).HasDatabaseName("IX_JobWorkOrderStatusHistories_ChangedByMemberId");
+        });
     }
-}
+}

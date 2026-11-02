@@ -23,9 +23,9 @@ public class TokenService : ITokenService
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(_jwtOptions.SigningKey);
 
-        // Public registration and login must never grant Admin privileges. Enforce Member role.
-        var effectiveRole = string.Equals(member.Role, "Member", StringComparison.OrdinalIgnoreCase)
-            ? "Member"
+        // Enforce valid role claims: Admin for designated admin users, otherwise Member
+        var effectiveRole = string.Equals(member.Role, "Admin", StringComparison.OrdinalIgnoreCase)
+            ? "Admin"
             : "Member";
 
         var claims = new List<Claim>

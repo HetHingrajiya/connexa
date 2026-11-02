@@ -75,10 +75,10 @@ class AppEmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.xxl,
-          vertical: AppSpacing.xxxl,
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.lg,
         ),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 420),
@@ -95,7 +95,7 @@ class AppEmptyState extends StatelessWidget {
                 ),
                 child: Icon(icon, size: 32, color: AppColors.textSecondary),
               ),
-              const SizedBox(height: AppSpacing.xl),
+              const SizedBox(height: AppSpacing.lg),
               Text(
                 title,
                 textAlign: TextAlign.center,
@@ -110,7 +110,7 @@ class AppEmptyState extends StatelessWidget {
                 ),
               ),
               if (actionLabel != null && onAction != null) ...<Widget>[
-                const SizedBox(height: AppSpacing.xxl),
+                const SizedBox(height: AppSpacing.xl),
                 AppButton.primary(text: actionLabel!, onPressed: onAction),
               ],
             ],
@@ -142,10 +142,10 @@ class AppErrorState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.xxl,
-          vertical: AppSpacing.xxxl,
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.lg,
         ),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 420),
@@ -162,7 +162,7 @@ class AppErrorState extends StatelessWidget {
                 ),
                 child: Icon(icon, size: 32, color: AppColors.error),
               ),
-              const SizedBox(height: AppSpacing.xl),
+              const SizedBox(height: AppSpacing.lg),
               Text(
                 title,
                 textAlign: TextAlign.center,
@@ -179,7 +179,7 @@ class AppErrorState extends StatelessWidget {
                 ),
               ),
               if (onRetry != null) ...<Widget>[
-                const SizedBox(height: AppSpacing.xxl),
+                const SizedBox(height: AppSpacing.xl),
                 AppButton.secondary(
                   text: retryLabel,
                   onPressed: onRetry,
