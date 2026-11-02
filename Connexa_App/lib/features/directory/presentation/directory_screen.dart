@@ -812,6 +812,12 @@ class _BusinessDirectoryScreenState
         title: const Text('Business Directory'),
         actions: <Widget>[
           IconButton(
+            key: const Key('directoryJobWorkButton'),
+            icon: const Icon(Icons.precision_manufacturing_outlined),
+            tooltip: 'Job Work Marketplace',
+            onPressed: () => context.push('/job-works'),
+          ),
+          IconButton(
             key: const Key('directoryMyNetworkButton'),
             icon: const Icon(Icons.people_outline_rounded),
             tooltip: 'My Network',

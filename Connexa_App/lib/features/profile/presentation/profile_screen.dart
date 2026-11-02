@@ -187,6 +187,11 @@ class ProfileScreen extends ConsumerWidget {
                                       index: 2,
                                       child: _buildDomainDetailsCard(profile),
                                     ),
+                                    const SizedBox(height: AppSpacing.lg),
+                                    AppStaggeredEntrance(
+                                      index: 3,
+                                      child: _buildB2BCommerceCard(context),
+                                    ),
                                     if (_hasIndustryHierarchy(
                                       profile,
                                     )) ...<Widget>[
@@ -200,6 +205,7 @@ class ProfileScreen extends ConsumerWidget {
                                     AppStaggeredEntrance(
                                       index: 4,
                                       child: _buildSecurityCard(
+                                        context,
                                         profile,
                                         authState.user,
                                       ),
@@ -254,6 +260,11 @@ class ProfileScreen extends ConsumerWidget {
                             index: 3,
                             child: _buildDomainDetailsCard(profile),
                           ),
+                          const SizedBox(height: AppSpacing.lg),
+                          AppStaggeredEntrance(
+                            index: 4,
+                            child: _buildB2BCommerceCard(context),
+                          ),
                           if (_hasIndustryHierarchy(profile)) ...<Widget>[
                             const SizedBox(height: AppSpacing.lg),
                             AppStaggeredEntrance(
@@ -264,7 +275,11 @@ class ProfileScreen extends ConsumerWidget {
                           const SizedBox(height: AppSpacing.lg),
                           AppStaggeredEntrance(
                             index: 5,
-                            child: _buildSecurityCard(profile, authState.user),
+                            child: _buildSecurityCard(
+                              context,
+                              profile,
+                              authState.user,
+                            ),
                           ),
                           const SizedBox(height: AppSpacing.lg),
                           AppStaggeredEntrance(
@@ -612,6 +627,64 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildB2BCommerceCard(BuildContext context) {
+    return AppCard(
+      title: 'Industrial & B2B Hub',
+      subtitle: 'Manage job work contracts, quotations, and B2B orders',
+      child: Column(
+        children: <Widget>[
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.primaryContainer,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.precision_manufacturing_rounded, color: AppColors.primary, size: 20),
+            ),
+            title: const Text('Industrial Job Work', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+            subtitle: const Text('Contract manufacturing & machining marketplace', style: TextStyle(fontSize: 12)),
+            trailing: const Icon(Icons.chevron_right_rounded, size: 20),
+            onTap: () => context.push('/job-works'),
+          ),
+          const Divider(height: AppSpacing.sm),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.assignment_turned_in_rounded, color: Color(0xFF10B981), size: 20),
+            ),
+            title: const Text('Job Work Orders', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+            subtitle: const Text('Placed & received job work order tracking', style: TextStyle(fontSize: 12)),
+            trailing: const Icon(Icons.chevron_right_rounded, size: 20),
+            onTap: () => context.push('/job-work-orders'),
+          ),
+          const Divider(height: AppSpacing.sm),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.receipt_long_rounded, color: Color(0xFFF59E0B), size: 20),
+            ),
+            title: const Text('B2B Orders & RFQs', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+            subtitle: const Text('Standard catalog orders and quotations', style: TextStyle(fontSize: 12)),
+            trailing: const Icon(Icons.chevron_right_rounded, size: 20),
+            onTap: () => context.push('/orders'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildDomainDetailsCard(MemberProfile profile) {
     final Map<String, dynamic>? details = profile.profileDetails;
     if (details == null || details.isEmpty) {
@@ -856,7 +929,11 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSecurityCard(MemberProfile profile, AuthenticatedMember? user) {
+  Widget _buildSecurityCard(
+    BuildContext context,
+    MemberProfile profile,
+    AuthenticatedMember? user,
+  ) {
     final String role = profile.role.isNotEmpty
         ? profile.role
         : (user?.role ?? 'Member');
@@ -886,6 +963,15 @@ class ProfileScreen extends ConsumerWidget {
             Icons.security_rounded,
             'Authorization Status',
             'Active (Strict Member Role)',
+          ),
+          const Divider(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.xs),
+          AppButton.secondary(
+            key: const Key('manageAccountSecurityButton'),
+            text: 'Security & Account Settings',
+            leadingIcon: const Icon(Icons.settings_suggest_outlined, size: 18),
+            isFullWidth: true,
+            onPressed: () => context.push('/account-settings'),
           ),
         ],
       ),

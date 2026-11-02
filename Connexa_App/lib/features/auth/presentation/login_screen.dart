@@ -359,7 +359,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ref.read(authProvider.notifier).clearError();
                 },
               ),
-              const SizedBox(height: AppSpacing.xl),
+              const SizedBox(height: AppSpacing.xs),
+
+              // Forgot Password Link
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  key: const Key('loginForgotPasswordButton'),
+                  onPressed: authState.isLoading
+                      ? null
+                      : () => context.push('/forgot-password'),
+                  child: Text(
+                    'Forgot Password?',
+                    style: AppTextStyles.labelMedium.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
 
               // Submit Button
               AppButton.primary(

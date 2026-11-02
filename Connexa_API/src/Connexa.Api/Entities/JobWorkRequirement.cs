@@ -62,3 +62,4 @@ public class JobWorkRequirement
     public ICollection<JobWorkQuotation> Quotations { get; set; } = new List<JobWorkQuotation>();
     public JobWorkOrder? Order { get; set; }
 }
+

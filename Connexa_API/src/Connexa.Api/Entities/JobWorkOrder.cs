@@ -54,3 +54,4 @@ public class JobWorkOrder
     public Member ContractorMember { get; set; } = null!;
     public ICollection<JobWorkOrderStatusHistory> StatusHistory { get; set; } = new List<JobWorkOrderStatusHistory>();
 }
+

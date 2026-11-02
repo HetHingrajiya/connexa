@@ -12,6 +12,9 @@ public class RefreshToken
     public string? RevokedByIp { get; set; }
     public string? ReplacedByTokenHash { get; set; }
     public string? ReasonRevoked { get; set; }
+    public string? DeviceName { get; set; }
+    public string? UserAgent { get; set; }
+    public DateTime LastActiveAtUtc { get; set; } = DateTime.UtcNow;
 
     public bool IsExpired => DateTime.UtcNow >= ExpiresAtUtc;
     public bool IsRevoked => RevokedAtUtc != null;

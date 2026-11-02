@@ -21,6 +21,8 @@ public class Member
     public string VerifiedDestination { get; set; } = string.Empty;
     public string Role { get; set; } = "Member"; // Strictly "Member" for public registration
     public bool IsActive { get; set; } = true;
+    public DateTime? DeactivatedAtUtc { get; set; }
+    public string? DeactivationReason { get; set; }
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAtUtc { get; set; }
 
@@ -76,5 +78,23 @@ public class Member
     public ICollection<JobWorkQuotation> SubmittedJobWorkQuotations { get; set; } = new List<JobWorkQuotation>();
     public ICollection<JobWorkOrder> PlacedJobWorkOrders { get; set; } = new List<JobWorkOrder>();
     public ICollection<JobWorkOrder> ReceivedJobWorkOrders { get; set; } = new List<JobWorkOrder>();
+
+    // Security & Account Deletion Requests navigation
+    public ICollection<AccountDeletionRequest> DeletionRequests { get; set; } = new List<AccountDeletionRequest>();
+
+    // B2B Services Marketplace navigation
+    public ICollection<BusinessService> PublishedServices { get; set; } = new List<BusinessService>();
+    public ICollection<ServiceInquiry> SentServiceInquiries { get; set; } = new List<ServiceInquiry>();
+    public ICollection<ServiceInquiry> ReceivedServiceInquiries { get; set; } = new List<ServiceInquiry>();
+
+    // Job Recruitment Marketplace navigation
+    public ICollection<JobOpening> PostedJobOpenings { get; set; } = new List<JobOpening>();
+    public ICollection<JobApplication> SubmittedJobApplications { get; set; } = new List<JobApplication>();
+
+    // Business Posts & Feed navigation
+    public ICollection<BusinessPost> BusinessPosts { get; set; } = new List<BusinessPost>();
+    public ICollection<BusinessPostLike> PostLikes { get; set; } = new List<BusinessPostLike>();
+    public ICollection<BusinessPostComment> PostComments { get; set; } = new List<BusinessPostComment>();
+    public ICollection<BusinessPostReport> PostReports { get; set; } = new List<BusinessPostReport>();
 }
 

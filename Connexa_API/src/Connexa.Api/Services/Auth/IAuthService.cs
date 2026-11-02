@@ -21,12 +21,12 @@ public interface IAuthService
     /// Authenticates a member by email or normalized phone number and password.
     /// Rate limits attempts and locks account on repeated failures. Never grants Admin privileges.
     /// </summary>
-    Task<AuthResult<AuthResponseDto>> LoginAsync(LoginRequestDto request, string? clientIp, CancellationToken cancellationToken = default);
+    Task<AuthResult<AuthResponseDto>> LoginAsync(LoginRequestDto request, string? clientIp, string? userAgent = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Rotates refresh token, detecting replay attacks, and issues a new access token and refresh token.
     /// </summary>
-    Task<AuthResult<AuthResponseDto>> RefreshTokenAsync(RefreshTokenRequestDto request, string? clientIp, CancellationToken cancellationToken = default);
+    Task<AuthResult<AuthResponseDto>> RefreshTokenAsync(RefreshTokenRequestDto request, string? clientIp, string? userAgent = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Revokes active refresh token.
@@ -52,4 +52,51 @@ public interface IAuthService
     /// Verifies OTP challenge and generates a fresh, single-use, 30-minute CredentialSetupToken for the registered member.
     /// </summary>
     Task<AuthResult<VerifySetupOtpResponseDto>> VerifySetupOtpAsync(VerifySetupOtpRequestDto request, string? clientIp, CancellationToken cancellationToken = default);
+
+    // --- Step 29: Security & Account Management ---
+
+    /// <summary>
+    /// Initiates password recovery by dispatching an OTP to the member's verified email or WhatsApp.
+    /// </summary>
+    Task<AuthResult<ForgotPasswordResponseDto>> ForgotPasswordAsync(ForgotPasswordRequestDto request, string? clientIp, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Verifies password reset OTP, validates new password complexity, updates member password, and revokes all active sessions.
+    /// </summary>
+    Task<AuthResult<bool>> ResetPasswordAsync(ResetPasswordRequestDto request, string? clientIp, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Authenticated password change requiring current password verification and password policy compliance.
+    /// </summary>
+    Task<AuthResult<bool>> ChangePasswordAsync(int memberId, ChangePasswordRequestDto request, string? clientIp, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Retrieves list of active sessions (refresh tokens) for the member.
+    /// </summary>
+    Task<AuthResult<List<ActiveSessionDto>>> GetActiveSessionsAsync(int memberId, string? currentTokenHash, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Revokes a specific active session owned by the member.
+    /// </summary>
+    Task<AuthResult<bool>> RevokeSessionAsync(int memberId, int sessionId, string? clientIp, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Revokes all active sessions for the member except the current session.
+    /// </summary>
+    Task<AuthResult<int>> RevokeAllOtherSessionsAsync(int memberId, string? currentTokenHash, string? clientIp, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deactivates member account, requiring password verification, and revokes all sessions.
+    /// </summary>
+    Task<AuthResult<bool>> DeactivateAccountAsync(int memberId, DeactivateAccountRequestDto request, string? clientIp, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Submits a formal account deletion request, requiring password verification, and deactivates the account.
+    /// </summary>
+    Task<AuthResult<bool>> RequestAccountDeletionAsync(int memberId, DeleteAccountRequestDto request, string? clientIp, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Returns account security and status summary (active status, pending deletion request).
+    /// </summary>
+    Task<AuthResult<AccountStatusResponseDto>> GetAccountStatusAsync(int memberId, CancellationToken cancellationToken = default);
 }

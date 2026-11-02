@@ -89,6 +89,18 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       } else {
         context.push('/orders');
       }
+    } else if (refType == 'job_work_requirement') {
+      if (refId != null && refId > 0) {
+        context.push('/job-works/$refId');
+      } else {
+        context.push('/job-works');
+      }
+    } else if (refType == 'job_work_order') {
+      if (refId != null && refId > 0) {
+        context.push('/job-work-orders/$refId');
+      } else {
+        context.push('/job-work-orders');
+      }
     }
   }
 
@@ -129,6 +141,18 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       case 'OrderCancelled':
       case 'OrderRejected':
         return Icons.shopping_bag_outlined;
+      case 'JobWorkRequirementPublished':
+      case 'JobWorkQuotationReceived':
+      case 'JobWorkQuotationRevised':
+      case 'JobWorkQuotationAccepted':
+      case 'JobWorkQuotationRejected':
+      case 'JobWorkQuotationRevisionRequested':
+      case 'JobWorkOrderCreated':
+      case 'JobWorkOrderConfirmed':
+      case 'JobWorkOrderProcessing':
+      case 'JobWorkOrderCompleted':
+      case 'JobWorkOrderCancelled':
+        return Icons.precision_manufacturing_rounded;
       default:
         return Icons.notifications_rounded;
     }
@@ -160,6 +184,18 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       case 'OrderCancelled':
       case 'OrderRejected':
         return const Color(0xFFDC2626); // Crimson
+      case 'JobWorkQuotationAccepted':
+      case 'JobWorkOrderCompleted':
+        return const Color(0xFF059669); // Emerald
+      case 'JobWorkQuotationRejected':
+      case 'JobWorkOrderCancelled':
+        return const Color(0xFFDC2626); // Crimson
+      case 'JobWorkOrderProcessing':
+        return const Color(0xFFD97706); // Amber
+      case 'JobWorkRequirementPublished':
+      case 'JobWorkQuotationReceived':
+      case 'JobWorkOrderCreated':
+        return const Color(0xFF4338CA); // Indigo
       default:
         return AppColors.primary;
     }

@@ -38,6 +38,19 @@ public class ConnexaDbContext : DbContext
     public DbSet<JobWorkQuotation> JobWorkQuotations => Set<JobWorkQuotation>();
     public DbSet<JobWorkOrder> JobWorkOrders => Set<JobWorkOrder>();
     public DbSet<JobWorkOrderStatusHistory> JobWorkOrderStatusHistories => Set<JobWorkOrderStatusHistory>();
+    public DbSet<AccountDeletionRequest> AccountDeletionRequests => Set<AccountDeletionRequest>();
+    public DbSet<BusinessService> BusinessServices => Set<BusinessService>();
+    public DbSet<ServiceInquiry> ServiceInquiries => Set<ServiceInquiry>();
+    public DbSet<ServiceInquiryStatusHistory> ServiceInquiryStatusHistories => Set<ServiceInquiryStatusHistory>();
+    public DbSet<JobOpening> JobOpenings => Set<JobOpening>();
+    public DbSet<JobApplication> JobApplications => Set<JobApplication>();
+    public DbSet<JobApplicationAttachment> JobApplicationAttachments => Set<JobApplicationAttachment>();
+    public DbSet<JobApplicationStatusHistory> JobApplicationStatusHistories => Set<JobApplicationStatusHistory>();
+    public DbSet<BusinessPost> BusinessPosts => Set<BusinessPost>();
+    public DbSet<BusinessPostAttachment> BusinessPostAttachments => Set<BusinessPostAttachment>();
+    public DbSet<BusinessPostLike> BusinessPostLikes => Set<BusinessPostLike>();
+    public DbSet<BusinessPostComment> BusinessPostComments => Set<BusinessPostComment>();
+    public DbSet<BusinessPostReport> BusinessPostReports => Set<BusinessPostReport>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -168,6 +181,7 @@ public class ConnexaDbContext : DbContext
             entity.Property(e => e.PasswordHash).HasMaxLength(256);
             entity.Property(e => e.PasswordSalt).HasMaxLength(128);
             entity.Property(e => e.CredentialSetupToken).HasMaxLength(128);
+            entity.Property(e => e.DeactivationReason).HasMaxLength(500);
             entity.Property(e => e.FailedLoginAttempts).HasDefaultValue(0);
 
             entity.HasIndex(e => e.PhoneNumber).IsUnique().HasDatabaseName("IX_Members_PhoneNumber");
@@ -356,6 +370,9 @@ public class ConnexaDbContext : DbContext
             entity.Property(e => e.RevokedByIp).HasMaxLength(64);
             entity.Property(e => e.ReplacedByTokenHash).HasMaxLength(128);
             entity.Property(e => e.ReasonRevoked).HasMaxLength(256);
+            entity.Property(e => e.DeviceName).HasMaxLength(128);
+            entity.Property(e => e.UserAgent).HasMaxLength(512);
+            entity.Property(e => e.LastActiveAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
 
             entity.HasOne(e => e.Member)
                   .WithMany(m => m.RefreshTokens)
@@ -1040,6 +1057,443 @@ public class ConnexaDbContext : DbContext
 
             entity.HasIndex(e => e.JobWorkOrderId).HasDatabaseName("IX_JobWorkOrderStatusHistories_OrderId");
             entity.HasIndex(e => e.ChangedByMemberId).HasDatabaseName("IX_JobWorkOrderStatusHistories_ChangedByMemberId");
+        });
+
+        // 26. AccountDeletionRequest
+        modelBuilder.Entity<AccountDeletionRequest>(entity =>
+        {
+            entity.ToTable("AccountDeletionRequests");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.MemberId).IsRequired();
+            entity.Property(e => e.Reason).HasMaxLength(500).IsRequired();
+            entity.Property(e => e.Status).HasMaxLength(32).IsRequired().HasDefaultValue("PendingReview");
+            entity.Property(e => e.RequestedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+            entity.Property(e => e.AdminNotes).HasMaxLength(1000);
+
+            entity.HasOne(e => e.Member)
+                  .WithMany(m => m.DeletionRequests)
+                  .HasForeignKey(e => e.MemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_AccountDeletionRequests_Members");
+
+            entity.HasIndex(e => e.MemberId).HasDatabaseName("IX_AccountDeletionRequests_MemberId");
+            entity.HasIndex(e => e.Status).HasDatabaseName("IX_AccountDeletionRequests_Status");
+        });
+
+        // 30. BusinessService
+        modelBuilder.Entity<BusinessService>(entity =>
+        {
+            entity.ToTable("BusinessServices");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.MemberId).IsRequired();
+            entity.Property(e => e.Title).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(4000).IsRequired();
+            entity.Property(e => e.ServiceCategory).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.ServiceType).HasMaxLength(50).IsRequired().HasDefaultValue("On-Site");
+            entity.Property(e => e.PricingModel).HasMaxLength(50).IsRequired().HasDefaultValue("Quote-Based");
+            entity.Property(e => e.StartingPrice).HasPrecision(18, 2);
+            entity.Property(e => e.PriceUnit).HasMaxLength(50);
+            entity.Property(e => e.TurnaroundTime).HasMaxLength(100);
+            entity.Property(e => e.CoverageArea).HasMaxLength(200);
+            entity.Property(e => e.Location).HasMaxLength(200);
+            entity.Property(e => e.TagsJson).HasMaxLength(1000);
+            entity.Property(e => e.ImagesJson).HasMaxLength(2000);
+            entity.Property(e => e.Certifications).HasMaxLength(500);
+            entity.Property(e => e.IsActive).IsRequired().HasDefaultValue(true);
+            entity.Property(e => e.ViewCount).IsRequired().HasDefaultValue(0);
+            entity.Property(e => e.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.Member)
+                  .WithMany(m => m.PublishedServices)
+                  .HasForeignKey(e => e.MemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_BusinessServices_Members");
+
+            entity.HasOne(e => e.Industry)
+                  .WithMany()
+                  .HasForeignKey(e => e.IndustryId)
+                  .OnDelete(DeleteBehavior.SetNull)
+                  .HasConstraintName("FK_BusinessServices_Industries");
+
+            entity.HasIndex(e => e.MemberId).HasDatabaseName("IX_BusinessServices_MemberId");
+            entity.HasIndex(e => e.ServiceCategory).HasDatabaseName("IX_BusinessServices_Category");
+            entity.HasIndex(e => e.IndustryId).HasDatabaseName("IX_BusinessServices_IndustryId");
+            entity.HasIndex(e => e.IsActive).HasDatabaseName("IX_BusinessServices_IsActive");
+            entity.HasIndex(e => e.Location).HasDatabaseName("IX_BusinessServices_Location");
+        });
+
+        // 31. ServiceInquiry
+        modelBuilder.Entity<ServiceInquiry>(entity =>
+        {
+            entity.ToTable("ServiceInquiries");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.InquiryNumber).HasMaxLength(64).IsRequired();
+            entity.Property(e => e.ServiceId).IsRequired();
+            entity.Property(e => e.SenderMemberId).IsRequired();
+            entity.Property(e => e.RecipientMemberId).IsRequired();
+            entity.Property(e => e.Subject).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.RequirementDescription).HasMaxLength(4000).IsRequired();
+            entity.Property(e => e.ScopeOfWork).HasMaxLength(2000);
+            entity.Property(e => e.Location).HasMaxLength(200);
+            entity.Property(e => e.EstimatedBudget).HasPrecision(18, 2);
+            entity.Property(e => e.Urgency).HasMaxLength(50).IsRequired().HasDefaultValue("Normal");
+            entity.Property(e => e.Status).HasConversion<int>().IsRequired().HasDefaultValue(ServiceInquiryStatus.Pending);
+            entity.Property(e => e.ResponseMessage).HasMaxLength(4000);
+            entity.Property(e => e.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.Service)
+                  .WithMany(s => s.Inquiries)
+                  .HasForeignKey(e => e.ServiceId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_ServiceInquiries_BusinessServices");
+
+            entity.HasOne(e => e.SenderMember)
+                  .WithMany(m => m.SentServiceInquiries)
+                  .HasForeignKey(e => e.SenderMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_ServiceInquiries_SenderMember");
+
+            entity.HasOne(e => e.RecipientMember)
+                  .WithMany(m => m.ReceivedServiceInquiries)
+                  .HasForeignKey(e => e.RecipientMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_ServiceInquiries_RecipientMember");
+
+            entity.HasIndex(e => e.InquiryNumber).IsUnique().HasDatabaseName("IX_ServiceInquiries_InquiryNumber");
+            entity.HasIndex(e => e.ServiceId).HasDatabaseName("IX_ServiceInquiries_ServiceId");
+            entity.HasIndex(e => e.SenderMemberId).HasDatabaseName("IX_ServiceInquiries_SenderMemberId");
+            entity.HasIndex(e => e.RecipientMemberId).HasDatabaseName("IX_ServiceInquiries_RecipientMemberId");
+            entity.HasIndex(e => e.Status).HasDatabaseName("IX_ServiceInquiries_Status");
+        });
+
+        // 32. ServiceInquiryStatusHistory
+        modelBuilder.Entity<ServiceInquiryStatusHistory>(entity =>
+        {
+            entity.ToTable("ServiceInquiryStatusHistories");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.ServiceInquiryId).IsRequired();
+            entity.Property(e => e.PreviousStatus).HasConversion<int?>();
+            entity.Property(e => e.NewStatus).HasConversion<int>().IsRequired();
+            entity.Property(e => e.ChangedByMemberId).IsRequired();
+            entity.Property(e => e.Remarks).HasMaxLength(1000);
+            entity.Property(e => e.ChangedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.ServiceInquiry)
+                  .WithMany(i => i.StatusHistory)
+                  .HasForeignKey(e => e.ServiceInquiryId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("FK_ServiceInquiryStatusHistories_Inquiries");
+
+            entity.HasOne(e => e.ChangedByMember)
+                  .WithMany()
+                  .HasForeignKey(e => e.ChangedByMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_ServiceInquiryStatusHistories_ChangedByMember");
+
+            entity.HasIndex(e => e.ServiceInquiryId).HasDatabaseName("IX_ServiceInquiryStatusHistories_InquiryId");
+            entity.HasIndex(e => e.ChangedByMemberId).HasDatabaseName("IX_ServiceInquiryStatusHistories_ChangedByMemberId");
+        });
+
+        // 33. JobOpening
+        modelBuilder.Entity<JobOpening>(entity =>
+        {
+            entity.ToTable("JobOpenings");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.MemberId).IsRequired();
+            entity.Property(e => e.Title).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(4000).IsRequired();
+            entity.Property(e => e.Department).HasMaxLength(100);
+            entity.Property(e => e.JobType).HasMaxLength(50).IsRequired().HasDefaultValue("Full-time");
+            entity.Property(e => e.WorkplaceType).HasMaxLength(50).IsRequired().HasDefaultValue("On-site");
+            entity.Property(e => e.City).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.State).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Address).HasMaxLength(500);
+            entity.Property(e => e.MinExperienceYears).HasDefaultValue(0);
+            entity.Property(e => e.MinSalary).HasPrecision(18, 2);
+            entity.Property(e => e.MaxSalary).HasPrecision(18, 2);
+            entity.Property(e => e.SalaryPeriod).HasMaxLength(50).IsRequired().HasDefaultValue("Per Month");
+            entity.Property(e => e.RequiredSkillsJson).HasMaxLength(2000);
+            entity.Property(e => e.EducationRequirements).HasMaxLength(200);
+            entity.Property(e => e.OpeningsCount).HasDefaultValue(1);
+            entity.Property(e => e.Status).HasConversion<int>().IsRequired().HasDefaultValue(JobOpeningStatus.Open);
+            entity.Property(e => e.ViewCount).HasDefaultValue(0);
+            entity.Property(e => e.ApplicationsCount).HasDefaultValue(0);
+            entity.Property(e => e.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.Member)
+                  .WithMany(m => m.PostedJobOpenings)
+                  .HasForeignKey(e => e.MemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_JobOpenings_Members");
+
+            entity.HasOne(e => e.Industry)
+                  .WithMany()
+                  .HasForeignKey(e => e.IndustryId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_JobOpenings_Industries");
+
+            entity.HasOne(e => e.BusinessGroup)
+                  .WithMany()
+                  .HasForeignKey(e => e.BusinessGroupId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_JobOpenings_BusinessGroups");
+
+            entity.HasOne(e => e.SubGroup)
+                  .WithMany()
+                  .HasForeignKey(e => e.SubGroupId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_JobOpenings_SubGroups");
+
+            entity.HasOne(e => e.Category)
+                  .WithMany()
+                  .HasForeignKey(e => e.CategoryId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_JobOpenings_Categories");
+
+            entity.HasIndex(e => e.MemberId).HasDatabaseName("IX_JobOpenings_MemberId");
+            entity.HasIndex(e => e.Status).HasDatabaseName("IX_JobOpenings_Status");
+            entity.HasIndex(e => e.IndustryId).HasDatabaseName("IX_JobOpenings_IndustryId");
+            entity.HasIndex(e => e.City).HasDatabaseName("IX_JobOpenings_City");
+            entity.HasIndex(e => e.CreatedAtUtc).HasDatabaseName("IX_JobOpenings_CreatedAtUtc");
+        });
+
+        // 34. JobApplication
+        modelBuilder.Entity<JobApplication>(entity =>
+        {
+            entity.ToTable("JobApplications");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.ApplicationNumber).HasMaxLength(64).IsRequired();
+            entity.Property(e => e.JobOpeningId).IsRequired();
+            entity.Property(e => e.ApplicantMemberId).IsRequired();
+            entity.Property(e => e.FullName).HasMaxLength(150).IsRequired();
+            entity.Property(e => e.Email).HasMaxLength(150).IsRequired();
+            entity.Property(e => e.Phone).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.CurrentCompany).HasMaxLength(150);
+            entity.Property(e => e.CurrentDesignation).HasMaxLength(150);
+            entity.Property(e => e.YearsOfExperience).HasDefaultValue(0);
+            entity.Property(e => e.ExpectedSalary).HasPrecision(18, 2);
+            entity.Property(e => e.CoverLetter).HasMaxLength(4000);
+            entity.Property(e => e.ResumeUrl).HasMaxLength(1000);
+            entity.Property(e => e.ResumeFileName).HasMaxLength(255);
+            entity.Property(e => e.EmployerNotes).HasMaxLength(2000);
+            entity.Property(e => e.Status).HasConversion<int>().IsRequired().HasDefaultValue(JobApplicationStatus.Submitted);
+            entity.Property(e => e.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.JobOpening)
+                  .WithMany(j => j.Applications)
+                  .HasForeignKey(e => e.JobOpeningId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_JobApplications_JobOpenings");
+
+            entity.HasOne(e => e.ApplicantMember)
+                  .WithMany(m => m.SubmittedJobApplications)
+                  .HasForeignKey(e => e.ApplicantMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_JobApplications_ApplicantMembers");
+
+            entity.HasIndex(e => e.ApplicationNumber).IsUnique().HasDatabaseName("IX_JobApplications_ApplicationNumber");
+            entity.HasIndex(e => e.JobOpeningId).HasDatabaseName("IX_JobApplications_JobOpeningId");
+            entity.HasIndex(e => e.ApplicantMemberId).HasDatabaseName("IX_JobApplications_ApplicantMemberId");
+            entity.HasIndex(e => e.Status).HasDatabaseName("IX_JobApplications_Status");
+            entity.HasIndex(e => new { e.JobOpeningId, e.ApplicantMemberId }).HasDatabaseName("IX_JobApplications_Job_Applicant");
+        });
+
+        // 35. JobApplicationAttachment
+        modelBuilder.Entity<JobApplicationAttachment>(entity =>
+        {
+            entity.ToTable("JobApplicationAttachments");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.JobApplicationId).IsRequired();
+            entity.Property(e => e.FileName).HasMaxLength(255).IsRequired();
+            entity.Property(e => e.FilePath).HasMaxLength(1000).IsRequired();
+            entity.Property(e => e.ContentType).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.UploadedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.JobApplication)
+                  .WithMany(a => a.Attachments)
+                  .HasForeignKey(e => e.JobApplicationId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("FK_JobApplicationAttachments_Applications");
+
+            entity.HasIndex(e => e.JobApplicationId).HasDatabaseName("IX_JobApplicationAttachments_ApplicationId");
+        });
+
+        // 36. JobApplicationStatusHistory
+        modelBuilder.Entity<JobApplicationStatusHistory>(entity =>
+        {
+            entity.ToTable("JobApplicationStatusHistories");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.JobApplicationId).IsRequired();
+            entity.Property(e => e.PreviousStatus).HasConversion<int?>();
+            entity.Property(e => e.NewStatus).HasConversion<int>().IsRequired();
+            entity.Property(e => e.ChangedByMemberId).IsRequired();
+            entity.Property(e => e.Remarks).HasMaxLength(1000);
+            entity.Property(e => e.ChangedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.JobApplication)
+                  .WithMany(a => a.StatusHistory)
+                  .HasForeignKey(e => e.JobApplicationId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("FK_JobApplicationStatusHistories_Applications");
+
+            entity.HasOne(e => e.ChangedByMember)
+                  .WithMany()
+                  .HasForeignKey(e => e.ChangedByMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_JobApplicationStatusHistories_ChangedByMember");
+
+            entity.HasIndex(e => e.JobApplicationId).HasDatabaseName("IX_JobApplicationStatusHistories_ApplicationId");
+            entity.HasIndex(e => e.ChangedByMemberId).HasDatabaseName("IX_JobApplicationStatusHistories_ChangedByMemberId");
+        });
+
+        // 37. BusinessPost
+        modelBuilder.Entity<BusinessPost>(entity =>
+        {
+            entity.ToTable("BusinessPosts");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.MemberId).IsRequired();
+            entity.Property(e => e.Content).HasMaxLength(4000).IsRequired();
+            entity.Property(e => e.LikeCount).HasDefaultValue(0);
+            entity.Property(e => e.CommentCount).HasDefaultValue(0);
+            entity.Property(e => e.IsEdited).HasDefaultValue(false);
+            entity.Property(e => e.IsDeleted).HasDefaultValue(false);
+            entity.Property(e => e.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.Member)
+                  .WithMany(m => m.BusinessPosts)
+                  .HasForeignKey(e => e.MemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_BusinessPosts_Members");
+
+            entity.HasOne(e => e.Industry)
+                  .WithMany()
+                  .HasForeignKey(e => e.IndustryId)
+                  .OnDelete(DeleteBehavior.SetNull)
+                  .HasConstraintName("FK_BusinessPosts_Industries");
+
+            entity.HasIndex(e => e.MemberId).HasDatabaseName("IX_BusinessPosts_MemberId");
+            entity.HasIndex(e => e.IndustryId).HasDatabaseName("IX_BusinessPosts_IndustryId");
+            entity.HasIndex(e => e.CreatedAtUtc).HasDatabaseName("IX_BusinessPosts_CreatedAtUtc");
+            entity.HasIndex(e => e.IsDeleted).HasDatabaseName("IX_BusinessPosts_IsDeleted");
+        });
+
+        // 38. BusinessPostAttachment
+        modelBuilder.Entity<BusinessPostAttachment>(entity =>
+        {
+            entity.ToTable("BusinessPostAttachments");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.PostId).IsRequired();
+            entity.Property(e => e.MediaUrl).HasMaxLength(1000).IsRequired();
+            entity.Property(e => e.MediaType).HasMaxLength(50);
+            entity.Property(e => e.DisplayOrder).HasDefaultValue(0);
+            entity.Property(e => e.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.Post)
+                  .WithMany(p => p.Attachments)
+                  .HasForeignKey(e => e.PostId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("FK_BusinessPostAttachments_Posts");
+
+            entity.HasIndex(e => e.PostId).HasDatabaseName("IX_BusinessPostAttachments_PostId");
+        });
+
+        // 39. BusinessPostLike
+        modelBuilder.Entity<BusinessPostLike>(entity =>
+        {
+            entity.ToTable("BusinessPostLikes");
+            entity.HasKey(e => new { e.PostId, e.MemberId });
+            entity.Property(e => e.LikedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.Post)
+                  .WithMany(p => p.Likes)
+                  .HasForeignKey(e => e.PostId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("FK_BusinessPostLikes_Posts");
+
+            entity.HasOne(e => e.Member)
+                  .WithMany(m => m.PostLikes)
+                  .HasForeignKey(e => e.MemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_BusinessPostLikes_Members");
+
+            entity.HasIndex(e => e.PostId).HasDatabaseName("IX_BusinessPostLikes_PostId");
+            entity.HasIndex(e => e.MemberId).HasDatabaseName("IX_BusinessPostLikes_MemberId");
+        });
+
+        // 40. BusinessPostComment
+        modelBuilder.Entity<BusinessPostComment>(entity =>
+        {
+            entity.ToTable("BusinessPostComments");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.PostId).IsRequired();
+            entity.Property(e => e.MemberId).IsRequired();
+            entity.Property(e => e.Content).HasMaxLength(2000).IsRequired();
+            entity.Property(e => e.IsEdited).HasDefaultValue(false);
+            entity.Property(e => e.IsDeleted).HasDefaultValue(false);
+            entity.Property(e => e.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.Post)
+                  .WithMany(p => p.Comments)
+                  .HasForeignKey(e => e.PostId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("FK_BusinessPostComments_Posts");
+
+            entity.HasOne(e => e.Member)
+                  .WithMany(m => m.PostComments)
+                  .HasForeignKey(e => e.MemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_BusinessPostComments_Members");
+
+            entity.HasIndex(e => e.PostId).HasDatabaseName("IX_BusinessPostComments_PostId");
+            entity.HasIndex(e => e.MemberId).HasDatabaseName("IX_BusinessPostComments_MemberId");
+            entity.HasIndex(e => e.CreatedAtUtc).HasDatabaseName("IX_BusinessPostComments_CreatedAtUtc");
+        });
+
+        // 41. BusinessPostReport
+        modelBuilder.Entity<BusinessPostReport>(entity =>
+        {
+            entity.ToTable("BusinessPostReports");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.ReporterMemberId).IsRequired();
+            entity.Property(e => e.Reason).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Details).HasMaxLength(1000);
+            entity.Property(e => e.Status).HasConversion<int>().IsRequired();
+            entity.Property(e => e.CreatedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
+
+            entity.HasOne(e => e.ReporterMember)
+                  .WithMany(m => m.PostReports)
+                  .HasForeignKey(e => e.ReporterMemberId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_BusinessPostReports_Members");
+
+            entity.HasOne(e => e.Post)
+                  .WithMany(p => p.Reports)
+                  .HasForeignKey(e => e.PostId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_BusinessPostReports_Posts");
+
+            entity.HasOne(e => e.Comment)
+                  .WithMany(c => c.Reports)
+                  .HasForeignKey(e => e.CommentId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_BusinessPostReports_Comments");
+
+            entity.HasIndex(e => e.ReporterMemberId).HasDatabaseName("IX_BusinessPostReports_ReporterMemberId");
+            entity.HasIndex(e => e.PostId).HasDatabaseName("IX_BusinessPostReports_PostId");
+            entity.HasIndex(e => e.CommentId).HasDatabaseName("IX_BusinessPostReports_CommentId");
+            entity.HasIndex(e => e.Status).HasDatabaseName("IX_BusinessPostReports_Status");
         });
     }
 }

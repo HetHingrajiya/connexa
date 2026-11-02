@@ -23,6 +23,9 @@ using Connexa.Api.Services.BusinessVerification;
 using Connexa.Api.Services.Rfq;
 using Connexa.Api.Services.Orders;
 using Connexa.Api.Services.JobWork;
+using Connexa.Api.Services.ServicesMarketplace;
+using Connexa.Api.Services.Recruitment;
+using Connexa.Api.Services.Feed;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -97,10 +100,15 @@ builder.Services.AddScoped<IBusinessVerificationService, BusinessVerificationSer
 builder.Services.AddScoped<IRfqService, RfqService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IJobWorkService, JobWorkService>();
+builder.Services.AddScoped<IBusinessServiceService, BusinessServiceService>();
+builder.Services.AddScoped<IJobRecruitmentService, JobRecruitmentService>();
+builder.Services.AddScoped<IBusinessFeedService, BusinessFeedService>();
 
 // Configure JWT Bearer Authentication
 var jwtSection = builder.Configuration.GetSection(JwtOptions.SectionName);
-var signingKey = jwtSection["SigningKey"] ?? "ConnexaEnterpriseSecureJwtSecretKey2026!MustBe32BytesOrLonger#";
+var signingKey = jwtSection["SigningKey"] ?? (builder.Environment.IsDevelopment() 
+    ? "ConnexaEnterpriseSecureJwtSecretKey2026!MustBe32BytesOrLonger#" 
+    : throw new InvalidOperationException("Production configuration error: Jwt:SigningKey must be explicitly configured in production environment."));
 var issuer = jwtSection["Issuer"] ?? "Connexa.Api";
 var audience = jwtSection["Audience"] ?? "Connexa.App";
 

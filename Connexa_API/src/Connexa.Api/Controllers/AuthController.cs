@@ -100,7 +100,8 @@ public class AuthController : ControllerBase
         CancellationToken cancellationToken)
     {
         var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
-        var result = await _authService.LoginAsync(request, clientIp, cancellationToken);
+        var userAgent = Request.Headers.UserAgent.ToString();
+        var result = await _authService.LoginAsync(request, clientIp, userAgent, cancellationToken);
 
         if (!result.Success)
         {
@@ -123,7 +124,8 @@ public class AuthController : ControllerBase
         CancellationToken cancellationToken)
     {
         var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
-        var result = await _authService.RefreshTokenAsync(request, clientIp, cancellationToken);
+        var userAgent = Request.Headers.UserAgent.ToString();
+        var result = await _authService.RefreshTokenAsync(request, clientIp, userAgent, cancellationToken);
 
         if (!result.Success)
         {
@@ -146,5 +148,51 @@ public class AuthController : ControllerBase
         var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
         var result = await _authService.LogoutAsync(request, clientIp, cancellationToken);
         return Ok(ApiResponse<bool>.Ok(true, 1));
+    }
+
+    /// <summary>
+    /// Initiates password recovery by dispatching an OTP to the member's verified email or WhatsApp.
+    /// POST /api/v1/auth/forgot-password
+    /// </summary>
+    [HttpPost("forgot-password")]
+    [ProducesResponseType(typeof(ApiResponse<ForgotPasswordResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<ForgotPasswordResponseDto>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<ForgotPasswordResponseDto>), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ForgotPassword(
+        [FromBody] ForgotPasswordRequestDto request,
+        CancellationToken cancellationToken)
+    {
+        var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
+        var result = await _authService.ForgotPasswordAsync(request, clientIp, cancellationToken);
+
+        if (!result.Success)
+        {
+            return StatusCode(result.StatusCode, ApiResponse<ForgotPasswordResponseDto>.Fail(result.ErrorMessage ?? "Password recovery request failed."));
+        }
+
+        return Ok(ApiResponse<ForgotPasswordResponseDto>.Ok(result.Data!, 1));
+    }
+
+    /// <summary>
+    /// Verifies OTP code and sets a new password complying with security complexity policies.
+    /// POST /api/v1/auth/reset-password
+    /// </summary>
+    [HttpPost("reset-password")]
+    [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ResetPassword(
+        [FromBody] ResetPasswordRequestDto request,
+        CancellationToken cancellationToken)
+    {
+        var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString();
+        var result = await _authService.ResetPasswordAsync(request, clientIp, cancellationToken);
+
+        if (!result.Success)
+        {
+            return StatusCode(result.StatusCode, ApiResponse<bool>.Fail(result.ErrorMessage ?? "Password reset failed."));
+        }
+
+        return Ok(ApiResponse<bool>.WithMessage(true, "Password reset successful. All prior sessions have been terminated."));
     }
 }

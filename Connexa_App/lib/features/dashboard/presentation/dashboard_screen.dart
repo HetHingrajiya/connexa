@@ -186,7 +186,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         _buildBusinessStatsSection(stats),
                         const SizedBox(height: AppSpacing.lg),
 
-                        // 3. My Products — Most Important Section
+                        // Marketplaces Hub (Job Work, Services & Recruitment)
+                        _buildMarketplacesHubSection(context),
+                        const SizedBox(height: AppSpacing.lg),
+
+                        // 3. My Products ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â Most Important Section
                         _buildMyProductsSection(productsAsync),
                         const SizedBox(height: AppSpacing.lg),
 
@@ -262,6 +266,38 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         ],
       ),
       actions: <Widget>[
+        IconButton(
+          key: const Key('dashboardFeedButton'),
+          constraints: const BoxConstraints(minWidth: 38, minHeight: 38),
+          padding: const EdgeInsets.all(7),
+          icon: const Icon(Icons.dynamic_feed_rounded, color: Colors.white, size: 21),
+          tooltip: 'Community Feed',
+          onPressed: () => context.push('/feed'),
+        ),
+        IconButton(
+          key: const Key('dashboardJobsButton'),
+          constraints: const BoxConstraints(minWidth: 38, minHeight: 38),
+          padding: const EdgeInsets.all(7),
+          icon: const Icon(Icons.work_outline_rounded, color: Colors.white, size: 21),
+          tooltip: 'Job Recruitment',
+          onPressed: () => context.push('/jobs'),
+        ),
+        IconButton(
+          key: const Key('dashboardServicesButton'),
+          constraints: const BoxConstraints(minWidth: 38, minHeight: 38),
+          padding: const EdgeInsets.all(7),
+          icon: const Icon(Icons.handyman_outlined, color: Colors.white, size: 21),
+          tooltip: 'B2B Services',
+          onPressed: () => context.push('/services'),
+        ),
+        IconButton(
+          key: const Key('dashboardJobWorkButton'),
+          constraints: const BoxConstraints(minWidth: 38, minHeight: 38),
+          padding: const EdgeInsets.all(7),
+          icon: const Icon(Icons.precision_manufacturing_outlined, color: Colors.white, size: 21),
+          tooltip: 'Industrial Job Work',
+          onPressed: () => context.push('/job-works'),
+        ),
         IconButton(
           key: const Key('dashboardOrdersButton'),
           constraints: const BoxConstraints(minWidth: 38, minHeight: 38),
@@ -648,7 +684,364 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  /// 4. My Products — Most Important Section
+  /// Industrial Job Work, Services & Recruitment Marketplaces Hub
+  Widget _buildMarketplacesHubSection(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F172A),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFF1E293B), width: 1.0),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF38BDF8).withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.hub_rounded,
+                  color: Color(0xFF38BDF8),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const <Widget>[
+                    Text(
+                      'Industrial Marketplaces',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      'Subcontracting, technical services & industrial hiring',
+                      style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          // Row 1: Job Work & B2B Services
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: InkWell(
+                  key: const Key('dashboardJobWorkHubCard'),
+                  onTap: () => context.push('/job-works'),
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    padding: const EdgeInsets.all(AppSpacing.sm + 2),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            Container(
+                              width: 28,
+                              height: 28,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF0284C7).withValues(alpha: 0.3),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: const Icon(
+                                Icons.precision_manufacturing_rounded,
+                                size: 16,
+                                color: Color(0xFF38BDF8),
+                              ),
+                            ),
+                            const Spacer(),
+                            const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 11,
+                              color: Color(0xFF64748B),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Job Work',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const Text(
+                          'Subcontracting & orders',
+                          style: TextStyle(color: Color(0xFF94A3B8), fontSize: 10),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: InkWell(
+                  key: const Key('dashboardServicesHubCard'),
+                  onTap: () => context.push('/services'),
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    padding: const EdgeInsets.all(AppSpacing.sm + 2),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            Container(
+                              width: 28,
+                              height: 28,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF059669).withValues(alpha: 0.3),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: const Icon(
+                                Icons.handyman_rounded,
+                                size: 16,
+                                color: Color(0xFF34D399),
+                              ),
+                            ),
+                            const Spacer(),
+                            const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 11,
+                              color: Color(0xFF64748B),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'B2B Services',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const Text(
+                          'Machining & engineering',
+                          style: TextStyle(color: Color(0xFF94A3B8), fontSize: 10),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          // Row 2: Job Board & Hire Talent
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: InkWell(
+                  key: const Key('dashboardRecruitmentHubCard'),
+                  onTap: () => context.push('/jobs'),
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    padding: const EdgeInsets.all(AppSpacing.sm + 2),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            Container(
+                              width: 28,
+                              height: 28,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF6366F1).withValues(alpha: 0.3),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: const Icon(
+                                Icons.work_outline_rounded,
+                                size: 16,
+                                color: Color(0xFF818CF8),
+                              ),
+                            ),
+                            const Spacer(),
+                            const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 11,
+                              color: Color(0xFF64748B),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Job Board',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const Text(
+                          'Engineering & operators',
+                          style: TextStyle(color: Color(0xFF94A3B8), fontSize: 10),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: InkWell(
+                  key: const Key('dashboardPostJobHubCard'),
+                  onTap: () => context.push('/jobs/post'),
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    padding: const EdgeInsets.all(AppSpacing.sm + 2),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            Container(
+                              width: 28,
+                              height: 28,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEC4899).withValues(alpha: 0.3),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: const Icon(
+                                Icons.person_add_alt_1_rounded,
+                                size: 16,
+                                color: Color(0xFFF472B6),
+                              ),
+                            ),
+                            const Spacer(),
+                            const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 11,
+                              color: Color(0xFF64748B),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Hire Talent',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const Text(
+                          'Post industrial vacancy',
+                          style: TextStyle(color: Color(0xFF94A3B8), fontSize: 10),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          // Row 3: Industrial Community Feed Banner
+          InkWell(
+            key: const Key('dashboardFeedHubCard'),
+            onTap: () => context.push('/feed'),
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm + 2, vertical: AppSpacing.sm),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+              ),
+              child: Row(
+                children: <Widget>[
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEAB308).withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Icon(
+                      Icons.dynamic_feed_rounded,
+                      size: 16,
+                      color: Color(0xFFFACC15),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const <Widget>[
+                        Text(
+                          'Community Feed',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
+                        Text(
+                          'Plant updates, machinery showcases & industrial posts',
+                          style: TextStyle(color: Color(0xFF94A3B8), fontSize: 10),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 11,
+                    color: Color(0xFF64748B),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  /// 4. My Products ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â Most Important Section
   Widget _buildMyProductsSection(AsyncValue<List<Product>> productsAsync) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -1179,7 +1572,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ),
               const SizedBox(height: 2),
               Text(
-                '${company.businessType} • ${company.location}',
+                '${company.businessType} ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ ${company.location}',
                 style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

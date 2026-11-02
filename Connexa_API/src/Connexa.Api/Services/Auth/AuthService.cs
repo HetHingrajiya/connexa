@@ -160,6 +160,7 @@ public class AuthService : IAuthService
     public async Task<AuthResult<AuthResponseDto>> LoginAsync(
         LoginRequestDto request,
         string? clientIp,
+        string? userAgent = null,
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(request.Identifier) || string.IsNullOrWhiteSpace(request.Password))
@@ -235,6 +236,9 @@ public class AuthService : IAuthService
 
         var accessToken = _tokenService.GenerateAccessToken(member);
         var (plainRefreshToken, refreshTokenEntity) = _tokenService.GenerateRefreshToken(member.Id, clientIp);
+        refreshTokenEntity.UserAgent = userAgent;
+        refreshTokenEntity.DeviceName = ParseDeviceName(userAgent);
+        refreshTokenEntity.LastActiveAtUtc = DateTime.UtcNow;
 
         _dbContext.RefreshTokens.Add(refreshTokenEntity);
         await _dbContext.SaveChangesAsync(cancellationToken);
@@ -262,6 +266,7 @@ public class AuthService : IAuthService
     public async Task<AuthResult<AuthResponseDto>> RefreshTokenAsync(
         RefreshTokenRequestDto request,
         string? clientIp,
+        string? userAgent = null,
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(request.RefreshToken))
@@ -319,6 +324,12 @@ public class AuthService : IAuthService
         storedToken.RevokedByIp = clientIp;
         storedToken.ReplacedByTokenHash = newRefreshTokenEntity.TokenHash;
         storedToken.ReasonRevoked = "Rotated";
+
+        newRefreshTokenEntity.UserAgent = userAgent ?? storedToken.UserAgent;
+        newRefreshTokenEntity.DeviceName = !string.IsNullOrEmpty(newRefreshTokenEntity.UserAgent)
+            ? ParseDeviceName(newRefreshTokenEntity.UserAgent)
+            : storedToken.DeviceName;
+        newRefreshTokenEntity.LastActiveAtUtc = DateTime.UtcNow;
 
         _dbContext.RefreshTokens.Add(newRefreshTokenEntity);
 
@@ -922,5 +933,481 @@ public class AuthService : IAuthService
         _logger.LogInformation("[Auth] Successfully updated profile for Member ID {MemberId}", authenticatedMemberId);
 
         return await GetMemberProfileAsync(authenticatedMemberId, cancellationToken);
+    }
+
+    // --- Step 29: Security & Account Management ---
+
+    private static string ParseDeviceName(string? userAgent)
+    {
+        if (string.IsNullOrWhiteSpace(userAgent)) return "Web Browser / Device";
+        var ua = userAgent.ToLowerInvariant();
+        if (ua.Contains("android")) return "Android Phone";
+        if (ua.Contains("iphone")) return "Apple iPhone";
+        if (ua.Contains("ipad")) return "Apple iPad";
+        if (ua.Contains("windows")) return "Windows PC";
+        if (ua.Contains("macintosh") || ua.Contains("mac os")) return "Mac Computer";
+        if (ua.Contains("linux")) return "Linux Device";
+        if (ua.Contains("dart") || ua.Contains("flutter")) return "Connexa Mobile App";
+        return userAgent.Length > 40 ? userAgent[..40] : userAgent;
+    }
+
+    public async Task<AuthResult<ForgotPasswordResponseDto>> ForgotPasswordAsync(
+        ForgotPasswordRequestDto request,
+        string? clientIp,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(request.Identifier))
+        {
+            return new AuthResult<ForgotPasswordResponseDto>(false, null, "Email or phone number is required.", 400);
+        }
+
+        var identifier = request.Identifier.Trim();
+        bool isEmail = identifier.Contains('@');
+
+        Member? member = null;
+        if (isEmail)
+        {
+            var normalizedEmail = identifier.ToLowerInvariant();
+            member = await _dbContext.Members
+                .FirstOrDefaultAsync(m => m.Email == normalizedEmail, cancellationToken);
+        }
+        else
+        {
+            var rawDigits = new string(identifier.Where(char.IsDigit).ToArray());
+            var normalizedPhone = identifier.StartsWith("+")
+                ? identifier
+                : (rawDigits.Length == 10 ? "+91" + rawDigits : "+" + rawDigits);
+
+            member = await _dbContext.Members
+                .FirstOrDefaultAsync(m => m.PhoneNumber == normalizedPhone || m.PhoneNumber == identifier, cancellationToken);
+        }
+
+        if (member == null)
+        {
+            return new AuthResult<ForgotPasswordResponseDto>(
+                false,
+                null,
+                "No registered account was found with the provided details. Please check your information.",
+                404);
+        }
+
+        if (!member.IsActive)
+        {
+            return new AuthResult<ForgotPasswordResponseDto>(false, null, "This account is inactive. Please contact support.", 403);
+        }
+
+        var flowId = $"pwd_reset_{Guid.NewGuid():N}";
+        bool sendViaEmail = isEmail;
+        if (!string.IsNullOrWhiteSpace(request.PreferredChannel))
+        {
+            sendViaEmail = string.Equals(request.PreferredChannel, "Email", StringComparison.OrdinalIgnoreCase);
+        }
+
+        if (sendViaEmail && !string.IsNullOrWhiteSpace(member.Email))
+        {
+            var sendResult = await _emailVerificationService.SendOtpAsync(
+                new SendEmailOtpRequestDto(member.Email, flowId),
+                clientIp,
+                cancellationToken);
+
+            if (!sendResult.Success || sendResult.Response == null)
+            {
+                return new AuthResult<ForgotPasswordResponseDto>(false, null, sendResult.ErrorMessage ?? "Failed to dispatch password reset code.", sendResult.StatusCode);
+            }
+
+            var responseDto = new ForgotPasswordResponseDto(
+                Success: true,
+                Message: "A 6-digit password reset code has been sent to your registered email address.",
+                MaskedDestination: sendResult.Response.MaskedEmail,
+                Channel: "Email",
+                FlowId: flowId,
+                ChallengeId: sendResult.Response.ChallengeId,
+                ExpirySeconds: 600
+            );
+
+            return new AuthResult<ForgotPasswordResponseDto>(true, responseDto, null, 200);
+        }
+        else
+        {
+            var sendResult = await _phoneVerificationService.SendOtpAsync(
+                new SendOtpRequestDto(member.PhoneNumber, flowId),
+                clientIp,
+                cancellationToken);
+
+            if (!sendResult.Success || sendResult.Response == null)
+            {
+                return new AuthResult<ForgotPasswordResponseDto>(false, null, sendResult.ErrorMessage ?? "Failed to dispatch password reset code.", sendResult.StatusCode);
+            }
+
+            var responseDto = new ForgotPasswordResponseDto(
+                Success: true,
+                Message: "A 6-digit password reset code has been sent to your registered phone number via WhatsApp.",
+                MaskedDestination: sendResult.Response.MaskedPhoneNumber,
+                Channel: "WhatsApp",
+                FlowId: flowId,
+                ChallengeId: sendResult.Response.ChallengeId,
+                ExpirySeconds: 600
+            );
+
+            return new AuthResult<ForgotPasswordResponseDto>(true, responseDto, null, 200);
+        }
+    }
+
+    public async Task<AuthResult<bool>> ResetPasswordAsync(
+        ResetPasswordRequestDto request,
+        string? clientIp,
+        CancellationToken cancellationToken = default)
+    {
+        if (request == null || string.IsNullOrWhiteSpace(request.OtpCode) || request.ChallengeId <= 0)
+        {
+            return new AuthResult<bool>(false, false, "Verification challenge ID and code are required.", 400);
+        }
+
+        // 1. Validate password policy
+        var (isValid, errorMessage) = _passwordHasher.ValidatePasswordPolicy(request.NewPassword);
+        if (!isValid)
+        {
+            return new AuthResult<bool>(false, false, errorMessage, 400);
+        }
+
+        if (!string.Equals(request.NewPassword, request.ConfirmPassword, StringComparison.Ordinal))
+        {
+            return new AuthResult<bool>(false, false, "Passwords do not match.", 400);
+        }
+
+        // 2. Locate challenge
+        var challenge = await _dbContext.OtpChallenges.FindAsync(new object[] { request.ChallengeId }, cancellationToken);
+        if (challenge == null || challenge.Status != OtpChallengeStatus.Pending || challenge.ExpiresAtUtc <= DateTime.UtcNow)
+        {
+            return new AuthResult<bool>(false, false, "Invalid or expired password reset challenge. Please request a new code.", 400);
+        }
+
+        // 3. Verify OTP using appropriate service
+        string verifiedDestination;
+        if (!string.IsNullOrWhiteSpace(challenge.Email))
+        {
+            var verifyResult = await _emailVerificationService.VerifyOtpAsync(
+                new VerifyEmailOtpRequestDto(request.ChallengeId, request.FlowId, request.OtpCode),
+                clientIp,
+                cancellationToken);
+
+            if (!verifyResult.Success)
+            {
+                return new AuthResult<bool>(false, false, verifyResult.ErrorMessage ?? "Invalid reset code.", verifyResult.StatusCode);
+            }
+
+            verifiedDestination = challenge.Email ?? "";
+        }
+        else
+        {
+            var verifyResult = await _phoneVerificationService.VerifyOtpAsync(
+                new VerifyOtpRequestDto(request.ChallengeId, request.FlowId, request.OtpCode),
+                clientIp,
+                cancellationToken);
+
+            if (!verifyResult.Success)
+            {
+                return new AuthResult<bool>(false, false, verifyResult.ErrorMessage ?? "Invalid reset code.", verifyResult.StatusCode);
+            }
+
+            verifiedDestination = challenge.PhoneNumber ?? "";
+        }
+
+        // 4. Find member
+        var member = await _dbContext.Members
+            .Include(m => m.RefreshTokens)
+            .FirstOrDefaultAsync(m => m.Email == verifiedDestination || m.PhoneNumber == verifiedDestination, cancellationToken);
+
+        if (member == null)
+        {
+            return new AuthResult<bool>(false, false, "Member account not found.", 404);
+        }
+
+        // 5. Hash new password
+        var (hash, salt) = _passwordHasher.HashPassword(request.NewPassword);
+        member.PasswordHash = hash;
+        member.PasswordSalt = salt;
+        member.FailedLoginAttempts = 0;
+        member.LockoutEndUtc = null;
+        member.UpdatedAtUtc = DateTime.UtcNow;
+
+        // 6. Security hardening: Revoke ALL existing active refresh tokens to terminate all active sessions
+        var activeTokens = await _dbContext.RefreshTokens
+            .Where(rt => rt.MemberId == member.Id && rt.RevokedAtUtc == null)
+            .ToListAsync(cancellationToken);
+
+        foreach (var rt in activeTokens)
+        {
+            rt.RevokedAtUtc = DateTime.UtcNow;
+            rt.RevokedByIp = clientIp;
+            rt.ReasonRevoked = "Password reset: security invalidation of all existing sessions";
+        }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("[Security] Password reset completed for Member ID {MemberId}. All existing sessions revoked.", member.Id);
+
+        return new AuthResult<bool>(true, true, null, 200);
+    }
+
+    public async Task<AuthResult<bool>> ChangePasswordAsync(
+        int memberId,
+        ChangePasswordRequestDto request,
+        string? clientIp,
+        CancellationToken cancellationToken = default)
+    {
+        if (request == null || string.IsNullOrWhiteSpace(request.CurrentPassword) || string.IsNullOrWhiteSpace(request.NewPassword))
+        {
+            return new AuthResult<bool>(false, false, "Current and new passwords are required.", 400);
+        }
+
+        var member = await _dbContext.Members.FindAsync(new object[] { memberId }, cancellationToken);
+        if (member == null)
+        {
+            return new AuthResult<bool>(false, false, "Member not found.", 404);
+        }
+
+        // Verify current password
+        if (string.IsNullOrEmpty(member.PasswordHash) || string.IsNullOrEmpty(member.PasswordSalt) ||
+            !_passwordHasher.VerifyPassword(request.CurrentPassword, member.PasswordHash, member.PasswordSalt))
+        {
+            return new AuthResult<bool>(false, false, "Current password is incorrect.", 400);
+        }
+
+        // Validate new password policy
+        var (isValid, errorMessage) = _passwordHasher.ValidatePasswordPolicy(request.NewPassword);
+        if (!isValid)
+        {
+            return new AuthResult<bool>(false, false, errorMessage, 400);
+        }
+
+        if (!string.Equals(request.NewPassword, request.ConfirmPassword, StringComparison.Ordinal))
+        {
+            return new AuthResult<bool>(false, false, "New password confirmation does not match.", 400);
+        }
+
+        if (string.Equals(request.CurrentPassword, request.NewPassword, StringComparison.Ordinal))
+        {
+            return new AuthResult<bool>(false, false, "New password must be different from the current password.", 400);
+        }
+
+        var (hash, salt) = _passwordHasher.HashPassword(request.NewPassword);
+        member.PasswordHash = hash;
+        member.PasswordSalt = salt;
+        member.UpdatedAtUtc = DateTime.UtcNow;
+
+        if (request.RevokeOtherSessions)
+        {
+            var activeTokens = await _dbContext.RefreshTokens
+                .Where(rt => rt.MemberId == memberId && rt.RevokedAtUtc == null)
+                .ToListAsync(cancellationToken);
+
+            foreach (var rt in activeTokens)
+            {
+                rt.RevokedAtUtc = DateTime.UtcNow;
+                rt.RevokedByIp = clientIp;
+                rt.ReasonRevoked = "Password changed: user requested termination of other sessions";
+            }
+        }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("[Security] Password successfully changed for Member ID {MemberId}.", memberId);
+
+        return new AuthResult<bool>(true, true, null, 200);
+    }
+
+    public async Task<AuthResult<List<ActiveSessionDto>>> GetActiveSessionsAsync(
+        int memberId,
+        string? currentTokenHash,
+        CancellationToken cancellationToken = default)
+    {
+        var now = DateTime.UtcNow;
+        var sessions = await _dbContext.RefreshTokens
+            .Where(rt => rt.MemberId == memberId && rt.RevokedAtUtc == null && rt.ExpiresAtUtc > now)
+            .OrderByDescending(rt => rt.LastActiveAtUtc)
+            .Select(rt => new ActiveSessionDto(
+                rt.Id,
+                rt.DeviceName ?? "Web Browser / Device",
+                rt.CreatedByIp,
+                rt.CreatedAtUtc,
+                rt.LastActiveAtUtc,
+                currentTokenHash != null && rt.TokenHash == currentTokenHash
+            ))
+            .ToListAsync(cancellationToken);
+
+        return new AuthResult<List<ActiveSessionDto>>(true, sessions, null, 200);
+    }
+
+    public async Task<AuthResult<bool>> RevokeSessionAsync(
+        int memberId,
+        int sessionId,
+        string? clientIp,
+        CancellationToken cancellationToken = default)
+    {
+        var session = await _dbContext.RefreshTokens
+            .FirstOrDefaultAsync(rt => rt.Id == sessionId && rt.MemberId == memberId, cancellationToken);
+
+        if (session == null)
+        {
+            return new AuthResult<bool>(false, false, "Session not found.", 404);
+        }
+
+        session.RevokedAtUtc = DateTime.UtcNow;
+        session.RevokedByIp = clientIp;
+        session.ReasonRevoked = "Manually revoked by member";
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("[Security] Member ID {MemberId} revoked session {SessionId}.", memberId, sessionId);
+
+        return new AuthResult<bool>(true, true, null, 200);
+    }
+
+    public async Task<AuthResult<int>> RevokeAllOtherSessionsAsync(
+        int memberId,
+        string? currentTokenHash,
+        string? clientIp,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _dbContext.RefreshTokens
+            .Where(rt => rt.MemberId == memberId && rt.RevokedAtUtc == null);
+
+        if (!string.IsNullOrEmpty(currentTokenHash))
+        {
+            query = query.Where(rt => rt.TokenHash != currentTokenHash);
+        }
+
+        var otherTokens = await query.ToListAsync(cancellationToken);
+        foreach (var rt in otherTokens)
+        {
+            rt.RevokedAtUtc = DateTime.UtcNow;
+            rt.RevokedByIp = clientIp;
+            rt.ReasonRevoked = "Revoked via Sign Out All Other Devices";
+        }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("[Security] Member ID {MemberId} signed out of {Count} other active devices.", memberId, otherTokens.Count);
+
+        return new AuthResult<int>(true, otherTokens.Count, null, 200);
+    }
+
+    public async Task<AuthResult<bool>> DeactivateAccountAsync(
+        int memberId,
+        DeactivateAccountRequestDto request,
+        string? clientIp,
+        CancellationToken cancellationToken = default)
+    {
+        var member = await _dbContext.Members.FindAsync(new object[] { memberId }, cancellationToken);
+        if (member == null)
+        {
+            return new AuthResult<bool>(false, false, "Member not found.", 404);
+        }
+
+        if (string.IsNullOrEmpty(member.PasswordHash) || string.IsNullOrEmpty(member.PasswordSalt) ||
+            !_passwordHasher.VerifyPassword(request.Password, member.PasswordHash, member.PasswordSalt))
+        {
+            return new AuthResult<bool>(false, false, "Incorrect password. Account deactivation aborted.", 400);
+        }
+
+        member.IsActive = false;
+        member.DeactivatedAtUtc = DateTime.UtcNow;
+        member.DeactivationReason = request.Reason ?? "Deactivated by member request";
+        member.UpdatedAtUtc = DateTime.UtcNow;
+
+        // Revoke all active sessions
+        var activeTokens = await _dbContext.RefreshTokens
+            .Where(rt => rt.MemberId == memberId && rt.RevokedAtUtc == null)
+            .ToListAsync(cancellationToken);
+
+        foreach (var rt in activeTokens)
+        {
+            rt.RevokedAtUtc = DateTime.UtcNow;
+            rt.RevokedByIp = clientIp;
+            rt.ReasonRevoked = "Account deactivated";
+        }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("[Security] Member ID {MemberId} deactivated their account. Reason: {Reason}", memberId, member.DeactivationReason);
+
+        return new AuthResult<bool>(true, true, null, 200);
+    }
+
+    public async Task<AuthResult<bool>> RequestAccountDeletionAsync(
+        int memberId,
+        DeleteAccountRequestDto request,
+        string? clientIp,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(request.Reason))
+        {
+            return new AuthResult<bool>(false, false, "A reason for deletion is required.", 400);
+        }
+
+        var member = await _dbContext.Members.FindAsync(new object[] { memberId }, cancellationToken);
+        if (member == null)
+        {
+            return new AuthResult<bool>(false, false, "Member not found.", 404);
+        }
+
+        if (string.IsNullOrEmpty(member.PasswordHash) || string.IsNullOrEmpty(member.PasswordSalt) ||
+            !_passwordHasher.VerifyPassword(request.Password, member.PasswordHash, member.PasswordSalt))
+        {
+            return new AuthResult<bool>(false, false, "Incorrect password. Account deletion request aborted.", 400);
+        }
+
+        var deletionReq = new AccountDeletionRequest
+        {
+            MemberId = memberId,
+            Reason = request.Reason.Trim(),
+            RequestedAtUtc = DateTime.UtcNow,
+            Status = "PendingReview"
+        };
+
+        _dbContext.AccountDeletionRequests.Add(deletionReq);
+
+        // Deactivate account immediately
+        member.IsActive = false;
+        member.DeactivatedAtUtc = DateTime.UtcNow;
+        member.DeactivationReason = $"Deletion requested: {request.Reason}";
+
+        // Revoke all sessions
+        var activeTokens = await _dbContext.RefreshTokens
+            .Where(rt => rt.MemberId == memberId && rt.RevokedAtUtc == null)
+            .ToListAsync(cancellationToken);
+
+        foreach (var rt in activeTokens)
+        {
+            rt.RevokedAtUtc = DateTime.UtcNow;
+            rt.RevokedByIp = clientIp;
+            rt.ReasonRevoked = "Account deletion requested";
+        }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        _logger.LogWarning("[Security] Member ID {MemberId} submitted an account deletion request.", memberId);
+
+        return new AuthResult<bool>(true, true, null, 200);
+    }
+
+    public async Task<AuthResult<AccountStatusResponseDto>> GetAccountStatusAsync(
+        int memberId,
+        CancellationToken cancellationToken = default)
+    {
+        var member = await _dbContext.Members.FindAsync(new object[] { memberId }, cancellationToken);
+        if (member == null)
+        {
+            return new AuthResult<AccountStatusResponseDto>(false, null, "Member not found.", 404);
+        }
+
+        var pendingDeletion = await _dbContext.AccountDeletionRequests
+            .OrderByDescending(d => d.RequestedAtUtc)
+            .FirstOrDefaultAsync(d => d.MemberId == memberId && d.Status == "PendingReview", cancellationToken);
+
+        var dto = new AccountStatusResponseDto(
+            IsActive: member.IsActive,
+            DeactivatedAtUtc: member.DeactivatedAtUtc,
+            DeactivationReason: member.DeactivationReason,
+            HasPendingDeletionRequest: pendingDeletion != null,
+            DeletionRequestedAtUtc: pendingDeletion?.RequestedAtUtc
+        );
+
+        return new AuthResult<AccountStatusResponseDto>(true, dto, null, 200);
     }
 }

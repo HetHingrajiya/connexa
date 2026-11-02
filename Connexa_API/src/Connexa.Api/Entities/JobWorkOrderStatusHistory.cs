@@ -14,3 +14,4 @@ public class JobWorkOrderStatusHistory
     public JobWorkOrder Order { get; set; } = null!;
     public Member ChangedByMember { get; set; } = null!;
 }
+

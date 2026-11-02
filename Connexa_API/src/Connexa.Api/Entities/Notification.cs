@@ -33,7 +33,14 @@ public enum NotificationEventType
     JobWorkOrderConfirmed = 29,
     JobWorkOrderProcessing = 30,
     JobWorkOrderCompleted = 31,
-    JobWorkOrderCancelled = 32
+    JobWorkOrderCancelled = 32,
+    ServiceInquiryReceived = 33,
+    ServiceInquiryResponded = 34,
+    ServiceInquiryStatusChanged = 35,
+    JobApplicationReceived = 36,
+    JobApplicationStatusChanged = 37,
+    PostLiked = 38,
+    PostCommented = 39
 }
 
 public class Notification

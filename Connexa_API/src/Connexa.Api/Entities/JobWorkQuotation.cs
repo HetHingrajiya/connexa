@@ -46,3 +46,4 @@ public class JobWorkQuotation
     public ICollection<JobWorkAttachment> Attachments { get; set; } = new List<JobWorkAttachment>();
     public JobWorkOrder? Order { get; set; }
 }
+

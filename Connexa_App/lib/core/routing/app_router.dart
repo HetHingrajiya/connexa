@@ -4,6 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import 'package:connexa/core/theme/theme.dart';
 import 'package:connexa/core/widgets/widgets.dart';
+import 'package:connexa/features/auth/models/security_models.dart';
+import 'package:connexa/features/auth/presentation/forgot_password_screen.dart';
+import 'package:connexa/features/auth/presentation/reset_password_screen.dart';
 import 'package:connexa/features/auth/presentation/login_screen.dart';
 import 'package:connexa/features/auth/presentation/setup_password_screen.dart';
 import 'package:connexa/features/auth/providers/auth_provider.dart';
@@ -21,8 +24,11 @@ import 'package:connexa/features/products/presentation/inquiries_screen.dart';
 import 'package:connexa/features/products/presentation/inquiry_details_screen.dart';
 import 'package:connexa/features/products/presentation/product_details_screen.dart';
 import 'package:connexa/features/products/presentation/products_screen.dart';
+import 'package:connexa/features/profile/presentation/account_settings_screen.dart';
+import 'package:connexa/features/profile/presentation/active_sessions_screen.dart';
 import 'package:connexa/features/profile/presentation/admin_verification_screen.dart';
 import 'package:connexa/features/profile/presentation/business_verification_screen.dart';
+import 'package:connexa/features/profile/presentation/change_password_screen.dart';
 import 'package:connexa/features/profile/presentation/edit_profile_screen.dart';
 import 'package:connexa/features/profile/presentation/profile_screen.dart';
 import 'package:connexa/features/notifications/presentation/notifications_screen.dart';
@@ -32,6 +38,23 @@ import 'package:connexa/features/rfq/presentation/rfqs_screen.dart';
 import 'package:connexa/features/rfq/presentation/rfq_details_screen.dart';
 import 'package:connexa/features/orders/presentation/orders_screen.dart';
 import 'package:connexa/features/orders/presentation/order_details_screen.dart';
+import 'package:connexa/features/job_work/presentation/job_work_marketplace_screen.dart';
+import 'package:connexa/features/job_work/presentation/post_job_work_screen.dart';
+import 'package:connexa/features/job_work/presentation/job_work_details_screen.dart';
+import 'package:connexa/features/job_work/presentation/job_work_orders_screen.dart';
+import 'package:connexa/features/job_work/presentation/job_work_order_details_screen.dart';
+import 'package:connexa/features/services/presentation/services_marketplace_screen.dart';
+import 'package:connexa/features/services/presentation/post_service_screen.dart';
+import 'package:connexa/features/services/presentation/service_details_screen.dart';
+import 'package:connexa/features/services/presentation/service_inquiry_details_screen.dart';
+import 'package:connexa/features/recruitment/presentation/job_listings_screen.dart';
+import 'package:connexa/features/recruitment/presentation/post_job_screen.dart';
+import 'package:connexa/features/recruitment/presentation/job_details_screen.dart';
+import 'package:connexa/features/recruitment/presentation/job_applicants_screen.dart';
+import 'package:connexa/features/recruitment/presentation/job_application_details_screen.dart';
+import 'package:connexa/features/feed/presentation/business_feed_screen.dart';
+import 'package:connexa/features/feed/presentation/create_post_screen.dart';
+import 'package:connexa/features/feed/presentation/post_details_screen.dart';
 import 'package:connexa/features/splash/presentation/splash_screen.dart';
 
 /// Listenable notifier bridging Riverpod auth state updates to GoRouter redirection.
@@ -75,6 +98,9 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((Ref ref) {
           loc == '/dashboard' ||
           loc == '/profile' ||
           loc.startsWith('/profile/') ||
+          loc == '/account-settings' ||
+          loc == '/change-password' ||
+          loc == '/active-sessions' ||
           loc.startsWith('/admin/') ||
           loc == '/directory' ||
           loc == '/network' ||
@@ -86,8 +112,23 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((Ref ref) {
           loc.startsWith('/rfqs/') ||
           loc == '/orders' ||
           loc.startsWith('/orders/') ||
+          loc == '/job-works' ||
+          loc.startsWith('/job-works/') ||
+          loc == '/job-work-orders' ||
+          loc.startsWith('/job-work-orders/') ||
+          loc == '/services' ||
+          loc.startsWith('/services/') ||
+          loc.startsWith('/service-inquiries/') ||
+          loc == '/jobs' ||
+          loc.startsWith('/jobs/') ||
+          loc.startsWith('/job-applications/') ||
+          loc == '/feed' ||
+          loc.startsWith('/feed/') ||
           loc == '/notifications';
-      final bool isAuthRoute = loc == '/login';
+      final bool isAuthRoute =
+          loc == '/login' ||
+          loc == '/forgot-password' ||
+          loc == '/reset-password';
 
       if (!isAuthenticated && isProtectedRoute) {
         return '/login';
@@ -126,6 +167,46 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((Ref ref) {
               key: state.pageKey,
               child: const LoginScreen(),
             ),
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        name: 'forgot-password',
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const ForgotPasswordScreen(),
+            ),
+      ),
+      GoRoute(
+        path: '/reset-password',
+        name: 'reset-password',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          String identifier = '';
+          ForgotPasswordResponse initialResponse = const ForgotPasswordResponse(
+            success: true,
+            message: '',
+            maskedDestination: '',
+            channel: 'Email',
+            flowId: '',
+            challengeId: 0,
+            expirySeconds: 600,
+          );
+          if (state.extra is Map<String, dynamic>) {
+            final Map<String, dynamic> extra =
+                state.extra! as Map<String, dynamic>;
+            identifier = extra['identifier'] as String? ?? '';
+            if (extra['response'] is ForgotPasswordResponse) {
+              initialResponse = extra['response'] as ForgotPasswordResponse;
+            }
+          }
+          return AppAnimations.buildPageTransition(
+            key: state.pageKey,
+            child: ResetPasswordScreen(
+              identifier: identifier,
+              initialResponse: initialResponse,
+            ),
+          );
+        },
       ),
       GoRoute(
         path: '/setup-password',
@@ -193,6 +274,33 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((Ref ref) {
             AppAnimations.buildPageTransition(
               key: state.pageKey,
               child: const BusinessVerificationScreen(),
+            ),
+      ),
+      GoRoute(
+        path: '/account-settings',
+        name: 'account-settings',
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const AccountSettingsScreen(),
+            ),
+      ),
+      GoRoute(
+        path: '/change-password',
+        name: 'change-password',
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const ChangePasswordScreen(),
+            ),
+      ),
+      GoRoute(
+        path: '/active-sessions',
+        name: 'active-sessions',
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const ActiveSessionsScreen(),
             ),
       ),
       GoRoute(
@@ -348,6 +456,226 @@ final Provider<GoRouter> appRouterProvider = Provider<GoRouter>((Ref ref) {
           return AppAnimations.buildPageTransition(
             key: state.pageKey,
             child: OrderDetailsScreen(orderId: orderId),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/job-works',
+        name: 'job-works',
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+          key: state.pageKey,
+          child: const JobWorkMarketplaceScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/job-works/create',
+        name: 'job-work-create',
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+          key: state.pageKey,
+          child: const PostJobWorkScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/job-works/:id',
+        name: 'job-work-details',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          final int reqId =
+              int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+          return AppAnimations.buildPageTransition(
+            key: state.pageKey,
+            child: JobWorkDetailsScreen(requirementId: reqId),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/job-work-orders',
+        name: 'job-work-orders',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          int initialTab = 0;
+          if (state.extra is int) {
+            initialTab = state.extra as int;
+          }
+          return AppAnimations.buildPageTransition(
+            key: state.pageKey,
+            child: JobWorkOrdersScreen(initialTab: initialTab),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/job-work-orders/:id',
+        name: 'job-work-order-details',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          final int orderId =
+              int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+          return AppAnimations.buildPageTransition(
+            key: state.pageKey,
+            child: JobWorkOrderDetailsScreen(orderId: orderId),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/services',
+        name: 'services',
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const ServicesMarketplaceScreen(),
+            ),
+      ),
+      GoRoute(
+        path: '/services/post',
+        name: 'services-post',
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const PostServiceScreen(),
+            ),
+      ),
+      GoRoute(
+        path: '/services/edit/:id',
+        name: 'services-edit',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          final int? serviceId =
+              int.tryParse(state.pathParameters['id'] ?? '');
+          return AppAnimations.buildPageTransition(
+            key: state.pageKey,
+            child: PostServiceScreen(serviceId: serviceId),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/services/:id',
+        name: 'service-details',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          final int serviceId =
+              int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+          return AppAnimations.buildPageTransition(
+            key: state.pageKey,
+            child: ServiceDetailsScreen(serviceId: serviceId),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/service-inquiries/:id',
+        name: 'service-inquiry-details',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          final int inquiryId =
+              int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+          return AppAnimations.buildPageTransition(
+            key: state.pageKey,
+            child: ServiceInquiryDetailsScreen(inquiryId: inquiryId),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/jobs',
+        name: 'jobs',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          int initialTab = 0;
+          if (state.extra is int) {
+            initialTab = state.extra as int;
+          } else if (state.uri.queryParameters.containsKey('tab')) {
+            initialTab = int.tryParse(state.uri.queryParameters['tab']!) ?? 0;
+          }
+          return AppAnimations.buildPageTransition(
+            key: state.pageKey,
+            child: JobListingsScreen(initialTabIndex: initialTab),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/jobs/post',
+        name: 'jobs-post',
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const PostJobScreen(),
+            ),
+      ),
+      GoRoute(
+        path: '/jobs/edit/:id',
+        name: 'jobs-edit',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          final int? jobId = int.tryParse(state.pathParameters['id'] ?? '');
+          return AppAnimations.buildPageTransition(
+            key: state.pageKey,
+            child: PostJobScreen(jobId: jobId),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/jobs/:id',
+        name: 'job-details',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          final int jobId = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+          return AppAnimations.buildPageTransition(
+            key: state.pageKey,
+            child: JobDetailsScreen(jobId: jobId),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/jobs/:id/applicants',
+        name: 'job-applicants',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          final int jobId = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+          return AppAnimations.buildPageTransition(
+            key: state.pageKey,
+            child: JobApplicantsScreen(jobId: jobId),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/job-applications/:id',
+        name: 'job-application-details',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          final int applicationId =
+              int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+          return AppAnimations.buildPageTransition(
+            key: state.pageKey,
+            child: JobApplicationDetailsScreen(applicationId: applicationId),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/feed',
+        name: 'feed',
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const BusinessFeedScreen(),
+            ),
+      ),
+      GoRoute(
+        path: '/feed/create',
+        name: 'feed-create',
+        pageBuilder: (BuildContext context, GoRouterState state) =>
+            AppAnimations.buildPageTransition(
+              key: state.pageKey,
+              child: const CreatePostScreen(),
+            ),
+      ),
+      GoRoute(
+        path: '/feed/edit/:id',
+        name: 'feed-edit',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          final int? editPostId = int.tryParse(state.pathParameters['id'] ?? '');
+          return AppAnimations.buildPageTransition(
+            key: state.pageKey,
+            child: CreatePostScreen(editPostId: editPostId),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/feed/posts/:id',
+        name: 'feed-post-details',
+        pageBuilder: (BuildContext context, GoRouterState state) {
+          final int postId = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+          return AppAnimations.buildPageTransition(
+            key: state.pageKey,
+            child: PostDetailsScreen(postId: postId),
           );
         },
       ),

@@ -19,3 +19,4 @@ public class JobWorkAttachment
     public JobWorkQuotation? JobWorkQuotation { get; set; }
     public Member UploadedByMember { get; set; } = null!;
 }
+
